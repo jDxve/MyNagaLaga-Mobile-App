@@ -2,13 +2,18 @@ import 'package:flutter/material.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/resources/strings.dart';
-import '../../../common/utils/ui_utils.dart'; // Import utility
+import '../../../common/utils/ui_utils.dart';
 import 'benefits_card.dart';
 
 class IndigentForm extends StatefulWidget {
   final TextEditingController existingIdController;
+  final Function(bool isValid, VoidCallback showError)? setIsFormValid;
 
-  const IndigentForm({super.key, required this.existingIdController});
+  const IndigentForm({
+    super.key,
+    required this.existingIdController,
+    this.setIsFormValid,
+  });
 
   @override
   State<IndigentForm> createState() => _IndigentFormState();
@@ -16,6 +21,16 @@ class IndigentForm extends StatefulWidget {
 
 class _IndigentFormState extends State<IndigentForm> {
   double _monthlyIncome = 8000;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _validate());
+  }
+
+  void _validate() {
+    widget.setIsFormValid?.call(true, () {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +50,7 @@ class _IndigentFormState extends State<IndigentForm> {
         Column(
           children: [
             Text(
-              UIUtils.numberFormat(_monthlyIncome), // Use numberFormat
+              UIUtils.numberFormat(_monthlyIncome),
               style: TextStyle(
                 fontSize: D.f(32),
                 fontWeight: D.bold,
@@ -68,7 +83,7 @@ class _IndigentFormState extends State<IndigentForm> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  UIUtils.numberFormat(0), // Use numberFormat
+                  UIUtils.numberFormat(0),
                   style: TextStyle(
                     fontSize: D.textSM,
                     color: AppColors.grey,
@@ -76,7 +91,7 @@ class _IndigentFormState extends State<IndigentForm> {
                   ),
                 ),
                 Text(
-                  UIUtils.numberFormat(50000), // Use numberFormat
+                  UIUtils.numberFormat(50000),
                   style: TextStyle(
                     fontSize: D.textSM,
                     color: AppColors.grey,

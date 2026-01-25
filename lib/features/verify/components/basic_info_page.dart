@@ -6,7 +6,7 @@ import '../../../common/resources/strings.dart';
 import '../../../common/widgets/error_modal.dart';
 import '../../../common/widgets/text_input.dart';
 
-class BasicInfoForm extends StatefulWidget {
+class BasicInfoPage extends StatefulWidget {
   final BuildContext context;
   final TextEditingController fullNameController;
   final TextEditingController dateOfBirthController;
@@ -16,7 +16,7 @@ class BasicInfoForm extends StatefulWidget {
   final TextEditingController phoneController;
   final Function(VoidCallback) setIsFormValid;
 
-  const BasicInfoForm({
+  const BasicInfoPage({
     super.key,
     required this.context,
     required this.fullNameController,
@@ -29,10 +29,10 @@ class BasicInfoForm extends StatefulWidget {
   });
 
   @override
-  State<BasicInfoForm> createState() => _BasicInfoFormState();
+  State<BasicInfoPage> createState() => _BasicInfoPageState();
 }
 
-class _BasicInfoFormState extends State<BasicInfoForm> {
+class _BasicInfoPageState extends State<BasicInfoPage> {
   @override
   void initState() {
     super.initState();

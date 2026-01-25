@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../home/screens/home_screen.dart';
 import '../components/application_submitted.dart';
-import '../components/basic_info_form.dart';
-import '../components/document_form.dart';
-import '../components/eligibility_form.dart';
+import '../components/basic_info_page.dart';
+import '../components/document_page.dart';
+import '../components/eligibility_page.dart';
 import '../components/previous_next_button.dart';
-import '../components/review_step.dart';
+import '../components/review_page.dart';
 import '../components/select_badges.dart';
 import '../components/top_verify.dart';
 
@@ -38,6 +38,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
 
   File? _frontIdImage;
   File? _backIdImage;
+  File? _supportingFile;
 
   @override
   void dispose() {
@@ -50,7 +51,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
   }
 
   void _handleNext() {
-    if ((_currentStep == 2 || _currentStep == 4 || _currentStep == 5) &&
+    if ((_currentStep == 2 || _currentStep == 3 || _currentStep == 4 || _currentStep == 5) &&
         !_isFormValid) {
       _validationCallback?.call();
       return;
@@ -133,7 +134,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
         );
 
       case 2:
-        return BasicInfoForm(
+        return BasicInfoPage(
           context: context,
           fullNameController: _fullNameController,
           dateOfBirthController: _dateOfBirthController,
@@ -159,18 +160,25 @@ class _VerifyScreenState extends State<VerifyScreen> {
         );
 
       case 3:
-        return EligibilityForm(
+        return EligibilityPage(
           context: context,
           selectedBadge: _selectedBadge ?? '',
           existingIdController: _existingIdController,
+          setIsFormValid: (isValid, showError) {
+            setState(() {
+              _isFormValid = isValid;
+              _validationCallback = showError;
+            });
+          },
         );
 
       case 4:
-        return DocumentForm(
+        return DocumentPage(
           context: context,
           selectedIdType: _selectedIdType,
           frontImage: _frontIdImage,
           backImage: _backIdImage,
+          supportingFile: _supportingFile,
           onIdTypeChanged: (value) {
             setState(() {
               _selectedIdType = value;
@@ -186,6 +194,11 @@ class _VerifyScreenState extends State<VerifyScreen> {
               _backIdImage = file;
             });
           },
+          onSupportingFileChanged: (file) {
+            setState(() {
+              _supportingFile = file;
+            });
+          },
           setIsFormValid: (isValid, showError) {
             setState(() {
               _isFormValid = isValid;
@@ -195,7 +208,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
         );
 
       case 5:
-        return ReviewStep(
+        return ReviewPage(
           selectedBadge: _selectedBadge,
           fullName: _fullNameController.text,
           dateOfBirth: _dateOfBirthController.text,
@@ -259,6 +272,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
                 onNext: _handleNext,
                 isDisabled:
                     (_currentStep == 2 ||
+                        _currentStep == 3 ||
                         _currentStep == 4 ||
                         _currentStep == 5) &&
                     !_isFormValid,

@@ -3,14 +3,17 @@ import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/resources/strings.dart';
 import '../../../common/widgets/text_input.dart';
+import '../../../common/widgets/error_modal.dart';
 import 'benefits_card.dart';
 
 class PwdForm extends StatefulWidget {
   final TextEditingController existingIdController;
+  final Function(bool isValid, VoidCallback showError)? setIsFormValid;
 
   const PwdForm({
     super.key,
     required this.existingIdController,
+    this.setIsFormValid,
   });
 
   @override
@@ -33,6 +36,38 @@ class _PwdFormState extends State<PwdForm> {
     'Psychosocial Disability',
     'Multiple Disabilities',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _disabilityTypeController.addListener(_validate);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _validate());
+  }
+
+  void _validate() {
+    final isValid = _disabilityTypeController.text.isNotEmpty;
+    widget.setIsFormValid?.call(isValid, _showError);
+  }
+
+  void _showError() {
+    List<String> missingFields = [];
+    
+    if (_disabilityTypeController.text.isEmpty) {
+      missingFields.add("Type of Disability");
+    }
+
+    String description = missingFields.isEmpty 
+        ? "All fields are complete."
+        : "Please complete the following field${missingFields.length > 1 ? 's' : ''}:\n\n${missingFields.map((f) => "• $f").join('\n')}";
+
+    showErrorModal(
+      context: context,
+      title: "Required Information Missing",
+      description: description,
+      icon: Icons.accessible_forward_outlined,
+      iconColor: AppColors.primary,
+    );
+  }
 
   @override
   void dispose() {
@@ -143,7 +178,6 @@ class _PwdFormState extends State<PwdForm> {
             ),
           ),
         ),
-  
         24.gapH,
         BenefitsCard(
           title: AppString.pwdBenefitsTitle,

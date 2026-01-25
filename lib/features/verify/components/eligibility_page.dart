@@ -5,16 +5,18 @@ import 'solo_parent_form.dart';
 import 'indigent_form.dart';
 import 'student_form.dart';
 
-class EligibilityForm extends StatelessWidget {
+class EligibilityPage extends StatelessWidget {
   final BuildContext context;
   final String selectedBadge;
   final TextEditingController existingIdController;
+  final Function(bool isValid, VoidCallback showError)? setIsFormValid;
 
-  const EligibilityForm({
+  const EligibilityPage({
     super.key,
     required this.context,
     required this.selectedBadge,
     required this.existingIdController,
+    this.setIsFormValid,
   });
 
   @override
@@ -23,22 +25,27 @@ class EligibilityForm extends StatelessWidget {
       case 'senior_citizen':
         return SeniorCitizenForm(
           existingIdController: existingIdController,
+          setIsFormValid: setIsFormValid,
         );
       case 'pwd':
         return PwdForm(
           existingIdController: existingIdController,
+          setIsFormValid: setIsFormValid,
         );
       case 'solo_parent':
         return SoloParentForm(
           existingIdController: existingIdController,
+          setIsFormValid: setIsFormValid,
         );
       case 'indigent':
         return IndigentForm(
           existingIdController: existingIdController,
+          setIsFormValid: setIsFormValid,
         );
       case 'student':
         return StudentForm(
           existingIdController: existingIdController,
+          setIsFormValid: setIsFormValid,
         );
       default:
         return const SizedBox.shrink();

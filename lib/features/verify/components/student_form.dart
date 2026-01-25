@@ -3,12 +3,18 @@ import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/resources/strings.dart';
 import '../../../common/widgets/text_input.dart';
+import '../../../common/widgets/error_modal.dart';
 import 'benefits_card.dart';
 
 class StudentForm extends StatefulWidget {
   final TextEditingController existingIdController;
+  final Function(bool isValid, VoidCallback showError)? setIsFormValid;
 
-  const StudentForm({super.key, required this.existingIdController});
+  const StudentForm({
+    super.key,
+    required this.existingIdController,
+    this.setIsFormValid,
+  });
 
   @override
   State<StudentForm> createState() => _StudentFormState();
@@ -16,7 +22,8 @@ class StudentForm extends StatefulWidget {
 
 class _StudentFormState extends State<StudentForm> {
   final TextEditingController _schoolNameController = TextEditingController();
-  final TextEditingController _educationLevelController = TextEditingController();
+  final TextEditingController _educationLevelController =
+      TextEditingController();
   final TextEditingController _yearLevelController = TextEditingController();
 
   final LayerLink _educationLayerLink = LayerLink();
@@ -37,12 +44,63 @@ class _StudentFormState extends State<StudentForm> {
   ];
 
   final Map<String, List<String>> yearLevels = {
-    'Elementary': ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6'],
+    'Elementary': [
+      'Grade 1',
+      'Grade 2',
+      'Grade 3',
+      'Grade 4',
+      'Grade 5',
+      'Grade 6',
+    ],
     'Junior High School': ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10'],
     'Senior High School': ['Grade 11', 'Grade 12'],
     'College': ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'],
     'Graduate School': ['1st Year', '2nd Year', '3rd Year'],
   };
+
+  @override
+  void initState() {
+    super.initState();
+    _schoolNameController.addListener(_validate);
+    _educationLevelController.addListener(_validate);
+    _yearLevelController.addListener(_validate);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _validate());
+  }
+
+  void _validate() {
+    final isValid =
+        _schoolNameController.text.isNotEmpty &&
+        _educationLevelController.text.isNotEmpty &&
+        _yearLevelController.text.isNotEmpty;
+
+    widget.setIsFormValid?.call(isValid, _showError);
+  }
+
+  void _showError() {
+    List<String> missingFields = [];
+
+    if (_schoolNameController.text.isEmpty) {
+      missingFields.add("School Name");
+    }
+    if (_educationLevelController.text.isEmpty) {
+      missingFields.add("Education Level");
+    }
+    if (_yearLevelController.text.isEmpty) {
+      missingFields.add("Year/Grade Level");
+    }
+
+    String description = missingFields.isEmpty
+        ? "All fields are complete."
+        : "Please complete the following field${missingFields.length > 1 ? 's' : ''}:\n\n${missingFields.map((f) => "• $f").join('\n')}";
+
+    showErrorModal(
+      context: context,
+      title: "Required Information Missing",
+      description: description,
+      icon: Icons.school_outlined,
+      iconColor: AppColors.primary,
+    );
+  }
 
   @override
   void dispose() {
@@ -87,7 +145,8 @@ class _StudentFormState extends State<StudentForm> {
   }
 
   void _toggleYearDropdown() {
-    if (_educationLevelController.text.isEmpty || !yearLevels.containsKey(_educationLevelController.text)) {
+    if (_educationLevelController.text.isEmpty ||
+        !yearLevels.containsKey(_educationLevelController.text)) {
       return;
     }
 
@@ -199,7 +258,9 @@ class _StudentFormState extends State<StudentForm> {
                 controller: _educationLevelController,
                 hintText: AppString.selectLevel,
                 suffixIcon: Icon(
-                  _isEducationDropdownOpen ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                  _isEducationDropdownOpen
+                      ? Icons.keyboard_arrow_up
+                      : Icons.keyboard_arrow_down,
                 ),
               ),
             ),
@@ -225,7 +286,9 @@ class _StudentFormState extends State<StudentForm> {
                 controller: _yearLevelController,
                 hintText: AppString.selectYearLevel,
                 suffixIcon: Icon(
-                  _isYearDropdownOpen ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                  _isYearDropdownOpen
+                      ? Icons.keyboard_arrow_up
+                      : Icons.keyboard_arrow_down,
                 ),
               ),
             ),

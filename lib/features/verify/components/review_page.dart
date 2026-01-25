@@ -5,7 +5,7 @@ import '../../../common/resources/dimensions.dart';
 import '../../../common/resources/strings.dart';
 import '../../../common/widgets/error_modal.dart';
 
-class ReviewStep extends StatefulWidget {
+class ReviewPage extends StatefulWidget {
   final String? selectedBadge;
   final String fullName;
   final String dateOfBirth;
@@ -20,7 +20,7 @@ class ReviewStep extends StatefulWidget {
   final bool isConsentGiven;
   final VoidCallback? onValidationError;
 
-  const ReviewStep({
+  const ReviewPage({
     super.key,
     required this.selectedBadge,
     required this.fullName,
@@ -38,10 +38,10 @@ class ReviewStep extends StatefulWidget {
   });
 
   @override
-  State<ReviewStep> createState() => _ReviewStepState();
+  State<ReviewPage> createState() => _ReviewPageState();
 }
 
-class _ReviewStepState extends State<ReviewStep> {
+class _ReviewPageState extends State<ReviewPage> {
   String _getBadgeDisplayName(String? badgeId) {
     switch (badgeId) {
       case 'senior_citizen':

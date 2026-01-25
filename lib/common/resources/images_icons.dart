@@ -36,4 +36,6 @@ class AppImages {
   static const String soloParentIcon = 'assets/icons/solo_parent_icon.svg';
   static const String studentIcon = 'assets/icons/student_icon.svg';
   static const String indigentFamilyIcon = 'assets/icons/indigent_icon.svg';
+
+  static const String imageUploadIcon = 'assets/icons/upload_image.svg';
 }

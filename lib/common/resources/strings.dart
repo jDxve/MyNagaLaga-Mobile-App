@@ -154,6 +154,7 @@ class AppString {
   static const String sssId = "SSS ID";
   static const String umid = "UMID";
   static const String postalId = "Postal ID";
+  static const String optionalField = '(Optional)';
 
   // Document Form - Buttons
   static const String takePhoto = "Take Photo";
