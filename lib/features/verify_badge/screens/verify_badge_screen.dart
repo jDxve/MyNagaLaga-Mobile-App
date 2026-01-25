@@ -11,15 +11,15 @@ import '../components/review_page.dart';
 import '../components/select_badges.dart';
 import '../components/top_verify.dart';
 
-class VerifyScreen extends StatefulWidget {
-  static const routeName = '/verify';
-  const VerifyScreen({super.key});
+class VerifyBadgeScreen extends StatefulWidget {
+  static const routeName = '/verify_badge';
+  const VerifyBadgeScreen({super.key});
 
   @override
-  State<VerifyScreen> createState() => _VerifyScreenState();
+  State<VerifyBadgeScreen> createState() => _VerifyScreenBadgeState();
 }
 
-class _VerifyScreenState extends State<VerifyScreen> {
+class _VerifyScreenBadgeState extends State<VerifyBadgeScreen> {
   String? _selectedBadge;
   int _currentStep = 1;
   final int _totalSteps = 6;

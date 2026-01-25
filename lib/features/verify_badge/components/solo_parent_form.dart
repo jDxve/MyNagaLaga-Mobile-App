@@ -34,7 +34,7 @@ class _SoloParentFormState extends State<SoloParentForm> {
 
   void _incrementDependents() {
     setState(() {
-      if (_numberOfDependents < 10) {
+      if (_numberOfDependents < 15) {
         _numberOfDependents++;
         _validate();
       }

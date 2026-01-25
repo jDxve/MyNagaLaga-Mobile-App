@@ -4,6 +4,7 @@ import '../../../common/resources/dimensions.dart';
 import '../../../common/widgets/nav_bar.dart';
 import '../../../common/widgets/search_input.dart';
 
+import '../../account/screens/account_screen.dart';
 import '../components/badges.dart';
 import '../components/circular_notif.dart';
 import '../components/home_greetings.dart';
@@ -25,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const Center(child: Text('Family')),
     const Center(child: Text('Services')),
     const Center(child: Text('Safety')),
-    const Center(child: Text('Account')),
+    const AccountScreen(),
   ];
 
   @override

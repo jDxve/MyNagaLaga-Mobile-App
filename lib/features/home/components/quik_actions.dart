@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../common/models/simple_option.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/resources/images_icons.dart';
-import '../../../features/verify/screens/verify_screen.dart';
+import '../../verify_badge/screens/verify_badge_screen.dart';
 
 Widget quickActions(BuildContext context) {
   final List<SimpleOption> actions = [
@@ -50,7 +50,7 @@ Widget quickActions(BuildContext context) {
             return GestureDetector(
               onTap: () {
                 if (action.id == 1) {
-                  Navigator.pushNamed(context, VerifyScreen.routeName);
+                  Navigator.pushNamed(context, VerifyBadgeScreen.routeName);
                 }
                 // Add other navigation here
               },

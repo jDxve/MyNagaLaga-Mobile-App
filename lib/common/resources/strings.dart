@@ -227,4 +227,14 @@ class AppString {
   static const String dependents = "Dependents";
   static const String estimatedMonthlyIncome =
       "Estimated Monthly Household Income";
+
+  // Account & Settings
+  static const String preferences = "Preferences";
+  static const String personalInfo = "Personal Information";
+  static const String appearance = "Appearance";
+  static const String legal = "Legal";
+  static const String termsAndConditions = "Terms and Conditions";
+  static const String privacyPolicy = "Privacy Policy";
+  static const String logOut = "Log Out";
+  static const String verifyYourBadge = "Verify your badge";
 }
