@@ -4,7 +4,7 @@ import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/resources/images_icons.dart';
 import '../../../common/resources/strings.dart';
-import '../../../common/widgets/primary_button.dart';
+import '../../../common/widgets/secondary_button.dart';
 import '../../../common/widgets/error_modal.dart';
 
 Widget badgeSelectionCards({
@@ -75,23 +75,23 @@ Widget badgeSelectionCards({
       ),
       16.gapH,
       _InfoCard(),
-      24.gapH,
-      PrimaryButton(
+      16.gapH,
+      SecondaryButton(
         text: AppString.next,
-        onPressed: () {
-          if (selectedBadge != null) {
-            onNext();
-          } else {
-            showErrorModal(
-              context: context,
-              title: AppString.noBadgeSelectedTitle,
-              description: AppString.noBadgeSelectedDescription,
-              icon: Icons.warning_amber_outlined,
-              iconColor: Colors.orange,
-              buttonText: AppString.gotIt,
-            );
-          }
-        },
+        isFilled: true,
+        isDisabled: selectedBadge == null,
+        onPressed: selectedBadge != null
+            ? onNext
+            : () {
+                showErrorModal(
+                  context: context,
+                  title: AppString.noBadgeSelectedTitle,
+                  description: AppString.noBadgeSelectedDescription,
+                  icon: Icons.warning_amber_outlined,
+                  iconColor: Colors.orange,
+                  buttonText: AppString.gotIt,
+                );
+              },
       ),
     ],
   );

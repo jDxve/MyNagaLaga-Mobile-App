@@ -27,15 +27,15 @@ class AppString {
   
   // Badge types
   static const String seniorCitizenTitle = "Senior Citizen";
-  static const String seniorCitizenDescription = "For Filipino citizens aged 60 years and above";
+  static const String seniorCitizenDescription = "For Filipino citizens aged 60\nyears and above";
   static const String pwdTitle = "PWD";
-  static const String pwdDescription = "For persons with disabilities seeking benefits and services";
+  static const String pwdDescription = "For persons with disabilities seeking\nbenefits and services";
   static const String soloParentTitle = "Solo Parents";
-  static const String soloParentDescription = "For single parents raising children independently";
+  static const String soloParentDescription = "For single parents raising children\nindependently";
   static const String indigentTitle = "Indigent";
-  static const String indigentDescription = "For citizens in need of financial assistance programs";
+  static const String indigentDescription = "For citizens in need of financial assistance\nprograms";
   static const String studentTitle = "Student";
-  static const String studentDescription = "For fare discounts, educational aid, and city library access";
+  static const String studentDescription = "For fare discounts, educational aid, and city\nlibrary access";
   
   // Info card
   static const String whyApplyTitle = "Why apply for a Digital Badge?";
@@ -48,4 +48,106 @@ class AppString {
   static const String noBadgeSelectedDescription = "Please select a badge type before continuing.";
   static const String gotIt = "Got it";
   static const String next = "Next";
+  static const String previous = "Previous";
+  
+  // Eligibility Form - ID Field Labels
+  static const String existingSeniorCitizenId = "Existing Senior Citizen ID Number (if any)";
+  static const String existingPwdId = "Existing PWD ID Number (if any)";
+  static const String existingSoloParentId = "Existing Solo Parent ID Number (if any)";
+  static const String existingIndigentId = "Existing Indigent ID Number (if any)";
+  static const String existingStudentId = "Existing Student ID Number (if any)";
+  static const String existingIdHint = "Optional - Enter if you have existing ID";
+  
+  // Benefits Card Titles
+  static const String seniorCitizenBenefitsTitle = "Senior Citizen Benefits";
+  static const String pwdBenefitsTitle = "PWD Benefits";
+  static const String soloParentBenefitsTitle = "Solo Parent Benefits";
+  static const String indigentBenefitsTitle = "Indigent Benefits";
+  static const String studentBenefitsTitle = "Student Benefits";
+  
+  // Senior Citizen Benefits
+  static const String seniorBenefit1 = "20% discount on goods and services";
+  static const String seniorBenefit2 = "VAT exemption on qualified purchases";
+  static const String seniorBenefit3 = "Priority lanes in all establishments";
+  
+  // PWD Benefits
+  static const String pwdBenefit1 = "20% discount on medicines and medical services";
+  static const String pwdBenefit2 = "Priority assistance in government offices";
+  static const String pwdBenefit3 = "Accessible facilities and transportation";
+  
+  // Solo Parent Benefits
+  static const String soloParentBenefit1 = "Educational assistance for children";
+  static const String soloParentBenefit2 = "Flexible working arrangements";
+  static const String soloParentBenefit3 = "Parental leave and childcare support";
+  
+  // Indigent Benefits
+  static const String indigentBenefit1 = "Financial assistance programs";
+  static const String indigentBenefit2 = "Free healthcare services";
+  static const String indigentBenefit3 = "Housing and livelihood support";
+  
+  // Student Benefits
+  static const String studentBenefit1 = "Discounted transportation fares";
+  static const String studentBenefit2 = "Educational assistance and scholarships";
+  static const String studentBenefit3 = "Free access to city library and facilities";
+  
+  // Basic Info Form - Field Labels
+  static const String fullName = "Full Name";
+  static const String fullNameHint = "Ex. Juan Dela Cruz";
+  static const String dateOfBirth = "Date of Birth";
+  static const String dateOfBirthHint = "MM/DD/YYYY";
+  static const String gender = "Gender";
+  static const String male = "Male";
+  static const String female = "Female";
+  static const String homeAddress = "Home Address";
+  static const String homeAddressHint = "House/Unit No., Street, Barangay, City/Municipality, Province";
+  static const String contactNumber = "Contact Number";
+  static const String contactNumberHint = "9XX XXX XXXX";
+  static const String phonePrefix = "+63";
+  
+  // Basic Info Form - Validation Errors
+  static const String invalidContactNumberTitle = "Invalid Contact Number";
+  static const String invalidContactNumberDescription = "Contact Number must be 10 digits (e.g., 9XX XXX XXXX)";
+  static const String requiredFieldsMissingTitle = "Required Fields Missing";
+  static const String requiredFieldsMissingDescription = "Please fill in the following fields: ";
+  static const String ok = "OK";
+  
+  // Document Form - Field Labels
+  static const String typeOfId = "Type of ID";
+  static const String selectTypeOfId = "Select type of ID";
+  static const String uploadFrontId = "Upload Front of your ID";
+  static const String uploadBackId = "Upload Back of your ID";
+  static const String takePhotoOrUpload = "Take a photo or upload an image file";
+  
+  // Document Form - ID Types
+  static const String nationalId = "National ID";
+  static const String driversLicense = "Driver's License";
+  static const String passport = "Passport";
+  static const String votersId = "Voter's ID";
+  static const String philhealthId = "PhilHealth ID";
+  static const String sssId = "SSS ID";
+  static const String umid = "UMID";
+  static const String postalId = "Postal ID";
+  
+  // Document Form - Buttons
+  static const String takePhoto = "Take Photo";
+  static const String upload = "Upload";
+  
+  // Document Form - Validation Errors
+  static const String requiredItemsMissingTitle = "Required Items Missing";
+  static const String requiredItemsMissingDescription = "Please provide the following: ";
+  
+  // Document Form - Missing Items
+  static const String idType = "ID Type";
+  static const String frontOfId = "Front of ID";
+  static const String backOfId = "Back of ID";
+  
+  // Document Form - Tips Section
+  static const String tipsForGoodCapture = "Tips for a good capture:";
+  static const String tip1 = "Ensure all corners of the ID are visible";
+  static const String tip2 = "Avoid glare and shadows";
+  static const String tip3 = "Photo should be clear - Make sure text is readable";
+  static const String tip4 = "Use good lighting";
+  
+  // Document Form - Image Cropper
+  static const String cropIdCard = "Crop ID Card";
 }

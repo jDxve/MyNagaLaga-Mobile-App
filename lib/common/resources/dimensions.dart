@@ -20,7 +20,7 @@ class D {
 
   static double get textXS => f(11);
   static double get textSM => f(12);
-  static double get textBase => f(17);
+  static double get textBase => f(15);
   static double get textMD => f(18);
   static double get textLG => f(20);
   static double get textXL => f(24);

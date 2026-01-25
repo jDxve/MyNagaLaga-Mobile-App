@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../resources/colors.dart';
 import '../resources/dimensions.dart';
-import 'primary_button.dart';
+import 'secondary_button.dart';
 
 void showErrorModal({
   required BuildContext context,
@@ -39,6 +39,7 @@ void showErrorModal({
                   fontSize: D.textXL,
                   fontWeight: D.bold,
                   color: Colors.black,
+                  fontFamily: 'Segoe UI',
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -49,11 +50,13 @@ void showErrorModal({
                   fontSize: D.textBase,
                   color: AppColors.grey,
                   height: 1.5,
+                  fontFamily: 'Segoe UI',
                 ),
                 textAlign: TextAlign.center,
               ),
               24.gapH,
-              PrimaryButton(
+              SecondaryButton(
+                isFilled: true,
                 text: buttonText ?? 'Okay',
                 onPressed: () {
                   Navigator.pop(context);

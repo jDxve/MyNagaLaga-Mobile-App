@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:mynagalaga_mobile_app/features/welcome/components/onboarding_button.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/images_icons.dart';
 import '../../../common/resources/strings.dart';
 import '../../../common/resources/dimensions.dart';
-import '../../../common/widgets/secondary_button.dart';
 import 'onboarding_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -52,7 +52,7 @@ class _WelcomeScreen extends State<WelcomeScreen> {
             ),
           ),
           35.gapH,
-          SecondaryButton(
+          OnboardingButton(
             text: AppString.letsGetStarted,
             width: 210.w,
             icon: Icons.chevron_right,

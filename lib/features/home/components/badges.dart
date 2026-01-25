@@ -113,6 +113,9 @@ class _BadgeDisplayState extends State<BadgeDisplay>
 
     double containerHeight;
     switch (displayCount) {
+      case 5:
+        containerHeight = 260.h;
+        break;
       case 4:
         containerHeight = 250.h;
         break;

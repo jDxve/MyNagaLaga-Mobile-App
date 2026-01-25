@@ -7,6 +7,8 @@ class SecondaryButton extends StatelessWidget {
   final VoidCallback onPressed;
   final double? width;
   final bool isLoading;
+  final bool isDisabled;
+  final bool isFilled;
   final IconData? icon;
   final bool iconAtEnd;
   final double? iconSize;
@@ -17,6 +19,8 @@ class SecondaryButton extends StatelessWidget {
     required this.onPressed,
     this.width,
     this.isLoading = false,
+    this.isDisabled = false,
+    this.isFilled = false,
     this.icon,
     this.iconAtEnd = false,
     this.iconSize,
@@ -27,54 +31,125 @@ class SecondaryButton extends StatelessWidget {
     return SizedBox(
       width: width ?? double.infinity,
       height: D.secondaryButton,
-      child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(D.radiusXXL),
-          ),
-          padding: EdgeInsets.symmetric(horizontal: D.w(16)),
-          // Fixes the alignment issue:
-          minimumSize: Size.zero,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        ),
-        child: isLoading
-            ? SizedBox(
-                height: 20.h,
-                width: 20.w,
-                child: const CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+      child: isFilled
+          ? ElevatedButton(
+              onPressed: isLoading ? null : onPressed,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isDisabled
+                    ? AppColors.grey.withOpacity(0.3)
+                    : AppColors.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(D.radiusLG),
                 ),
-              )
-            : Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (icon != null && !iconAtEnd) ...[
-                    Icon(icon, size: iconSize ?? D.iconMD),
-                    SizedBox(width: D.w(4)),
-                  ],
-                  8.gapW,
-                  Text(
-                    text,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: D.textBase,
-                      fontWeight: D.semiBold,
-                      fontFamily: 'Manrope', // Matches your WelcomeScreen
-                    ),
-                  ),
-                  if (icon != null && iconAtEnd) ...[
-                    5.gapW,
-                    Icon(icon, size: iconSize ?? D.iconMD),
-                  ],
-                ],
+                elevation: 0,
+                padding: EdgeInsets.symmetric(horizontal: D.w(16)),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-      ),
+              child: isLoading
+                  ? SizedBox(
+                      height: 20.h,
+                      width: 20.w,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (icon != null && !iconAtEnd) ...[
+                          Icon(
+                            icon,
+                            size: iconSize ?? D.iconMD,
+                            color: Colors.white,
+                          ),
+                          SizedBox(width: D.w(4)),
+                        ],
+                        8.gapW,
+                        Text(
+                          text,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: D.textMD,
+                            fontWeight: D.semiBold,
+                            fontFamily: 'Segoe UI',
+                            color: Colors.white,
+                          ),
+                        ),
+                        if (icon != null && iconAtEnd) ...[
+                          5.gapW,
+                          Icon(
+                            icon,
+                            size: iconSize ?? D.iconMD,
+                            color: Colors.white,
+                          ),
+                        ],
+                      ],
+                    ),
+            )
+          : OutlinedButton(
+              onPressed: isLoading ? null : onPressed,
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(
+                  color: isDisabled
+                      ? AppColors.grey.withOpacity(0.3)
+                      : AppColors.grey,
+                  width: 1,
+                ),
+                foregroundColor: AppColors.grey,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(D.radiusLG),
+                ),
+                padding: EdgeInsets.symmetric(horizontal: D.w(16)),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: isLoading
+                  ? SizedBox(
+                      height: 20.h,
+                      width: 20.w,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.grey),
+                      ),
+                    )
+                  : Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (icon != null && !iconAtEnd) ...[
+                          Icon(
+                            icon,
+                            size: iconSize ?? D.iconMD,
+                            color: AppColors.grey,
+                          ),
+                          SizedBox(width: D.w(4)),
+                        ],
+                        8.gapW,
+                        Text(
+                          text,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: D.textBase,
+                            fontWeight: D.semiBold,
+                            fontFamily: 'Segoe UI',
+                            color: AppColors.grey,
+                          ),
+                        ),
+                        if (icon != null && iconAtEnd) ...[
+                          5.gapW,
+                          Icon(
+                            icon,
+                            size: iconSize ?? D.iconMD,
+                            color: AppColors.grey,
+                          ),
+                        ],
+                      ],
+                    ),
+            ),
     );
   }
 }

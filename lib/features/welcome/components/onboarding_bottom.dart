@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'onboarding_button.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
-import '../../../common/widgets/secondary_button.dart';
 
 Widget buildOnboardingBottomSection({
   required int currentPage,
@@ -21,7 +21,7 @@ Widget buildOnboardingBottomSection({
             (index) => buildPageIndicatorDot(isActive: index == currentPage),
           ),
         ),
-        SecondaryButton(
+        OnboardingButton(
           text: 'Next',
           onPressed: onNextPressed,
           icon: Icons.arrow_forward_ios,
