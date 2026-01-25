@@ -68,7 +68,6 @@ class AppString {
   // Eligibility Form - ID Field Labels
   static const String existingSeniorCitizenId =
       "Existing Senior Citizen ID Number (if any)";
-  static const String existingPwdId = "Existing PWD ID Number (if any)";
   static const String existingSoloParentId =
       "Existing Solo Parent ID Number (if any)";
   static const String existingIndigentId =
@@ -210,4 +209,21 @@ class AppString {
   static const String referenceNumberLabel = "Reference Number";
   static const String startNewApplication = "Start New Application";
   static const String backToHome = "Back to Home";
+
+  static const String schoolName = "School Name";
+  static const String searchSchoolName = "Search school name";
+  static const String educationLevel = "Education Level";
+  static const String selectLevel = "Select level";
+  static const String yearGradeLevel = "Year/Grade Level";
+  static const String selectYearLevel = "Select year level";
+
+  // PWD Form
+  static const String typeOfDisability = "Type of Disability";
+  static const String selectDisabilityType = "Select disability type";
+
+  // Solo Parent & Indigent Forms
+  static const String numberOfDependents = "Number of Dependents";
+  static const String dependents = "Dependents";
+  static const String estimatedMonthlyIncome =
+      "Estimated Monthly Household Income";
 }
