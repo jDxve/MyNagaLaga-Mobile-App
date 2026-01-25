@@ -32,7 +32,7 @@ Widget buildOnboardingContent({
             fontWeight: D.medium,
           ),
         ),
-        30.gapH,
+        5.gapH,
       ],
     ),
   );

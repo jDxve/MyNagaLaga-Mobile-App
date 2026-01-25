@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'features/welcome/screens/onboarding_screen.dart';
-import 'features/welcome/screens/welcome_screen.dart';
-
 import 'features/welcome/screens/splash_screen.dart';
+import 'features/welcome/screens/welcome_screen.dart';
+import 'features/home/screens/home_screen.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
@@ -17,6 +17,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case OnboardingScreen.routeName:
       return MaterialPageRoute(
         builder: ((context) => const OnboardingScreen()),
+      );
+    case HomeScreen.routeName:
+      return MaterialPageRoute(
+        builder: ((context) => const HomeScreen()),
       );
     default:
       return MaterialPageRoute(

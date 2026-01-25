@@ -13,4 +13,7 @@ class AppString {
   
   static const String onboarding3Title = "Protected Together";
   static const String onboarding3Description = "Live shelter updates and unified\nhousehold protection.";
+
+  static const String aga = "Marahay na Aga";
+  static const String bangi = "Marahay na Bangi";
 }

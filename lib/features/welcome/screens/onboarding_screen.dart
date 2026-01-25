@@ -4,10 +4,11 @@ import '../components/onboarding_top_bar.dart';
 import '../components/onboarding_bottom.dart';
 import '../../../common/resources/images_icons.dart';
 import '../../../common/resources/strings.dart';
+import '../../home/screens/home_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   static const routeName = '/onboarding';
-  
+
   const OnboardingScreen({super.key});
 
   @override
@@ -60,7 +61,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _completeOnboarding() {
-    //Navigator.pushReplacementNamed(context, '/login');
+    Navigator.pushReplacementNamed(context, HomeScreen.routeName);
   }
 
   @override

@@ -6,4 +6,27 @@ class AppImages {
   static const String onboarding1 = 'assets/images/onboarding_1.png';
   static const String onboarding2 = 'assets/images/onboarding_2.png';
   static const String onboarding3 = 'assets/images/onboarding_3.png';
+
+  static const String studentBadge = 'assets/badges/student_badge.png';
+  static const String soloParentBadge = 'assets/badges/solo_parent_badge.png';
+  static const String seniorCitizenBadge = 'assets/badges/senior_citizen_badge.png';
+  static const String pwdBadge = 'assets/badges/pwd_badge.png';
+  static const String indigentFamilyBadge = 'assets/badges/indigent_family_badge.png';
+
+  static const String homeBG = 'assets/images/home_bg.png';
+
+  static const String notifIcon = 'assets/icons/notif.svg';
+
+  //quick action icons
+  static const String verifyIcon = 'assets/icons/verify.png';
+  static const String requestIcon = 'assets/icons/request.png';
+  static const String addFamilyIcon = 'assets/icons/add_family.png';
+  static const String shelterIcon = 'assets/icons/shelter.png';
+
+  //navigation icons
+  static const String homeIcon = 'assets/icons/home.svg';
+  static const String servicesIcon = 'assets/icons/services.svg';
+  static const String familyIcon = 'assets/icons/family.svg';
+  static const String saftyIcon = 'assets/icons/safety.svg';
+  static const String acountIcon = 'assets/icons/account.svg';
 }

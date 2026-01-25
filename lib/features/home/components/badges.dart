@@ -1,0 +1,206 @@
+import 'package:flutter/material.dart';
+import '../../../common/resources/images_icons.dart';
+import '../../../common/resources/dimensions.dart';
+
+enum BadgeType { student, soloParent, seniorCitizen, pwd, indigentFamily }
+
+class BadgeDisplay extends StatefulWidget {
+  final List<BadgeType> badges;
+
+  const BadgeDisplay({super.key, required this.badges});
+
+  @override
+  State<BadgeDisplay> createState() => _BadgeDisplayState();
+}
+
+class _BadgeDisplayState extends State<BadgeDisplay>
+    with SingleTickerProviderStateMixin {
+  int _currentIndex = 0;
+  bool _isMovingForward = true;
+  late AnimationController _controller;
+  late Animation<Offset> _slideAnimation;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(0, -1),
+    ).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
+    );
+
+    _fadeAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  String _getBadgeImage(BadgeType badgeType) {
+    switch (badgeType) {
+      case BadgeType.student:
+        return AppImages.studentBadge;
+      case BadgeType.soloParent:
+        return AppImages.soloParentBadge;
+      case BadgeType.seniorCitizen:
+        return AppImages.seniorCitizenBadge;
+      case BadgeType.pwd:
+        return AppImages.pwdBadge;
+      case BadgeType.indigentFamily:
+        return AppImages.indigentFamilyBadge;
+    }
+  }
+
+  Future<void> _nextBadge() async {
+    if (_controller.isAnimating) return;
+    setState(() {
+      _isMovingForward = true;
+      _slideAnimation = Tween<Offset>(
+        begin: Offset.zero,
+        end: const Offset(0, -1),
+      ).animate(
+        CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
+      );
+    });
+
+    await _controller.forward();
+    setState(() {
+      _currentIndex = (_currentIndex + 1) % widget.badges.length;
+    });
+    _controller.reset();
+  }
+
+  Future<void> _previousBadge() async {
+    if (_controller.isAnimating) return;
+    setState(() {
+      _isMovingForward = false;
+      _slideAnimation = Tween<Offset>(
+        begin: Offset.zero,
+        end: const Offset(0, 1),
+      ).animate(
+        CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
+      );
+    });
+
+    await _controller.forward();
+    setState(() {
+      _currentIndex =
+          (_currentIndex - 1 + widget.badges.length) % widget.badges.length;
+    });
+    _controller.reset();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.badges.isEmpty) return const SizedBox.shrink();
+
+    final int total = widget.badges.length;
+    final int displayCount = total > 4 ? 4 : total;
+
+    double containerHeight;
+    switch (displayCount) {
+      case 4:
+        containerHeight = 250.h;
+        break;
+      case 3:
+        containerHeight = 230.h;
+        break;
+      case 2:
+        containerHeight = 220.h;
+        break;
+      default:
+        containerHeight = 210.h;
+    }
+
+    return GestureDetector(
+      onVerticalDragEnd: (details) {
+        // Only allow swiping if there is more than one card
+        if (total <= 1) return;
+
+        if (details.primaryVelocity! < 0) {
+          _nextBadge();
+        } else if (details.primaryVelocity! > 0) {
+          _previousBadge();
+        }
+      },
+      child: SizedBox(
+        height: containerHeight,
+        child: Stack(
+          alignment: Alignment.topCenter,
+          children: List.generate(displayCount, (index) {
+            final int reversedIndex = displayCount - 1 - index;
+            
+            int badgeIndex;
+            if (_isMovingForward) {
+              badgeIndex = (_currentIndex + reversedIndex) % total;
+            } else {
+              badgeIndex = (_currentIndex - reversedIndex + total) % total;
+            }
+
+            return AnimatedBuilder(
+              animation: _controller,
+              builder: (context, child) {
+                final double progress = _controller.value;
+                final double position = reversedIndex - progress;
+
+                if (reversedIndex == 0) {
+                  return Positioned(
+                    top: 0,
+                    left: 32.w,
+                    right: 32.w,
+                    child: SlideTransition(
+                      position: _slideAnimation,
+                      child: FadeTransition(
+                        opacity: _fadeAnimation,
+                        child: Image.asset(
+                          _getBadgeImage(widget.badges[_currentIndex]),
+                          height: 200.h,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+
+                final double topOffset = 15.h * position;
+                final double scale = 1.0 - (0.04 * position);
+                final double opacity = position > 3 ? 0.0 : (1.0 - (0.25 * position));
+
+                return Positioned(
+                  top: topOffset.clamp(0, 60.h),
+                  left: 32.w,
+                  right: 32.w,
+                  child: Opacity(
+                    opacity: opacity.clamp(0.0, 1.0),
+                    child: Transform.scale(
+                      scale: scale.clamp(0.8, 1.0),
+                      child: Image.asset(
+                        _getBadgeImage(widget.badges[badgeIndex]),
+                        height: 200.h,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            );
+          }),
+        ),
+      ),
+    );
+  }
+}

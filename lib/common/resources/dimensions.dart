@@ -24,7 +24,7 @@ class D {
   static double get textMD => f(18);
   static double get textLG => f(20);
   static double get textXL => f(24);
-  static double get textXXL => f(32);
+  static double get textXXL => f(28);
 
   static double get radiusSM => r(4);
   static double get radiusMD => r(8);
