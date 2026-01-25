@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mynagalaga_mobile_app/features/verify/screens/verify_screen.dart';
 import 'features/welcome/screens/onboarding_screen.dart';
 import 'features/welcome/screens/splash_screen.dart';
 import 'features/welcome/screens/welcome_screen.dart';
@@ -21,6 +22,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case HomeScreen.routeName:
       return MaterialPageRoute(
         builder: ((context) => const HomeScreen()),
+      );
+    case VerifyScreen.routeName:
+      return MaterialPageRoute(
+        builder: ((context) => const VerifyScreen()),
       );
     default:
       return MaterialPageRoute(

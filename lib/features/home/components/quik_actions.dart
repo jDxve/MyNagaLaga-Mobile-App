@@ -1,25 +1,31 @@
 import 'package:flutter/material.dart';
+import '../../../common/models/simple_option.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/resources/images_icons.dart';
+import '../../../features/verify/screens/verify_screen.dart';
 
-Widget quickActions() {
-  final List<Map<String, String>> actions = [
-    {
-      'icon': AppImages.verifyIcon,
-      'title': 'Verify',
-    },
-    {
-      'icon': AppImages.requestIcon,
-      'title': 'Request',
-    },
-    {
-      'icon': AppImages.addFamilyIcon,
-      'title': 'Add Family',
-    },
-    {
-      'icon': AppImages.shelterIcon,
-      'title': 'Find Shelter',
-    },
+Widget quickActions(BuildContext context) {
+  final List<SimpleOption> actions = [
+    SimpleOption(
+      id: 1,
+      icon: AppImages.verifyIcon,
+      title: 'Verify',
+    ),
+    SimpleOption(
+      id: 2,
+      icon: AppImages.requestIcon,
+      title: 'Request',
+    ),
+    SimpleOption(
+      id: 3,
+      icon: AppImages.addFamilyIcon,
+      title: 'Add Family',
+    ),
+    SimpleOption(
+      id: 4,
+      icon: AppImages.shelterIcon,
+      title: 'Find Shelter',
+    ),
   ];
 
   return Column(
@@ -43,7 +49,10 @@ Widget quickActions() {
           children: actions.map((action) {
             return GestureDetector(
               onTap: () {
-                // Handle tap
+                if (action.id == 1) {
+                  Navigator.pushNamed(context, VerifyScreen.routeName);
+                }
+                // Add other navigation here
               },
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -53,16 +62,14 @@ Widget quickActions() {
                     height: 50.h,
                     child: Center(
                       child: Image.asset(
-                        action['icon']!,
+                        action.icon!,
                         width: 30.w,
                         height: 30.h,
-                      
                       ),
                     ),
                   ),
-       
                   Text(
-                    action['title']!,
+                    action.title!,
                     style: TextStyle(
                       fontSize: D.textSM,
                       fontWeight: D.medium,

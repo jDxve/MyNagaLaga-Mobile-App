@@ -29,4 +29,11 @@ class AppImages {
   static const String familyIcon = 'assets/icons/family.svg';
   static const String saftyIcon = 'assets/icons/safety.svg';
   static const String acountIcon = 'assets/icons/account.svg';
+
+  //badge type icons
+  static const String seniorCitizenIcon = 'assets/icons/senior_citizen_icon.svg';
+  static const String pwdIcon = 'assets/icons/pwd_icon.svg';
+  static const String soloParentIcon = 'assets/icons/solo_parent_icon.svg';
+  static const String studentIcon = 'assets/icons/student_icon.svg';
+  static const String indigentFamilyIcon = 'assets/icons/indigent_icon.svg';
 }

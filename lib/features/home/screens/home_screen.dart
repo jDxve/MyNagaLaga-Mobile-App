@@ -75,7 +75,7 @@ class _HomeTab extends StatelessWidget {
               badges: [BadgeType.student, BadgeType.soloParent, BadgeType.pwd],
             ),
             10.gapH,
-            quickActions(),
+            quickActions(context),
           ],
         ),
       ),
