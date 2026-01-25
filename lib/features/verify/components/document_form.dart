@@ -89,7 +89,8 @@ class _DocumentFormState extends State<DocumentForm> {
   }
 
   void _validateForm() {
-    bool isValid = _selectedIdType != null &&
+    bool isValid =
+        _selectedIdType != null &&
         _selectedIdType!.isNotEmpty &&
         widget.frontImage != null &&
         widget.backImage != null;
@@ -97,17 +98,27 @@ class _DocumentFormState extends State<DocumentForm> {
     widget.setIsFormValid?.call(isValid, _showValidationError);
   }
 
-  void _showValidationError() {
-    List<String> missingItems = [];
+  void _showIdTypeError() {
+    showErrorModal(
+      context: widget.context,
+      title: AppString.idTypeNotSelectedTitle,
+      description: AppString.idTypeNotSelectedDescription,
+      icon: Icons.badge_outlined,
+      iconColor: Colors.orange,
+      buttonText: AppString.ok,
+    );
+  }
 
+  void _showValidationError() {
     if (_selectedIdType == null || _selectedIdType!.isEmpty) {
-      missingItems.add(AppString.idType);
+      _showIdTypeError();
+      return;
     }
+    List<String> missingItems = [];
 
     if (widget.frontImage == null) {
       missingItems.add(AppString.frontOfId);
     }
-
     if (widget.backImage == null) {
       missingItems.add(AppString.backOfId);
     }
@@ -455,9 +466,7 @@ class _DocumentFormState extends State<DocumentForm> {
       height: 7.h,
       width: (isActive ? 30 : 7).w,
       decoration: BoxDecoration(
-        color: isActive
-            ? AppColors.primary
-            : AppColors.grey.withOpacity(0.3),
+        color: isActive ? AppColors.primary : AppColors.grey.withOpacity(0.3),
         borderRadius: BorderRadius.circular(12),
       ),
     );
@@ -493,7 +502,7 @@ class _DocumentFormState extends State<DocumentForm> {
 
   Widget _tipRow(String text) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
+      padding: const EdgeInsets.only(bottom: 1),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -501,9 +510,9 @@ class _DocumentFormState extends State<DocumentForm> {
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.grey,
-                fontSize: 13,
+                fontSize: D.textSM,
                 fontFamily: 'Segoe UI',
               ),
             ),

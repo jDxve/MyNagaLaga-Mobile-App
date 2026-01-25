@@ -1,10 +1,13 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../../common/resources/dimensions.dart';
+import '../../home/screens/home_screen.dart';
+import '../components/application_submitted.dart';
 import '../components/basic_info_form.dart';
 import '../components/document_form.dart';
 import '../components/eligibility_form.dart';
 import '../components/previous_next_button.dart';
+import '../components/review_step.dart';
 import '../components/select_badges.dart';
 import '../components/top_verify.dart';
 
@@ -19,9 +22,11 @@ class VerifyScreen extends StatefulWidget {
 class _VerifyScreenState extends State<VerifyScreen> {
   String? _selectedBadge;
   int _currentStep = 1;
-  final int _totalSteps = 5;
+  final int _totalSteps = 6;
   bool _isFormValid = false;
+  bool _isConsentGiven = false;
   VoidCallback? _validationCallback;
+  String? _generatedReferenceNumber;
 
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _dateOfBirthController = TextEditingController();
@@ -30,8 +35,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
   final TextEditingController _existingIdController = TextEditingController();
   String? _selectedGender;
   String? _selectedIdType;
-  
-  // Store document images at parent level
+
   File? _frontIdImage;
   File? _backIdImage;
 
@@ -46,8 +50,8 @@ class _VerifyScreenState extends State<VerifyScreen> {
   }
 
   void _handleNext() {
-    // Validate for step 2 (Basic Info) and step 4 (Document Upload)
-    if ((_currentStep == 2 || _currentStep == 4) && !_isFormValid) {
+    if ((_currentStep == 2 || _currentStep == 4 || _currentStep == 5) &&
+        !_isFormValid) {
       _validationCallback?.call();
       return;
     }
@@ -55,6 +59,8 @@ class _VerifyScreenState extends State<VerifyScreen> {
     setState(() {
       if (_currentStep < _totalSteps) {
         _currentStep++;
+      } else {
+        _submitApplication();
       }
     });
   }
@@ -64,6 +70,51 @@ class _VerifyScreenState extends State<VerifyScreen> {
       if (_currentStep > 1) {
         _currentStep--;
       }
+    });
+  }
+
+  void _submitApplication() {
+    print('\n========================================');
+    print('APPLICATION SUBMITTED SUCCESSFULLY');
+    print('========================================');
+    print('Timestamp: ${DateTime.now()}');
+    print('');
+    print('Selected Badge: ${_selectedBadge ?? "N/A"}');
+    print('Full Name: ${_fullNameController.text}');
+    print('Date of Birth: ${_dateOfBirthController.text}');
+    print('Gender: ${_selectedGender ?? "N/A"}');
+    print('Address: ${_addressController.text}');
+    print('Contact Number: ${_phoneController.text}');
+    print(
+      'Existing ID: ${_existingIdController.text.isEmpty ? "None" : _existingIdController.text}',
+    );
+    print('ID Type: ${_selectedIdType ?? "N/A"}');
+    print('Front ID: ${_frontIdImage != null ? _frontIdImage!.path : "N/A"}');
+    print('Back ID: ${_backIdImage != null ? _backIdImage!.path : "N/A"}');
+    print('Consent Given: $_isConsentGiven');
+    print('========================================\n');
+
+    setState(() {
+      _currentStep = 6;
+    });
+  }
+
+  void _resetForm() {
+    setState(() {
+      _currentStep = 1;
+      _selectedBadge = null;
+      _isFormValid = false;
+      _isConsentGiven = false;
+      _fullNameController.clear();
+      _dateOfBirthController.clear();
+      _phoneController.clear();
+      _addressController.clear();
+      _existingIdController.clear();
+      _selectedGender = null;
+      _selectedIdType = null;
+      _frontIdImage = null;
+      _backIdImage = null;
+      _generatedReferenceNumber = null;
     });
   }
 
@@ -80,6 +131,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
           selectedBadge: _selectedBadge,
           onNext: _handleNext,
         );
+
       case 2:
         return BasicInfoForm(
           context: context,
@@ -105,12 +157,14 @@ class _VerifyScreenState extends State<VerifyScreen> {
             });
           },
         );
+
       case 3:
         return EligibilityForm(
           context: context,
           selectedBadge: _selectedBadge ?? '',
           existingIdController: _existingIdController,
         );
+
       case 4:
         return DocumentForm(
           context: context,
@@ -139,8 +193,42 @@ class _VerifyScreenState extends State<VerifyScreen> {
             });
           },
         );
+
       case 5:
-        return Center(child: Text('Step 5: Review'));
+        return ReviewStep(
+          selectedBadge: _selectedBadge,
+          fullName: _fullNameController.text,
+          dateOfBirth: _dateOfBirthController.text,
+          gender: _selectedGender,
+          address: _addressController.text,
+          contactNumber: _phoneController.text,
+          existingId: _existingIdController.text.isNotEmpty
+              ? _existingIdController.text
+              : null,
+          selectedIdType: _selectedIdType,
+          frontIdImage: _frontIdImage,
+          backIdImage: _backIdImage,
+          isConsentGiven: _isConsentGiven,
+          onConsentChanged: (value) {
+            setState(() {
+              _isConsentGiven = value;
+              _isFormValid = value;
+            });
+          },
+        );
+
+      case 6:
+        return applicationSubmitted(
+          context: context,
+          referenceNumber: _generatedReferenceNumber,
+          onStartNewApplication: _resetForm,
+          onBackToHome: () {
+            Navigator.of(
+              context,
+            ).pushNamedAndRemoveUntil(HomeScreen.routeName, (route) => false);
+          },
+        );
+
       default:
         return Center(child: Text('Unknown Step'));
     }
@@ -155,18 +243,25 @@ class _VerifyScreenState extends State<VerifyScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            topVerify(currentStep: _currentStep, totalSteps: _totalSteps),
+            if (_currentStep < 6)
+              topVerify(currentStep: _currentStep, totalSteps: _totalSteps - 1),
             Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.all(20.w),
-                child: _buildStepContent(),
-              ),
+              child: _currentStep == 6
+                  ? _buildStepContent()
+                  : SingleChildScrollView(
+                      padding: EdgeInsets.all(20.w),
+                      child: _buildStepContent(),
+                    ),
             ),
-            if (_currentStep > 1)
+            if (_currentStep > 1 && _currentStep < 6)
               previousNextButton(
                 onPrevious: _handlePrevious,
                 onNext: _handleNext,
-                isDisabled: (_currentStep == 2 || _currentStep == 4) && !_isFormValid,
+                isDisabled:
+                    (_currentStep == 2 ||
+                        _currentStep == 4 ||
+                        _currentStep == 5) &&
+                    !_isFormValid,
               ),
           ],
         ),
