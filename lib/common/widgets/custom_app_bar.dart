@@ -6,16 +6,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final VoidCallback? onBackPressed;
 
-  const CustomAppBar({
-    super.key,
-    required this.title,
-    this.onBackPressed,
-  });
+  const CustomAppBar({super.key, required this.title, this.onBackPressed});
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.transparent,
+      scrolledUnderElevation: 0,
       elevation: 0,
       leading: IconButton(
         icon: Icon(

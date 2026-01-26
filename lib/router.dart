@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'features/account/screens/account_screen.dart';
 import 'features/services/screens/services_screen.dart';
+import 'features/services/screens/women_welfare_screen.dart';
 import 'features/welcome/screens/onboarding_screen.dart';
 import 'features/welcome/screens/splash_screen.dart';
 import 'features/welcome/screens/welcome_screen.dart';
@@ -25,6 +26,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case ChildrenYouthScreen.routeName:
       return MaterialPageRoute(
         builder: ((context) => const ChildrenYouthScreen()),
+      );
+    case WomenWelfareScreen.routeName:
+      return MaterialPageRoute(
+        builder: ((context) => const WomenWelfareScreen()),
       );
     case VerifyBadgeScreen.routeName:
       return MaterialPageRoute(

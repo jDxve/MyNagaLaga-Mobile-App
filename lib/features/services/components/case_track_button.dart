@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/resources/assets.dart';
 
@@ -43,7 +44,7 @@ class _TrackCaseButtonState extends State<TrackCaseButton> {
             vertical: _isExpanded ? 12.h : 16.h,
           ),
           decoration: BoxDecoration(
-            color: const Color(0xFF7DB9A8),
+            color: AppColors.primary,
             borderRadius: BorderRadius.circular(100),
             boxShadow: [
               BoxShadow(
@@ -95,7 +96,7 @@ class _TrackCaseButtonState extends State<TrackCaseButton> {
                             child: Text(
                               '${widget.caseCount}',
                               style: TextStyle(
-                                color: const Color(0xFF7DB9A8),
+                                color: AppColors.primary,
                                 fontSize: D.textSM,
                                 fontWeight: D.bold,
                                 fontFamily: 'Segoe UI',

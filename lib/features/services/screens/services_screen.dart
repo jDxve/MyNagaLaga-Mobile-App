@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 import '../components/case_track_button.dart';
 import '../components/services_header.dart';
@@ -47,7 +46,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Stack(
           children: [

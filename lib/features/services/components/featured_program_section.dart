@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mynagalaga_mobile_app/features/services/screens/women_welfare_screen.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/resources/assets.dart';
@@ -27,7 +28,9 @@ class FeaturedProgramSection extends StatelessWidget {
         title: AppString.womenWelfareTitle,
         subtitle: AppString.womenWelfareSubtitle,
         iconBackgroundColor: AppColors.purple,
-        onTap: () => print('Women Welfare tapped'),
+          onTap: () {
+          Navigator.pushNamed(context, WomenWelfareScreen.routeName);
+        },
       ),
       FeaturedProgramData(
         icon: Assets.familyCommunityIcon,
