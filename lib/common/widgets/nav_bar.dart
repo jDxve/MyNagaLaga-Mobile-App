@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../models/simple_option.dart';
 import '../resources/colors.dart';
 import '../resources/dimensions.dart';
-import '../resources/images_icons.dart';
+import '../resources/assets.dart';
 
 class BottomNavigation extends StatefulWidget {
   final int currentIndex;
@@ -21,11 +21,11 @@ class BottomNavigation extends StatefulWidget {
 
 class _BottomNavigationState extends State<BottomNavigation> {
   final List<SimpleOption> navItems = [
-    SimpleOption(id: 0, icon: AppImages.homeIcon, title: 'Home'),
-    SimpleOption(id: 1, icon: AppImages.familyIcon, title: 'Family'),
-    SimpleOption(id: 2, icon: AppImages.servicesIcon, title: 'Services'),
-    SimpleOption(id: 3, icon: AppImages.saftyIcon, title: 'Safety'),
-    SimpleOption(id: 4, icon: AppImages.acountIcon, title: 'Account'),
+    SimpleOption(id: 0, icon: Assets.homeIcon, title: 'Home'),
+    SimpleOption(id: 1, icon: Assets.familyIcon, title: 'Family'),
+    SimpleOption(id: 2, icon: Assets.servicesIcon, title: 'Services'),
+    SimpleOption(id: 3, icon: Assets.saftyIcon, title: 'Safety'),
+    SimpleOption(id: 4, icon: Assets.acountIcon, title: 'Account'),
   ];
 
   @override

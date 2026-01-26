@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
-import '../../../common/resources/images_icons.dart';
+import '../../../common/resources/assets.dart';
 import '../../../common/resources/strings.dart';
 import '../../../common/widgets/secondary_button.dart';
 import '../../../common/widgets/error_modal.dart';
@@ -18,7 +18,7 @@ Widget badgeSelectionCards({
       'id': 'senior_citizen',
       'title': AppString.seniorCitizenTitle,
       'description': AppString.seniorCitizenDescription,
-      'icon': AppImages.seniorCitizenIcon,
+      'icon': Assets.seniorCitizenIcon,
       'lightColor': AppColors.lightYellow,
       'darkColor': AppColors.darkYellow,
     },
@@ -26,7 +26,7 @@ Widget badgeSelectionCards({
       'id': 'pwd',
       'title': AppString.pwdTitle,
       'description': AppString.pwdDescription,
-      'icon': AppImages.pwdIcon,
+      'icon': Assets.pwdIcon,
       'lightColor': AppColors.lightPink,
       'darkColor': AppColors.darkPink,
     },
@@ -34,7 +34,7 @@ Widget badgeSelectionCards({
       'id': 'solo_parent',
       'title': AppString.soloParentTitle,
       'description': AppString.soloParentDescription,
-      'icon': AppImages.soloParentIcon,
+      'icon': Assets.soloParentIcon,
       'lightColor': AppColors.lightPurple,
       'darkColor': AppColors.darkPurple,
     },
@@ -42,7 +42,7 @@ Widget badgeSelectionCards({
       'id': 'indigent',
       'title': AppString.indigentTitle,
       'description': AppString.indigentDescription,
-      'icon': AppImages.indigentFamilyIcon,
+      'icon': Assets.indigentFamilyIcon,
       'lightColor': AppColors.lightPrimary,
       'darkColor': AppColors.darkPrimary,
     },
@@ -50,7 +50,7 @@ Widget badgeSelectionCards({
       'id': 'student',
       'title': AppString.studentTitle,
       'description': AppString.studentDescription,
-      'icon': AppImages.studentIcon,
+      'icon': Assets.studentIcon,
       'lightColor': AppColors.lightBlue,
       'darkColor': AppColors.darkBlue,
     },

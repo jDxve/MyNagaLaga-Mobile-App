@@ -237,4 +237,67 @@ class AppString {
   static const String privacyPolicy = "Privacy Policy";
   static const String logOut = "Log Out";
   static const String verifyYourBadge = "Verify your badge";
+
+  static const String childrenYouthWelfare = "Children & Youth Welfare";
+  static const String childrenYouthSubTitle =
+      "Programs for children and young adults";
+
+  static const String sanggawadanTitle = "SANGGAWADAN";
+  static const String sanggawadanDesc =
+      "Educational financial assistance for students from indigent families";
+
+  static const String educareTitle = "EDUCARE";
+  static const String educareDesc =
+      "Early childhood education for children aged 3-4 years old";
+
+  static const String feedingProgramTitle = "Supplemental Feeding Program";
+  static const String feedingProgramDesc =
+      "Nutritional food support for underweight and malnourished children";
+
+  static const String pagAsaTitle = "Pag-Asa Youth Movement";
+  static const String pagAsaDesc =
+      "Government internship and summer employment for Out-of-School Youth";
+
+  static const String yakapYouthTitle = "Yakap Youth";
+  static const String yakapYouthDesc =
+      "Rehab/haven and reintegration for children in conflict with the law (CICL)";
+
+  static const String featuredProgramsTitle = "Featured Program";
+  static const String featuredProgramsDesc =
+      "Quick guides and downloadable forms for other essential city services";
+
+  static const String childrenYouthTitle = "Children & Youth";
+  static const String childrenYouthSubtitle = "Sanggawadan, Educare";
+
+  static const String womenWelfareTitle = "Women Welfare";
+  static const String womenWelfareSubtitle = "Solo Parent & Livelihood";
+
+  static const String familyCommunityTitle = "Family & Community";
+  static const String familyCommunitySubtitle = "Marriage and Counselling";
+
+  static const String crisisInterventionTitle = "Crisis Intervention";
+  static const String crisisInterventionSubtitle = "Medical & Burial Aid";
+
+  static const String disasterResponseTitle = "Disaster Response";
+  static const String disasterResponseSubtitle = "Evacuation & Relief";
+
+  static const String otherServicesTitle = "Other Services";
+  static const String otherServicesSubtitle = "Senior & PWD IDs";
+
+  static const String forMe = "For me";
+  static const String forFamilyMember = "For Family Member";
+  static const String applicantDetails = "Applicant Details";
+  static const String age = "Age";
+  static const String submitRequest = "Submit Request";
+  static const String familyMember = "Family Member";
+  static const String selectFamilyMember = "Select family member";
+  static const String requestDetails = "Request Details";
+  static const String reasonForRequest = "Reason for Request";
+  static const String reasonHint = "Please explain why you need this assistance";
+  static const String charactersMinimum = "characters minimum";
+  static const String uploadSupportingDocument = "Upload Supporting Document";
+  static const String enrollmentCertExample = "e.g. Certificate of Enrolment";
+  static const String uploadYourFile = "Upload your file";
+  static const String dragOrChoose = "Drag or choose your file to upload";
+  static const String attachedBadge = "Attached Badge";
 }

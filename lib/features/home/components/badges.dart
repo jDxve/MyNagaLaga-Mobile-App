@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../common/resources/images_icons.dart';
+import '../../../common/resources/assets.dart';
 import '../../../common/resources/dimensions.dart';
 
 enum BadgeType { student, soloParent, seniorCitizen, pwd, indigentFamily }
@@ -53,15 +53,15 @@ class _BadgeDisplayState extends State<BadgeDisplay>
   String _getBadgeImage(BadgeType badgeType) {
     switch (badgeType) {
       case BadgeType.student:
-        return AppImages.studentBadge;
+        return Assets.studentBadge;
       case BadgeType.soloParent:
-        return AppImages.soloParentBadge;
+        return Assets.soloParentBadge;
       case BadgeType.seniorCitizen:
-        return AppImages.seniorCitizenBadge;
+        return Assets.seniorCitizenBadge;
       case BadgeType.pwd:
-        return AppImages.pwdBadge;
+        return Assets.pwdBadge;
       case BadgeType.indigentFamily:
-        return AppImages.indigentFamilyBadge;
+        return Assets.indigentFamilyBadge;
     }
   }
 

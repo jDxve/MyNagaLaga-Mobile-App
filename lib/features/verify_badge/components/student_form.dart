@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/resources/strings.dart';
+import '../../../common/utils/constant.dart';
 import '../../../common/widgets/drop_down.dart';
 import '../../../common/widgets/text_input.dart';
 import '../../../common/widgets/error_modal.dart';
@@ -25,22 +26,6 @@ class _StudentFormState extends State<StudentForm> {
   final TextEditingController _schoolNameController = TextEditingController();
   final TextEditingController _educationLevelController = TextEditingController();
   final TextEditingController _yearLevelController = TextEditingController();
-
-  final List<String> educationLevels = [
-    'Elementary',
-    'Junior High School',
-    'Senior High School',
-    'College',
-    'Graduate School',
-  ];
-
-  final Map<String, List<String>> yearLevels = {
-    'Elementary': ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6'],
-    'Junior High School': ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10'],
-    'Senior High School': ['Grade 11', 'Grade 12'],
-    'College': ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'],
-    'Graduate School': ['1st Year', '2nd Year', '3rd Year'],
-  };
 
   @override
   void initState() {
@@ -126,7 +111,7 @@ class _StudentFormState extends State<StudentForm> {
         Dropdown(
           controller: _educationLevelController,
           hintText: AppString.selectLevel,
-          items: educationLevels,
+          items: Constant.educationLevels,
           onChanged: (value) {
             setState(() {
               _yearLevelController.clear();
@@ -147,7 +132,7 @@ class _StudentFormState extends State<StudentForm> {
         Dropdown(
           controller: _yearLevelController,
           hintText: AppString.selectYearLevel,
-          items: yearLevels[_educationLevelController.text] ?? [],
+          items: Constant.yearLevelMap[_educationLevelController.text] ?? [],
         ),
         24.gapH,
         BenefitsCard(

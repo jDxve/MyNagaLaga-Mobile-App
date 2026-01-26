@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../components/onboarding_content.dart';
 import '../components/onboarding_top_bar.dart';
 import '../components/onboarding_bottom.dart';
-import '../../../common/resources/images_icons.dart';
+import '../../../common/resources/assets.dart';
 import '../../../common/resources/strings.dart';
 import '../../home/screens/home_screen.dart';
 
@@ -22,17 +22,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   final List<Map<String, String>> _pages = [
     {
-      'image': AppImages.onboarding1,
+      'image': Assets.onboarding1,
       'title': AppString.onboarding1Title,
       'description': AppString.onboarding1Description,
     },
     {
-      'image': AppImages.onboarding2,
+      'image': Assets.onboarding2,
       'title': AppString.onboarding2Title,
       'description': AppString.onboarding2Description,
     },
     {
-      'image': AppImages.onboarding3,
+      'image':Assets.onboarding3,
       'title': AppString.onboarding3Title,
       'description': AppString.onboarding3Description,
     },

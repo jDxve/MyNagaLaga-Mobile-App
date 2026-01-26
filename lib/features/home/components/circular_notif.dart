@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../common/resources/dimensions.dart';
-import '../../../common/resources/images_icons.dart';
+import '../../../common/resources/assets.dart';
 
 Widget circularNotif({
   VoidCallback? onTap,
@@ -28,7 +28,7 @@ Widget circularNotif({
         children: [
           Center(
             child: SvgPicture.asset(
-              AppImages.notifIcon,
+              Assets.notifIcon,
               width: D.iconLG,
               height: D.iconLG,
             ),

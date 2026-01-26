@@ -5,7 +5,7 @@ import '../../home/screens/home_screen.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/strings.dart';
 import '../../../common/resources/dimensions.dart';
-import '../../../common/resources/images_icons.dart';
+import '../../../common/resources/assets.dart';
 import 'welcome_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -61,7 +61,7 @@ Future<void> _checkFirstInstall() async {
       body: Stack(
         children: [
           SvgPicture.asset(
-            AppImages.splash,
+            Assets.splash,
             fit: BoxFit.cover,
             width: double.infinity,
             height: double.infinity,
@@ -70,7 +70,7 @@ Future<void> _checkFirstInstall() async {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Image.asset(AppImages.logo, height: 100.h),
+                Image.asset(Assets.logo, height: 100.h),
                 11.gapH,
                 Text(
                   AppString.appName,

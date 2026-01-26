@@ -1,0 +1,45 @@
+class Constant {
+  static const String forMe = 'for_me';
+  static const String forFamily = 'for_family';
+
+  static const List<String> educationLevels = [
+    'Elementary',
+    'Junior High School',
+    'Senior High School',
+    'College',
+    'Graduate School',
+  ];
+
+  static const Map<String, List<String>> yearLevelMap = {
+    'Elementary': [
+      'Grade 1',
+      'Grade 2',
+      'Grade 3',
+      'Grade 4',
+      'Grade 5',
+      'Grade 6'
+    ],
+    'Junior High School': [
+      'Grade 7',
+      'Grade 8',
+      'Grade 9',
+      'Grade 10'
+    ],
+    'Senior High School': [
+      'Grade 11',
+      'Grade 12'
+    ],
+    'College': [
+      '1st Year',
+      '2nd Year',
+      '3rd Year',
+      '4th Year',
+      '5th Year'
+    ],
+    'Graduate School': [
+      '1st Year',
+      '2nd Year',
+      '3rd Year'
+    ],
+  };
+}

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mynagalaga_mobile_app/features/welcome/components/onboarding_button.dart';
 import '../../../common/resources/colors.dart';
-import '../../../common/resources/images_icons.dart';
+import '../../../common/resources/assets.dart';
 import '../../../common/resources/strings.dart';
 import '../../../common/resources/dimensions.dart';
 import 'onboarding_screen.dart';
@@ -24,7 +24,7 @@ class _WelcomeScreen extends State<WelcomeScreen> {
         children: [
           50.gapH,
           Image.asset(
-            AppImages.getStarted,
+            Assets.getStarted,
             width: double.infinity,
             height: 400.h,
           ),

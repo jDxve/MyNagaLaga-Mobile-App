@@ -30,7 +30,7 @@ class ProfileHeaderContent extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(4.w),
               decoration: const BoxDecoration(
-                color: Color(0xFF00BFA5),
+                color: AppColors.primary,
                 shape: BoxShape.circle,
               ),
               child: Icon(

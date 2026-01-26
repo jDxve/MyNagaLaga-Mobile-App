@@ -4,6 +4,7 @@ import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/resources/strings.dart';
 import '../../../common/widgets/error_modal.dart';
+import '../../../common/widgets/info_card.dart';
 
 class ReviewPage extends StatefulWidget {
   final String? selectedBadge;
@@ -16,6 +17,7 @@ class ReviewPage extends StatefulWidget {
   final String? selectedIdType;
   final File? frontIdImage;
   final File? backIdImage;
+  final File? supportingFile;
   final Function(bool) onConsentChanged;
   final bool isConsentGiven;
   final VoidCallback? onValidationError;
@@ -32,6 +34,7 @@ class ReviewPage extends StatefulWidget {
     this.selectedIdType,
     this.frontIdImage,
     this.backIdImage,
+    this.supportingFile,
     required this.onConsentChanged,
     required this.isConsentGiven,
     this.onValidationError,
@@ -44,18 +47,12 @@ class ReviewPage extends StatefulWidget {
 class _ReviewPageState extends State<ReviewPage> {
   String _getBadgeDisplayName(String? badgeId) {
     switch (badgeId) {
-      case 'senior_citizen':
-        return AppString.seniorCitizenTitle;
-      case 'pwd':
-        return AppString.pwdTitle;
-      case 'solo_parent':
-        return AppString.soloParentTitle;
-      case 'indigent':
-        return AppString.indigentTitle;
-      case 'student':
-        return AppString.studentTitle;
-      default:
-        return 'Unknown';
+      case 'senior_citizen': return AppString.seniorCitizenTitle;
+      case 'pwd': return AppString.pwdTitle;
+      case 'solo_parent': return AppString.soloParentTitle;
+      case 'indigent': return AppString.indigentTitle;
+      case 'student': return AppString.studentTitle;
+      default: return 'Unknown';
     }
   }
 
@@ -104,6 +101,37 @@ class _ReviewPageState extends State<ReviewPage> {
     );
   }
 
+  Widget _buildImageItem(String label, File image, {bool isFullWidth = false}) {
+    Widget content = GestureDetector(
+      onTap: () => _showImagePreview(image),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: D.textXS,
+              color: AppColors.grey,
+              fontFamily: 'Segoe UI',
+            ),
+          ),
+          4.gapH,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(D.radiusMD),
+            child: Image.file(
+              image,
+              height: 120.h,
+              width: isFullWidth ? double.infinity : double.infinity,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ],
+      ),
+    );
+
+    return isFullWidth ? content : Expanded(child: content);
+  }
+
   void _showConsentError() {
     showErrorModal(
       context: context,
@@ -120,49 +148,38 @@ class _ReviewPageState extends State<ReviewPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _ReviewSection(
+        InfoCard(
           icon: Icons.badge_outlined,
           iconColor: AppColors.lightYellow,
           title: AppString.step1Title,
-          children: [
-            _ReviewItem(
+          items: [
+            InfoCardItem(
               label: AppString.selectedBadgeLabel,
               value: _getBadgeDisplayName(widget.selectedBadge),
             ),
           ],
         ),
         16.gapH,
-
-        _ReviewSection(
+        InfoCard(
           icon: Icons.person_outline,
           iconColor: AppColors.lightYellow,
           title: AppString.personalInformationTitle,
-          children: [
-            _ReviewItem(label: AppString.fullName, value: widget.fullName),
-            _ReviewItem(
-              label: AppString.dateOfBirth,
-              value: widget.dateOfBirth,
-            ),
-            _ReviewItem(
-              label: AppString.gender,
-              value: _getGenderDisplayName(widget.gender),
-            ),
-            _ReviewItem(label: AppString.homeAddress, value: widget.address),
-            _ReviewItem(
-              label: AppString.contactNumber,
-              value: '+63 ${widget.contactNumber}',
-            ),
+          items: [
+            InfoCardItem(label: AppString.fullName, value: widget.fullName),
+            InfoCardItem(label: AppString.dateOfBirth, value: widget.dateOfBirth),
+            InfoCardItem(label: AppString.gender, value: _getGenderDisplayName(widget.gender)),
+            InfoCardItem(label: AppString.homeAddress, value: widget.address),
+            InfoCardItem(label: AppString.contactNumber, value: '+63 ${widget.contactNumber}'),
           ],
         ),
         16.gapH,
-
         if (widget.existingId != null && widget.existingId!.isNotEmpty) ...[
-          _ReviewSection(
+          InfoCard(
             icon: Icons.verified_user_outlined,
             iconColor: AppColors.lightYellow,
             title: AppString.eligibilityDetailsTitle,
-            children: [
-              _ReviewItem(
+            items: [
+              InfoCardItem(
                 label: '${_getBadgeDisplayName(widget.selectedBadge)} ID',
                 value: widget.existingId!,
               ),
@@ -170,191 +187,54 @@ class _ReviewPageState extends State<ReviewPage> {
           ),
           16.gapH,
         ],
-
-        _ReviewSection(
+        InfoCard(
           icon: Icons.description_outlined,
           iconColor: AppColors.lightYellow,
           title: AppString.uploadedDocumentTitle,
-          children: [
+          items: [
             if (widget.selectedIdType != null)
-              _ReviewItem(
-                label: AppString.typeOfId,
-                value: widget.selectedIdType!,
-              ),
-            12.gapH,
-            if (widget.frontIdImage != null || widget.backIdImage != null)
-              Row(
+              InfoCardItem(label: AppString.typeOfId, value: widget.selectedIdType!),
+            InfoCardItem(
+              customWidget: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (widget.frontIdImage != null)
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () => _showImagePreview(widget.frontIdImage!),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              AppString.frontIdLabel,
-                              style: TextStyle(
-                                fontSize: D.textXS,
-                                color: AppColors.grey,
-                                fontFamily: 'Segoe UI',
-                              ),
-                            ),
-                            4.gapH,
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(D.radiusMD),
-                              child: Image.file(
-                                widget.frontIdImage!,
-                                height: 100.h,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ],
+                  Row(
+                    children: [
+                      if (widget.frontIdImage != null)
+                        _buildImageItem(AppString.frontIdLabel, widget.frontIdImage!),
+                      if (widget.frontIdImage != null && widget.backIdImage != null)
+                        12.gapW,
+                      if (widget.backIdImage != null)
+                        _buildImageItem(AppString.backIdLabel, widget.backIdImage!),
+                    ],
+                  ),
+                  if (widget.supportingFile != null) ...[
+                    16.gapH,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: _buildImageItem(
+                            "Supporting Document", 
+                            widget.supportingFile!, 
+                            isFullWidth: true,
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  if (widget.frontIdImage != null && widget.backIdImage != null)
-                    12.gapW,
-                  if (widget.backIdImage != null)
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () => _showImagePreview(widget.backIdImage!),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              AppString.backIdLabel,
-                              style: TextStyle(
-                                fontSize: D.textXS,
-                                color: AppColors.grey,
-                                fontFamily: 'Segoe UI',
-                              ),
-                            ),
-                            4.gapH,
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(D.radiusMD),
-                              child: Image.file(
-                                widget.backIdImage!,
-                                height: 100.h,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                  ],
                 ],
               ),
+            ),
           ],
         ),
         24.gapH,
-
         _ConsentCheckbox(
           isChecked: widget.isConsentGiven,
           onChanged: widget.onConsentChanged,
           onValidationError: _showConsentError,
         ),
       ],
-    );
-  }
-}
-
-class _ReviewSection extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
-  final String title;
-  final List<Widget> children;
-
-  const _ReviewSection({
-    required this.icon,
-    required this.iconColor,
-    required this.title,
-    required this.children,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(D.radiusLG),
-        border: Border.all(color: AppColors.grey.withOpacity(0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: EdgeInsets.all(8.w),
-                decoration: BoxDecoration(
-                  color: iconColor,
-                  borderRadius: BorderRadius.circular(D.radiusMD),
-                ),
-                child: Icon(icon, color: Colors.black, size: 20.w),
-              ),
-              12.gapW,
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: D.textBase,
-                  fontWeight: D.semiBold,
-                  color: Colors.black,
-                  fontFamily: 'Segoe UI',
-                ),
-              ),
-            ],
-          ),
-          16.gapH,
-          ...children,
-        ],
-      ),
-    );
-  }
-}
-
-class _ReviewItem extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const _ReviewItem({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 12.h),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: D.textSM,
-                color: AppColors.grey,
-                fontFamily: 'Segoe UI',
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Text(
-              value,
-              style: TextStyle(
-                fontSize: D.textSM,
-                fontWeight: D.medium,
-                color: Colors.black,
-                fontFamily: 'Segoe UI',
-              ),
-              textAlign: TextAlign.right,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -380,9 +260,7 @@ class _ConsentCheckbox extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(D.radiusLG),
           border: Border.all(
-            color: isChecked
-                ? AppColors.primary
-                : AppColors.grey.withOpacity(0.2),
+            color: isChecked ? AppColors.primary : AppColors.grey.withOpacity(0.2),
             width: isChecked ? 1.5 : 1,
           ),
         ),
@@ -426,10 +304,7 @@ class _ConsentCheckbox extends StatelessWidget {
                     TextSpan(text: AppString.consentText1),
                     TextSpan(
                       text: AppString.consentText2,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
                     ),
                     TextSpan(text: AppString.consentText3),
                   ],

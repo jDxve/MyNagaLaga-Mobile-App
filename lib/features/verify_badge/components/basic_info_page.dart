@@ -5,6 +5,7 @@ import '../../../common/resources/dimensions.dart';
 import '../../../common/resources/strings.dart';
 import '../../../common/widgets/error_modal.dart';
 import '../../../common/widgets/text_input.dart';
+import '../../../common/widgets/toggle.dart';
 
 class BasicInfoPage extends StatefulWidget {
   final BuildContext context;
@@ -191,36 +192,13 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
           ),
         ),
         8.gapH,
-        Container(
-          height: 45.h,
-          padding: EdgeInsets.all(2.w),
-          decoration: BoxDecoration(
-            color: Colors.grey.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(D.radiusLG),
-            border: Border.all(
-              color: AppColors.grey.withOpacity(0.2),
-              width: 1,
-            ),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: _GenderOption(
-                  label: AppString.male,
-                  isSelected: widget.selectedGender == 'male',
-                  onTap: () => widget.onGenderChanged('male'),
-                ),
-              ),
-              4.gapW,
-              Expanded(
-                child: _GenderOption(
-                  label: AppString.female,
-                  isSelected: widget.selectedGender == 'female',
-                  onTap: () => widget.onGenderChanged('female'),
-                ),
-              ),
-            ],
-          ),
+        Toggle(
+          selectedValue: widget.selectedGender,
+          onChanged: widget.onGenderChanged,
+          firstLabel: AppString.male,
+          secondLabel: AppString.female,
+          firstValue: 'male',
+          secondValue: 'female',
         ),
         20.gapH,
         Text(
@@ -256,47 +234,6 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
           prefixText: AppString.phonePrefix,
         ),
       ],
-    );
-  }
-}
-
-class _GenderOption extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _GenderOption({
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 40.h,
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.white,
-          borderRadius: BorderRadius.circular(D.radiusMD),
-          border: Border.all(
-            color: isSelected ? AppColors.primary : Colors.transparent,
-            width: 1,
-          ),
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: D.textBase,
-              fontWeight: D.semiBold,
-              color: isSelected ? Colors.white : Colors.black,
-              fontFamily: 'Segoe UI',
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

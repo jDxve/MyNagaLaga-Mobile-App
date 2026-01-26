@@ -1,15 +1,14 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
-import '../../../common/resources/images_icons.dart';
 import '../../../common/resources/strings.dart';
 import '../../../common/widgets/secondary_button.dart';
 import '../../../common/widgets/text_input.dart';
 import '../../../common/widgets/error_modal.dart';
+import '../../../common/widgets/upload_image_card.dart';
 
 class DocumentPage extends StatefulWidget {
   final BuildContext context;
@@ -42,7 +41,6 @@ class DocumentPage extends StatefulWidget {
 }
 
 class _DocumentPageState extends State<DocumentPage> {
-  static const Color darkYellow = Color(0xFFE5C565);
   final ImagePicker _picker = ImagePicker();
   final PageController _pageController = PageController();
   final TextEditingController _idTypeController = TextEditingController();
@@ -78,7 +76,6 @@ class _DocumentPageState extends State<DocumentPage> {
         widget.frontImage != null &&
         widget.backImage != null &&
         widget.supportingFile != null;
-
     widget.setIsFormValid?.call(isValid, _showValidationError);
   }
 
@@ -111,7 +108,7 @@ class _DocumentPageState extends State<DocumentPage> {
     }
   }
 
-  Future<void> _pickImage(ImageSource source, {bool isSupporting = false}) async {
+  Future<void> _pickImage(ImageSource source, {required bool isSupporting}) async {
     try {
       final XFile? pickedFile = await _picker.pickImage(source: source);
       if (pickedFile != null) {
@@ -164,10 +161,12 @@ class _DocumentPageState extends State<DocumentPage> {
     setState(() => _isDropdownOpen = true);
   }
 
-  void _removeOverlay() {
+  void _removeOverlay({bool isDisposing = false}) {
     _overlayEntry?.remove();
     _overlayEntry = null;
-    if (mounted) setState(() => _isDropdownOpen = false);
+    if (!isDisposing && mounted) {
+      setState(() => _isDropdownOpen = false);
+    }
   }
 
   OverlayEntry _createOverlayEntry(double width) {
@@ -243,100 +242,74 @@ class _DocumentPageState extends State<DocumentPage> {
               controller: _pageController,
               onPageChanged: (index) => setState(() => _currentPage = index),
               children: [
-                _buildImageCard(widget.frontImage, AppString.uploadFrontId, () => widget.onFrontImageChanged(null)),
-                _buildImageCard(widget.backImage, AppString.uploadBackId, () => widget.onBackImageChanged(null)),
+                UploadImage(
+                  image: widget.frontImage,
+                  title: AppString.uploadFrontId,
+                  subtitle: AppString.takePhotoOrUpload,
+                  onTap: () => _showImagePreview(widget.frontImage!),
+                  onRemove: () {
+                    widget.onFrontImageChanged(null);
+                    _validateForm();
+                    setState(() {});
+                  },
+                ),
+                UploadImage(
+                  image: widget.backImage,
+                  title: AppString.uploadBackId,
+                  subtitle: AppString.takePhotoOrUpload,
+                  onTap: () => _showImagePreview(widget.backImage!),
+                  onRemove: () {
+                    widget.onBackImageChanged(null);
+                    _validateForm();
+                    setState(() {});
+                  },
+                ),
               ],
             ),
           ),
           12.gapH,
           Row(mainAxisAlignment: MainAxisAlignment.center, children: List.generate(2, (index) => _buildPageIndicator(index))),
           16.gapH,
-          _buildActionButtons(isSupporting: false),
+          Row(
+            children: [
+              Expanded(
+                child: SecondaryButton(
+                  text: AppString.takePhoto,
+                  isFilled: true,
+                  icon: Icons.camera_alt_outlined,
+                  onPressed: () => _pickImage(ImageSource.camera, isSupporting: false),
+                ),
+              ),
+              12.gapW,
+              Expanded(
+                child: SecondaryButton(
+                  text: AppString.upload,
+                  icon: Icons.file_upload_outlined,
+                  onPressed: () => _pickImage(ImageSource.gallery, isSupporting: false),
+                ),
+              ),
+            ],
+          ),
           24.gapH,
-          Text("Upload a supporting file", style: TextStyle(fontSize: D.textBase, fontWeight: D.semiBold, fontFamily: 'Segoe UI')),
+          Text("Upload a supporting file", style: TextStyle(fontSize: D.textBase, fontWeight: D.semiBold, fontFamily: 'Segoe UI', color: AppColors.black)),
           Text("e.g Birth Certificate, Barangay clearance", style: TextStyle(fontSize: D.textSM, color: AppColors.grey, fontFamily: 'Segoe UI')),
           12.gapH,
-          _buildImageCard(widget.supportingFile, "Upload your ID", () => widget.onSupportingFileChanged(null), isSupporting: true),
-          16.gapH,
-          _buildActionButtons(isSupporting: true),
+          UploadImage(
+            image: widget.supportingFile,
+            title: "Upload your ID",
+            showActions: true,
+            onPickImage: (source) => _pickImage(source, isSupporting: true),
+            onRemove: () {
+              widget.onSupportingFileChanged(null);
+              _validateForm();
+              setState(() {});
+            },
+            onTap: () => _showImagePreview(widget.supportingFile!),
+          ),
           24.gapH,
           _buildTipsSection(),
           24.gapH,
         ],
-      ),
-    );
-  }
-
-  Widget _buildActionButtons({required bool isSupporting}) {
-    return Row(
-      children: [
-        Expanded(
-          child: SecondaryButton(
-            text: AppString.takePhoto,
-            isFilled: true,
-            icon: Icons.camera_alt_outlined,
-            onPressed: () => _pickImage(ImageSource.camera, isSupporting: isSupporting),
-          ),
-        ),
-        12.gapW,
-        Expanded(
-          child: SecondaryButton(
-            text: AppString.upload,
-            icon: Icons.file_upload_outlined,
-            onPressed: () => _pickImage(ImageSource.gallery, isSupporting: isSupporting),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildImageCard(File? image, String uploadText, VoidCallback onRemove, {bool isSupporting = false}) {
-    return GestureDetector(
-      onTap: image != null ? () => _showImagePreview(image) : null,
-      child: CustomPaint(
-        painter: DashedRectPainter(color: AppColors.grey.withOpacity(0.3)),
-        child: Container(
-          height: 200.h,
-          width: double.infinity,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(D.radiusLG)),
-          child: image != null
-              ? Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    ClipRRect(borderRadius: BorderRadius.circular(D.radiusLG), child: Image.file(image, fit: BoxFit.cover)),
-                    Positioned(
-                      top: 8.h,
-                      right: 8.w,
-                      child: GestureDetector(
-                        onTap: () {
-                          onRemove();
-                          _validateForm();
-                          setState(() {});
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(6.w),
-                          decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.7), shape: BoxShape.circle),
-                          child: Icon(Icons.close, color: Colors.white, size: 16.w),
-                        ),
-                      ),
-                    ),
-                  ],
-                )
-              : Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(12.w),
-                      decoration: BoxDecoration(color: darkYellow.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
-                      child: SvgPicture.asset(AppImages.imageUploadIcon, width: 32.w, height: 32.w, colorFilter: const ColorFilter.mode(darkYellow, BlendMode.srcIn)),
-                    ),
-                    12.gapH,
-                    Text(uploadText, style: TextStyle(fontSize: D.textBase, fontWeight: FontWeight.bold, fontFamily: 'Segoe UI')),
-                    4.gapH,
-                    Text(AppString.takePhotoOrUpload, style: TextStyle(fontSize: D.textSM, color: AppColors.grey, fontFamily: 'Segoe UI')),
-                  ],
-                ),
-        ),
       ),
     );
   }
@@ -413,35 +386,7 @@ class _DocumentPageState extends State<DocumentPage> {
   void dispose() {
     _pageController.dispose();
     _idTypeController.dispose();
-    _removeOverlay();
+    _removeOverlay(isDisposing: true);
     super.dispose();
   }
-}
-
-class DashedRectPainter extends CustomPainter {
-  final Color color;
-  DashedRectPainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    double dashWidth = 6, dashSpace = 4;
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 1
-      ..style = PaintingStyle.stroke;
-
-    RRect rrect = RRect.fromRectAndRadius(Rect.fromLTWH(0, 0, size.width, size.height), Radius.circular(D.radiusLG));
-    Path path = Path()..addRRect(rrect);
-
-    for (var measurePath in path.computeMetrics()) {
-      double distance = 0.0;
-      while (distance < measurePath.length) {
-        canvas.drawPath(measurePath.extractPath(distance, distance + dashWidth), paint);
-        distance += dashWidth + dashSpace;
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }

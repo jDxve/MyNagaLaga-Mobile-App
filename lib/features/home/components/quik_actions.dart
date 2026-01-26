@@ -1,29 +1,29 @@
 import 'package:flutter/material.dart';
 import '../../../common/models/simple_option.dart';
 import '../../../common/resources/dimensions.dart';
-import '../../../common/resources/images_icons.dart';
+import '../../../common/resources/assets.dart';
 import '../../verify_badge/screens/verify_badge_screen.dart';
 
 Widget quickActions(BuildContext context) {
   final List<SimpleOption> actions = [
     SimpleOption(
       id: 1,
-      icon: AppImages.verifyIcon,
+      icon: Assets.verifyIcon,
       title: 'Verify',
     ),
     SimpleOption(
       id: 2,
-      icon: AppImages.requestIcon,
+      icon: Assets.requestIcon,
       title: 'Request',
     ),
     SimpleOption(
       id: 3,
-      icon: AppImages.addFamilyIcon,
+      icon: Assets.addFamilyIcon,
       title: 'Add Family',
     ),
     SimpleOption(
       id: 4,
-      icon: AppImages.shelterIcon,
+      icon: Assets.shelterIcon,
       title: 'Find Shelter',
     ),
   ];

@@ -221,6 +221,7 @@ class _VerifyScreenBadgeState extends State<VerifyBadgeScreen> {
           selectedIdType: _selectedIdType,
           frontIdImage: _frontIdImage,
           backIdImage: _backIdImage,
+          supportingFile: _supportingFile,
           isConsentGiven: _isConsentGiven,
           onConsentChanged: (value) {
             setState(() {

@@ -28,7 +28,7 @@ class _DropdownState extends State<Dropdown> {
 
   @override
   void dispose() {
-    _removeOverlay();
+    _removeOverlay(isDisposing: true); 
     super.dispose();
   }
 
@@ -48,10 +48,13 @@ class _DropdownState extends State<Dropdown> {
     setState(() => _isDropdownOpen = true);
   }
 
-  void _removeOverlay() {
+  // Added the isDisposing parameter to solve the crash
+  void _removeOverlay({bool isDisposing = false}) {
     _overlayEntry?.remove();
     _overlayEntry = null;
-    if (mounted) {
+    
+    // Only update state if the widget is still "alive" and not disposing
+    if (!isDisposing && mounted) {
       setState(() => _isDropdownOpen = false);
     }
   }
@@ -99,9 +102,7 @@ class _DropdownState extends State<Dropdown> {
                           )
                         : null,
                     onTap: () {
-                      setState(() {
-                        widget.controller.text = item;
-                      });
+                      widget.controller.text = item;
                       widget.onChanged?.call(item);
                       _toggleDropdown();
                     },

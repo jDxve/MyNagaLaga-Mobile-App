@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../resources/colors.dart';
-import '../resources/images_icons.dart';
+import '../resources/assets.dart';
 
 Widget gradientBackground({required Widget child}) {
   return Container(
@@ -29,7 +29,7 @@ Widget gradientBackground({required Widget child}) {
           right: 0,
 
           child: Image.asset(
-            AppImages.homeBG,
+            Assets.homeBG,
             width: double.infinity,
             fit: BoxFit.cover,
           ),
