@@ -37,6 +37,17 @@ dependencies:
   image_cropper: ^11.0.0
   confetti: ^0.8.0
 
+  # Retrofit and API calls:
+  dio: ^5.9.0
+  retrofit: ^4.9.2
+  flutter_dotenv: ^6.0.0
+  json_annotation: ^4.9.0
+  freezed_annotation: ^3.1.0
+  logger: ^2.6.2
+
+  # Riverpod
+  flutter_riverpod: ^3.2.0
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
@@ -52,6 +63,12 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
 
+  # Retrofit code generation:
+  retrofit_generator: ^10.2.1
+  build_runner: ^2.10.5
+  json_serializable: ^6.8.0
+  freezed: ^3.2.3
+  
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
