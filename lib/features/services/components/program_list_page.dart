@@ -4,39 +4,26 @@ import '../../../common/resources/dimensions.dart';
 import '../../../common/widgets/custom_app_bar.dart';
 import '../components/program_list_item.dart';
 
-class WomenWelfarePage extends StatelessWidget {
+class ProgramListPage extends StatelessWidget {
+  final String title;
+  final String subtitle;
   final Function(String) onProgramTap;
+  final List<Map<String, String>> programs;
 
-  const WomenWelfarePage({
+  const ProgramListPage({
     super.key,
+    required this.title,
+    required this.subtitle,
     required this.onProgramTap,
+    required this.programs,
   });
-
-  static final List<Map<String, String>> _programs = [
-    {
-      'title': 'Solo Parent Services',
-      'description': 'Issuance of Solo Parent ID, booklets, and monthly financial aid for indigents.',
-    },
-    {
-      'title': 'Sustainable Livelihood (SLP)',
-      'description': 'Skills training (e.g., weaving, food processing) and capital assistance for mothers.',
-    },
-    {
-      'title': 'Violence Against Women Help Desk',
-      'description': 'Legal assistance, counseling, and rescue for victims of domestic violence.',
-    },
-    {
-      'title': 'Pre-natal & Maternal Care',
-      'description': 'Medical assistance and check-ups for pregnant and nursing mothers.',
-    },
-  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const CustomAppBar(
-        title: 'Women Welfare',
+      appBar: CustomAppBar(
+        title: title,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -46,7 +33,7 @@ class WomenWelfarePage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Support for mothers, solo parents, and women in difficult circumstances.',
+                  subtitle,
                   style: TextStyle(
                     fontSize: D.textBase,
                     fontWeight: D.regular,
@@ -58,10 +45,10 @@ class WomenWelfarePage extends StatelessWidget {
                 ListView.separated(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _programs.length,
+                  itemCount: programs.length,
                   separatorBuilder: (context, index) => 12.gapH,
                   itemBuilder: (context, index) {
-                    final program = _programs[index];
+                    final program = programs[index];
                     return ProgramListItem(
                       title: program['title']!,
                       description: program['description']!,

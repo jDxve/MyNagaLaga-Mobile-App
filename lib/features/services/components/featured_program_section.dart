@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:mynagalaga_mobile_app/features/services/screens/women_welfare_screen.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/resources/assets.dart';
 import '../../../common/resources/strings.dart';
 import '../../services/screens/children_youth_screen.dart';
+import '../screens/women_welfare_screen.dart';
+import '../screens/crisis_intervention_screen.dart';
+import '../screens/family_community_screen.dart';
+import '../screens/disaster_response_screen.dart';
 import 'featured_program_card.dart';
 
 class FeaturedProgramSection extends StatelessWidget {
@@ -28,7 +31,7 @@ class FeaturedProgramSection extends StatelessWidget {
         title: AppString.womenWelfareTitle,
         subtitle: AppString.womenWelfareSubtitle,
         iconBackgroundColor: AppColors.purple,
-          onTap: () {
+        onTap: () {
           Navigator.pushNamed(context, WomenWelfareScreen.routeName);
         },
       ),
@@ -37,21 +40,27 @@ class FeaturedProgramSection extends StatelessWidget {
         title: AppString.familyCommunityTitle,
         subtitle: AppString.familyCommunitySubtitle,
         iconBackgroundColor: AppColors.teal,
-        onTap: () => print('Family & Community tapped'),
+        onTap: () {
+          Navigator.pushNamed(context, FamilyCommunityScreen.routeName);
+        },
       ),
       FeaturedProgramData(
         icon: Assets.crisisInterventionIcon,
         title: AppString.crisisInterventionTitle,
         subtitle: AppString.crisisInterventionSubtitle,
         iconBackgroundColor: AppColors.orange,
-        onTap: () => print('Crisis Intervention tapped'),
+        onTap: () {
+          Navigator.pushNamed(context, CrisisInterventionScreen.routeName);
+        },
       ),
       FeaturedProgramData(
         icon: Assets.disasterResponseIcon,
         title: AppString.disasterResponseTitle,
         subtitle: AppString.disasterResponseSubtitle,
         iconBackgroundColor: AppColors.red,
-        onTap: () => print('Disaster Response tapped'),
+        onTap: () {
+          Navigator.pushNamed(context, DisasterResponseScreen.routeName);
+        },
       ),
       FeaturedProgramData(
         icon: Assets.otherServicesIcon,

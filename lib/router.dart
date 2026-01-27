@@ -8,6 +8,9 @@ import 'features/welcome/screens/welcome_screen.dart';
 import 'features/home/screens/home_screen.dart';
 import 'features/verify_badge/screens/verify_badge_screen.dart';
 import 'features/services/screens/children_youth_screen.dart';
+import 'features/services/screens/family_community_screen.dart';
+import 'features/services/screens/crisis_intervention_screen.dart';
+import 'features/services/screens/disaster_response_screen.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
@@ -30,6 +33,18 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case WomenWelfareScreen.routeName:
       return MaterialPageRoute(
         builder: ((context) => const WomenWelfareScreen()),
+      );
+    case FamilyCommunityScreen.routeName:
+      return MaterialPageRoute(
+        builder: ((context) => const FamilyCommunityScreen()),
+      );
+    case CrisisInterventionScreen.routeName:
+      return MaterialPageRoute(
+        builder: ((context) => const CrisisInterventionScreen()),
+      );
+    case DisasterResponseScreen.routeName:
+      return MaterialPageRoute(
+        builder: ((context) => const DisasterResponseScreen()),
       );
     case VerifyBadgeScreen.routeName:
       return MaterialPageRoute(

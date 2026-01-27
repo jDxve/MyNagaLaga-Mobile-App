@@ -27,7 +27,7 @@ class TextInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: maxLines == 1 ? 40.h : null,
+      height: maxLines == 1 ? 45.h : null,
       child: TextField(
         controller: controller,
         keyboardType: keyboardType,
