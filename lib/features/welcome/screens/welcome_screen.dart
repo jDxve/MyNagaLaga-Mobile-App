@@ -4,6 +4,7 @@ import '../../../common/resources/colors.dart';
 import '../../../common/resources/assets.dart';
 import '../../../common/resources/strings.dart';
 import '../../../common/resources/dimensions.dart';
+import '../../auth/screens/login_screen.dart';
 import 'onboarding_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -23,11 +24,7 @@ class _WelcomeScreen extends State<WelcomeScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           50.gapH,
-          Image.asset(
-            Assets.getStarted,
-            width: double.infinity,
-            height: 400.h,
-          ),
+          Image.asset(Assets.getStarted, width: double.infinity, height: 400.h),
           30.gapH,
           Text(
             AppString.appName,
@@ -77,7 +74,12 @@ class _WelcomeScreen extends State<WelcomeScreen> {
               ),
               GestureDetector(
                 onTap: () {
-                  // Navigate to sign-in screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LogInScreen(),
+                    ),
+                  );
                 },
                 child: Text(
                   AppString.signIn,

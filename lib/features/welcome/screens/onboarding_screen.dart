@@ -4,7 +4,7 @@ import '../components/onboarding_top_bar.dart';
 import '../components/onboarding_bottom.dart';
 import '../../../common/resources/assets.dart';
 import '../../../common/resources/strings.dart';
-import '../../home/screens/home_screen.dart';
+import '../../auth/screens/signup_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   static const routeName = '/onboarding';
@@ -32,7 +32,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       'description': AppString.onboarding2Description,
     },
     {
-      'image':Assets.onboarding3,
+      'image': Assets.onboarding3,
       'title': AppString.onboarding3Title,
       'description': AppString.onboarding3Description,
     },
@@ -61,7 +61,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _completeOnboarding() {
-    Navigator.pushReplacementNamed(context, HomeScreen.routeName);
+    Navigator.pushReplacementNamed(context, SignUpScreen.routeName);
   }
 
   @override

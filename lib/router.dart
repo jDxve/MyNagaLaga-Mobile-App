@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mynagalaga_mobile_app/features/auth/screens/login_screen.dart';
+import 'package:mynagalaga_mobile_app/features/auth/screens/signup_screen.dart';
 import 'features/account/screens/account_screen.dart';
 import 'features/services/screens/services_screen.dart';
 import 'features/services/screens/women_welfare_screen.dart';
@@ -22,6 +24,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(
         builder: ((context) => const OnboardingScreen()),
       );
+    case SignUpScreen.routeName:
+      return MaterialPageRoute(builder: ((context) => const SignUpScreen()));
+    case LogInScreen.routeName:
+      return MaterialPageRoute(builder: ((context) => const LogInScreen()));
     case HomeScreen.routeName:
       return MaterialPageRoute(builder: ((context) => const HomeScreen()));
     case ServicesScreen.routeName:
