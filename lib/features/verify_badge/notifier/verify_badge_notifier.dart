@@ -15,7 +15,7 @@ class VerifyBadgeNotifier extends Notifier<DataState<dynamic>> {
   }
 
   Future<void> submitBadge({
-    required String residentId,
+    required String mobileUserId,
     required String badgeTypeId,
     required String fullName,
     required String birthdate,
@@ -26,6 +26,8 @@ class VerifyBadgeNotifier extends Notifier<DataState<dynamic>> {
     required File frontId,
     required File backId,
     File? supportingFile,
+    String? submittedByUserProfileId,
+    String? existingSeniorCitizenId,
     String? typeOfDisability,
     int? numberOfDependents,
     String? estimatedMonthlyHouseholdIncome,
@@ -34,12 +36,15 @@ class VerifyBadgeNotifier extends Notifier<DataState<dynamic>> {
     String? yearOrGradeLevel,
     String? schoolIdNumber,
   }) async {
+    print('🔔 VerifyBadgeNotifier: submitBadge called');
+    print('📋 Notifier State: Setting to loading...');
     state = const DataState.loading();
 
     final repository = ref.read(verifyBadgeRepositoryProvider);
+    print('📞 Notifier: Calling repository...');
 
     final result = await repository.submitBadgeApplication(
-      residentId: residentId,
+      mobileUserId: mobileUserId,
       badgeTypeId: badgeTypeId,
       fullName: fullName,
       birthdate: birthdate,
@@ -50,6 +55,8 @@ class VerifyBadgeNotifier extends Notifier<DataState<dynamic>> {
       frontId: frontId,
       backId: backId,
       supportingFile: supportingFile,
+      submittedByUserProfileId: submittedByUserProfileId,
+      existingSeniorCitizenId: existingSeniorCitizenId,
       typeOfDisability: typeOfDisability,
       numberOfDependents: numberOfDependents,
       estimatedMonthlyHouseholdIncome: estimatedMonthlyHouseholdIncome,
@@ -59,11 +66,26 @@ class VerifyBadgeNotifier extends Notifier<DataState<dynamic>> {
       schoolIdNumber: schoolIdNumber,
     );
 
+    print('📦 Notifier: Repository returned result');
+    result.when(
+      started: () => print('⚪ Result: started'),
+      loading: () => print('🔄 Result: loading'),
+      success: (data) {
+        print('✅ Result: SUCCESS');
+        print('📦 Data: $data');
+      },
+      error: (error) {
+        print('❌ Result: ERROR');
+        print('❌ Error: $error');
+      },
+    );
+
     state = result;
+    print('📋 Notifier State updated');
   }
 
   void reset() {
+    print('🔄 Notifier: Resetting state');
     state = const DataState.started();
   }
 }
-

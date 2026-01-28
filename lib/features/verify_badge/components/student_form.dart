@@ -11,11 +11,13 @@ import 'benefits_card.dart';
 class StudentForm extends StatefulWidget {
   final TextEditingController existingIdController;
   final Function(bool isValid, VoidCallback showError)? setIsFormValid;
+  final Function(Map<String, dynamic>)? onDataChanged;
 
   const StudentForm({
     super.key,
     required this.existingIdController,
     this.setIsFormValid,
+    this.onDataChanged,
   });
 
   @override
@@ -26,20 +28,33 @@ class _StudentFormState extends State<StudentForm> {
   final TextEditingController _schoolNameController = TextEditingController();
   final TextEditingController _educationLevelController = TextEditingController();
   final TextEditingController _yearLevelController = TextEditingController();
+  final TextEditingController _schoolIdController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _schoolNameController.addListener(_validate);
-    _educationLevelController.addListener(_validate);
-    _yearLevelController.addListener(_validate);
+    _schoolNameController.addListener(_notifyChanges);
+    _educationLevelController.addListener(_notifyChanges);
+    _yearLevelController.addListener(_notifyChanges);
+    _schoolIdController.addListener(_notifyChanges);
     WidgetsBinding.instance.addPostFrameCallback((_) => _validate());
+  }
+
+  void _notifyChanges() {
+    _validate();
+    widget.onDataChanged?.call({
+      'schoolName': _schoolNameController.text,
+      'educationLevel': _educationLevelController.text,
+      'yearOrGradeLevel': _yearLevelController.text,
+      'schoolIdNumber': _schoolIdController.text,
+    });
   }
 
   void _validate() {
     final isValid = _schoolNameController.text.isNotEmpty &&
         _educationLevelController.text.isNotEmpty &&
-        _yearLevelController.text.isNotEmpty;
+        _yearLevelController.text.isNotEmpty &&
+        _schoolIdController.text.isNotEmpty;
 
     widget.setIsFormValid?.call(isValid, _showError);
   }
@@ -55,6 +70,9 @@ class _StudentFormState extends State<StudentForm> {
     }
     if (_yearLevelController.text.isEmpty) {
       missingFields.add("Year/Grade Level");
+    }
+    if (_schoolIdController.text.isEmpty) {
+      missingFields.add("School ID Number");
     }
 
     String description = missingFields.isEmpty 
@@ -75,6 +93,7 @@ class _StudentFormState extends State<StudentForm> {
     _schoolNameController.dispose();
     _educationLevelController.dispose();
     _yearLevelController.dispose();
+    _schoolIdController.dispose();
     super.dispose();
   }
 
@@ -133,6 +152,21 @@ class _StudentFormState extends State<StudentForm> {
           controller: _yearLevelController,
           hintText: AppString.selectYearLevel,
           items: Constant.yearLevelMap[_educationLevelController.text] ?? [],
+        ),
+        16.gapH,
+        Text(
+          'School ID Number',
+          style: TextStyle(
+            fontSize: D.textBase,
+            fontWeight: D.semiBold,
+            color: Colors.black,
+            fontFamily: 'Segoe UI',
+          ),
+        ),
+        8.gapH,
+        TextInput(
+          controller: _schoolIdController,
+          hintText: 'Enter your school ID number',
         ),
         24.gapH,
         BenefitsCard(

@@ -145,15 +145,6 @@ class AppString {
   static const String takePhotoOrUpload =
       "Take a photo or upload an image file";
 
-  // Document Form - ID Types
-  static const String nationalId = "National ID";
-  static const String driversLicense = "Driver's License";
-  static const String passport = "Passport";
-  static const String votersId = "Voter's ID";
-  static const String philhealthId = "PhilHealth ID";
-  static const String sssId = "SSS ID";
-  static const String umid = "UMID";
-  static const String postalId = "Postal ID";
   static const String optionalField = '(Optional)';
 
   // Document Form - Buttons

@@ -6,15 +6,16 @@ import '../../../common/widgets/drop_down.dart';
 import '../../../common/widgets/error_modal.dart';
 import 'benefits_card.dart';
 
-
 class PwdForm extends StatefulWidget {
   final TextEditingController existingIdController;
   final Function(bool isValid, VoidCallback showError)? setIsFormValid;
+  final Function(Map<String, dynamic>)? onDataChanged;
 
   const PwdForm({
     super.key,
     required this.existingIdController,
     this.setIsFormValid,
+    this.onDataChanged,
   });
 
   @override
@@ -23,7 +24,7 @@ class PwdForm extends StatefulWidget {
 
 class _PwdFormState extends State<PwdForm> {
   final TextEditingController _disabilityTypeController = TextEditingController();
-
+  
   final List<String> disabilityTypes = [
     'Visual Impairment',
     'Hearing Impairment',
@@ -45,23 +46,14 @@ class _PwdFormState extends State<PwdForm> {
   void _validate() {
     final isValid = _disabilityTypeController.text.isNotEmpty;
     widget.setIsFormValid?.call(isValid, _showError);
+    widget.onDataChanged?.call({'typeOfDisability': _disabilityTypeController.text});
   }
 
   void _showError() {
-    List<String> missingFields = [];
-    
-    if (_disabilityTypeController.text.isEmpty) {
-      missingFields.add("Type of Disability");
-    }
-
-    String description = missingFields.isEmpty 
-        ? "All fields are complete."
-        : "Please complete the following field${missingFields.length > 1 ? 's' : ''}:\n\n${missingFields.map((f) => "• $f").join('\n')}";
-
     showErrorModal(
       context: context,
       title: "Required Information Missing",
-      description: description,
+      description: "Please select a type of disability.",
       icon: Icons.accessible_forward_outlined,
       iconColor: AppColors.primary,
     );

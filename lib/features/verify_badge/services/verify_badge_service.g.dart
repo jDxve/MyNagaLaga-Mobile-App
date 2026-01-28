@@ -20,8 +20,30 @@ class _VerifyBadgeService implements VerifyBadgeService {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<HttpResponse<EmptyDataResponse>> createBadgeApplication({
-    required String residentId,
+  Future<HttpResponse<dynamic>> getBadgeTypes() async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<HttpResponse<dynamic>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/badge-requests/badge-types',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch(_options);
+    final _value = _result.data;
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<dynamic>> createBadgeApplication({
+    required String mobileUserId,
     required String badgeTypeId,
     String? submittedByUserProfileId,
     required String fullName,
@@ -38,16 +60,16 @@ class _VerifyBadgeService implements VerifyBadgeService {
     String? educationLevel,
     String? yearOrGradeLevel,
     String? schoolIdNumber,
-    required File frontId,
-    required File backId,
-    File? supportingFile,
+    required MultipartFile frontId,
+    required MultipartFile backId,
+    MultipartFile? supportingFile,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = FormData();
-    _data.fields.add(MapEntry('residentId', residentId));
+    _data.fields.add(MapEntry('mobileUserId', mobileUserId));
     _data.fields.add(MapEntry('badgeTypeId', badgeTypeId));
     if (submittedByUserProfileId != null) {
       _data.fields.add(
@@ -93,36 +115,12 @@ class _VerifyBadgeService implements VerifyBadgeService {
     if (schoolIdNumber != null) {
       _data.fields.add(MapEntry('schoolIdNumber', schoolIdNumber));
     }
-    _data.files.add(
-      MapEntry(
-        'front_id',
-        MultipartFile.fromFileSync(
-          frontId.path,
-          filename: frontId.path.split(Platform.pathSeparator).last,
-        ),
-      ),
-    );
-    _data.files.add(
-      MapEntry(
-        'back_id',
-        MultipartFile.fromFileSync(
-          backId.path,
-          filename: backId.path.split(Platform.pathSeparator).last,
-        ),
-      ),
-    );
+    _data.files.add(MapEntry('front_id', frontId));
+    _data.files.add(MapEntry('back_id', backId));
     if (supportingFile != null) {
-      _data.files.add(
-        MapEntry(
-          'supporting_file',
-          MultipartFile.fromFileSync(
-            supportingFile.path,
-            filename: supportingFile.path.split(Platform.pathSeparator).last,
-          ),
-        ),
-      );
+      _data.files.add(MapEntry('supporting_file', supportingFile));
     }
-    final _options = _setStreamType<HttpResponse<EmptyDataResponse>>(
+    final _options = _setStreamType<HttpResponse<dynamic>>(
       Options(
             method: 'POST',
             headers: _headers,
@@ -131,20 +129,14 @@ class _VerifyBadgeService implements VerifyBadgeService {
           )
           .compose(
             _dio.options,
-            '/badge-requests',
+            '/badge-requests/apply',
             queryParameters: queryParameters,
             data: _data,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late EmptyDataResponse _value;
-    try {
-      _value = EmptyDataResponse.fromJson(_result.data!);
-    } on Object catch (e, s) {
-      errorLogger?.logError(e, s, _options, response: _result);
-      rethrow;
-    }
+    final _result = await _dio.fetch(_options);
+    final _value = _result.data;
     final httpResponse = HttpResponse(_value, _result);
     return httpResponse;
   }

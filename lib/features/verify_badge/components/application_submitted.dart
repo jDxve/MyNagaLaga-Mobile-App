@@ -38,7 +38,6 @@ class _ApplicationSubmittedWidget extends StatefulWidget {
 class _ApplicationSubmittedWidgetState
     extends State<_ApplicationSubmittedWidget> {
   late ConfettiController _confettiController;
-  late String _referenceNumber;
 
   @override
   void initState() {
@@ -46,22 +45,12 @@ class _ApplicationSubmittedWidgetState
     _confettiController = ConfettiController(
       duration: const Duration(seconds: 3),
     );
-    _referenceNumber = widget.referenceNumber ?? _generateReferenceNumber();
 
     Future.delayed(const Duration(milliseconds: 300), () {
       if (mounted) {
         _confettiController.play();
       }
     });
-  }
-
-  String _generateReferenceNumber() {
-    final now = DateTime.now();
-    final random = Random();
-    final datePart =
-        '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}';
-    final randomPart = (10000 + random.nextInt(90000)).toString();
-    return 'MNA-$datePart-$randomPart';
   }
 
   @override
@@ -123,39 +112,46 @@ class _ApplicationSubmittedWidgetState
                 ),
                 32.gapH,
 
-                Container(
-                  padding: EdgeInsets.all(20.w),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(D.radiusLG),
-                    border: Border.all(
-                      color: AppColors.grey.withOpacity(0.3),
-                      width: 1,
+                // Only show reference number if it exists
+                if (widget.referenceNumber != null)
+                  Container(
+                    padding: EdgeInsets.all(20.w),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(D.radiusLG),
+                      border: Border.all(
+                        color: AppColors.grey.withOpacity(0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          AppString.referenceNumberLabel,
+                          style: TextStyle(
+                            fontSize: D.textSM,
+                            color: AppColors.grey,
+                          ),
+                        ),
+                        8.gapH,
+                        SelectableText(
+                          widget.referenceNumber!, // Use the one from backend
+                          style: TextStyle(
+                            fontSize: D.textLG,
+                            fontWeight: D.bold,
+                            color: AppColors.primary,
+                            letterSpacing: 0.5,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                     ),
                   ),
-                  child: Column(
-                    children: [
-                      Text(
-                        AppString.referenceNumberLabel,
-                        style: TextStyle(
-                          fontSize: D.textSM,
-                          color: AppColors.grey,
-                        ),
-                      ),
-                      8.gapH,
-                      SelectableText(
-                        _referenceNumber,
-                        style: TextStyle(
-                          fontSize: D.textLG,
-                          fontWeight: D.bold,
-                          color: AppColors.primary,
-                          letterSpacing: 0.5,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ),
+
+                // Show loading if no reference number yet
+                if (widget.referenceNumber == null)
+                  const CircularProgressIndicator(),
+
                 40.gapH,
 
                 SecondaryButton(

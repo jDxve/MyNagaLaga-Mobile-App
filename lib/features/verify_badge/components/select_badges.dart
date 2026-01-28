@@ -1,104 +1,154 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../../common/models/dio/data_state.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/resources/assets.dart';
 import '../../../common/resources/strings.dart';
 import '../../../common/widgets/secondary_button.dart';
 import '../../../common/widgets/error_modal.dart';
+import '../models/badge_type_model.dart';
+import '../notifier/badge_types_notifier.dart';
 
 Widget badgeSelectionCards({
   required BuildContext context,
-  required Function(String) onBadgeSelected,
-  String? selectedBadge,
+  required Function(BadgeType) onBadgeSelected,
+  BadgeType? selectedBadge,
   required VoidCallback onNext,
 }) {
-  final List<Map<String, dynamic>> badges = [
-    {
-      'id': 'senior_citizen',
-      'title': AppString.seniorCitizenTitle,
-      'description': AppString.seniorCitizenDescription,
-      'icon': Assets.seniorCitizenIcon,
-      'lightColor': AppColors.lightYellow,
-      'darkColor': AppColors.darkYellow,
-    },
-    {
-      'id': 'pwd',
-      'title': AppString.pwdTitle,
-      'description': AppString.pwdDescription,
-      'icon': Assets.pwdIcon,
-      'lightColor': AppColors.lightPink,
-      'darkColor': AppColors.darkPink,
-    },
-    {
-      'id': 'solo_parent',
-      'title': AppString.soloParentTitle,
-      'description': AppString.soloParentDescription,
-      'icon': Assets.soloParentIcon,
-      'lightColor': AppColors.lightPurple,
-      'darkColor': AppColors.darkPurple,
-    },
-    {
-      'id': 'indigent',
-      'title': AppString.indigentTitle,
-      'description': AppString.indigentDescription,
-      'icon': Assets.indigentFamilyIcon,
-      'lightColor': AppColors.lightPrimary,
-      'darkColor': AppColors.darkPrimary,
-    },
-    {
-      'id': 'student',
-      'title': AppString.studentTitle,
-      'description': AppString.studentDescription,
-      'icon': Assets.studentIcon,
-      'lightColor': AppColors.lightBlue,
-      'darkColor': AppColors.darkBlue,
-    },
-  ];
+  return Consumer(
+    builder: (context, ref, _) {
+      final badgeTypesState = ref.watch(badgeTypesNotifierProvider);
 
-  return Column(
-    children: [
-      ...badges.map(
-        (badge) => Padding(
-          padding: EdgeInsets.only(bottom: 12.h),
-          child: _BadgeCard(
-            id: badge['id'],
-            title: badge['title'],
-            description: badge['description'],
-            icon: badge['icon'],
-            lightColor: badge['lightColor'],
-            darkColor: badge['darkColor'],
-            isSelected: selectedBadge == badge['id'],
-            onTap: () => onBadgeSelected(badge['id']),
+      return badgeTypesState.when(
+        started: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        success: (badgeTypes) {
+          if (badgeTypes.isEmpty) {
+            return const Center(child: Text('No badge types available'));
+          }
+
+          return Column(
+            children: [
+              ...badgeTypes.map((badgeType) {
+                final isSelected = selectedBadge?.id == badgeType.id;
+                final badgeInfo = _getBadgeInfo(badgeType.badgeKey);
+                
+                return Padding(
+                  padding: EdgeInsets.only(bottom: 12.h),
+                  child: _BadgeCard(
+                    badgeType: badgeType,
+                    title: badgeInfo['title'],
+                    description: badgeInfo['description'],
+                    icon: badgeInfo['icon'],
+                    lightColor: badgeInfo['lightColor'],
+                    darkColor: badgeInfo['darkColor'],
+                    isSelected: isSelected,
+                    onTap: () => onBadgeSelected(badgeType),
+                  ),
+                );
+              }),
+              16.gapH,
+              _InfoCard(),
+              16.gapH,
+              SecondaryButton(
+                text: AppString.next,
+                isFilled: true,
+                isDisabled: selectedBadge == null,
+                onPressed: selectedBadge != null
+                    ? onNext
+                    : () {
+                        showErrorModal(
+                          context: context,
+                          title: AppString.noBadgeSelectedTitle,
+                          description: AppString.noBadgeSelectedDescription,
+                          icon: Icons.warning_amber_outlined,
+                          iconColor: Colors.orange,
+                          buttonText: AppString.gotIt,
+                        );
+                      },
+              ),
+            ],
+          );
+        },
+        error: (error) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 48, color: Colors.red),
+              16.gapH,
+              Text('Error: $error'),
+              16.gapH,
+              ElevatedButton(
+                onPressed: () => ref
+                    .read(badgeTypesNotifierProvider.notifier)
+                    .fetchBadgeTypes(),
+                child: const Text('Retry'),
+              ),
+            ],
           ),
         ),
-      ),
-      16.gapH,
-      _InfoCard(),
-      16.gapH,
-      SecondaryButton(
-        text: AppString.next,
-        isFilled: true,
-        isDisabled: selectedBadge == null,
-        onPressed: selectedBadge != null
-            ? onNext
-            : () {
-                showErrorModal(
-                  context: context,
-                  title: AppString.noBadgeSelectedTitle,
-                  description: AppString.noBadgeSelectedDescription,
-                  icon: Icons.warning_amber_outlined,
-                  iconColor: Colors.orange,
-                  buttonText: AppString.gotIt,
-                );
-              },
-      ),
-    ],
+      );
+    },
   );
 }
 
+Map<String, dynamic> _getBadgeInfo(String badgeKey) {
+  switch (badgeKey) {
+    case 'senior_citizen':
+      return {
+        'title': AppString.seniorCitizenTitle,
+        'description': AppString.seniorCitizenDescription,
+        'icon': Assets.seniorCitizenIcon,
+        'lightColor': AppColors.lightYellow,
+        'darkColor': AppColors.darkYellow,
+      };
+    case 'pwd':
+      return {
+        'title': AppString.pwdTitle,
+        'description': AppString.pwdDescription,
+        'icon': Assets.pwdIcon,
+        'lightColor': AppColors.lightPink,
+        'darkColor': AppColors.darkPink,
+      };
+    case 'solo_parent':
+      return {
+        'title': AppString.soloParentTitle,
+        'description': AppString.soloParentDescription,
+        'icon': Assets.soloParentIcon,
+        'lightColor': AppColors.lightPurple,
+        'darkColor': AppColors.darkPurple,
+      };
+    case 'indigent':
+      return {
+        'title': AppString.indigentTitle,
+        'description': AppString.indigentDescription,
+        'icon': Assets.indigentFamilyIcon,
+        'lightColor': AppColors.lightPrimary,
+        'darkColor': AppColors.darkPrimary,
+      };
+    case 'student':
+      return {
+        'title': AppString.studentTitle,
+        'description': AppString.studentDescription,
+        'icon': Assets.studentIcon,
+        'lightColor': AppColors.lightBlue,
+        'darkColor': AppColors.darkBlue,
+      };
+    default:
+      return {
+        'title': 'Other',
+        'description': 'Other badge type',
+        'icon': Assets.studentIcon,
+        'lightColor': AppColors.lightGrey,
+        'darkColor': AppColors.grey,
+      };
+  }
+}
+
 class _BadgeCard extends StatelessWidget {
-  final String id;
+  final BadgeType badgeType;
   final String title;
   final String description;
   final String icon;
@@ -108,7 +158,7 @@ class _BadgeCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const _BadgeCard({
-    required this.id,
+    required this.badgeType,
     required this.title,
     required this.description,
     required this.icon,

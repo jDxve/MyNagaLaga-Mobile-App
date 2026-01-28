@@ -8,11 +8,13 @@ import 'benefits_card.dart';
 class IndigentForm extends StatefulWidget {
   final TextEditingController existingIdController;
   final Function(bool isValid, VoidCallback showError)? setIsFormValid;
+  final Function(Map<String, dynamic>)? onDataChanged;
 
   const IndigentForm({
     super.key,
     required this.existingIdController,
     this.setIsFormValid,
+    this.onDataChanged,
   });
 
   @override
@@ -30,6 +32,7 @@ class _IndigentFormState extends State<IndigentForm> {
 
   void _validate() {
     widget.setIsFormValid?.call(true, () {});
+    widget.onDataChanged?.call({'estimatedMonthlyIncome': _monthlyIncome});
   }
 
   @override
@@ -75,6 +78,7 @@ class _IndigentFormState extends State<IndigentForm> {
                 onChanged: (value) {
                   setState(() {
                     _monthlyIncome = value;
+                    _validate();
                   });
                 },
               ),

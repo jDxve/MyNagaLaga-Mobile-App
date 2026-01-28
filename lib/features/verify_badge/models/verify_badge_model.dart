@@ -1,4 +1,3 @@
-
 class VerifyBadgeRequest {
   final String residentId;
   final String badgeTypeId;
@@ -47,24 +46,113 @@ class VerifyBadgeRequest {
   });
 
   Map<String, dynamic> toJson() {
-    return {
-      'residentId': residentId,
+    final json = <String, dynamic>{
+      'mobileUserId': residentId, // Fixed: matches server expectation
       'badgeTypeId': badgeTypeId,
-      'submittedByUserProfileId': submittedByUserProfileId,
       'fullName': fullName,
       'birthdate': birthdate,
       'gender': gender,
       'homeAddress': homeAddress,
       'contactNumber': contactNumber,
-      'existingSeniorCitizenId': existingSeniorCitizenId,
       'typeOfId': typeOfId,
-      'typeOfDisability': typeOfDisability,
-      'numberOfDependents': numberOfDependents,
-      'estimatedMonthlyHouseholdIncome': estimatedMonthlyHouseholdIncome,
-      'schoolName': schoolName,
-      'educationLevel': educationLevel,
-      'yearOrGradeLevel': yearOrGradeLevel,
-      'schoolIdNumber': schoolIdNumber,
     };
+
+    // Only include optional fields if they have values
+    if (submittedByUserProfileId != null) {
+      json['submittedByUserProfileId'] = submittedByUserProfileId;
+    }
+    if (existingSeniorCitizenId != null) {
+      json['existingSeniorCitizenId'] = existingSeniorCitizenId;
+    }
+    if (typeOfDisability != null) {
+      json['typeOfDisability'] = typeOfDisability;
+    }
+    if (numberOfDependents != null) {
+      json['numberOfDependents'] = numberOfDependents;
+    }
+    if (estimatedMonthlyHouseholdIncome != null) {
+      json['estimatedMonthlyHouseholdIncome'] = estimatedMonthlyHouseholdIncome;
+    }
+    if (schoolName != null) {
+      json['schoolName'] = schoolName;
+    }
+    if (educationLevel != null) {
+      json['educationLevel'] = educationLevel;
+    }
+    if (yearOrGradeLevel != null) {
+      json['yearOrGradeLevel'] = yearOrGradeLevel;
+    }
+    if (schoolIdNumber != null) {
+      json['schoolIdNumber'] = schoolIdNumber;
+    }
+
+    return json;
+  }
+
+  // Factory constructor for creating from JSON
+  factory VerifyBadgeRequest.fromJson(Map<String, dynamic> json) {
+    return VerifyBadgeRequest(
+      residentId: json['residentId'] ?? json['mobileUserId'],
+      badgeTypeId: json['badgeTypeId'],
+      submittedByUserProfileId: json['submittedByUserProfileId'],
+      fullName: json['fullName'],
+      birthdate: json['birthdate'],
+      gender: json['gender'],
+      homeAddress: json['homeAddress'],
+      contactNumber: json['contactNumber'],
+      existingSeniorCitizenId: json['existingSeniorCitizenId'],
+      typeOfId: json['typeOfId'],
+      typeOfDisability: json['typeOfDisability'],
+      numberOfDependents: json['numberOfDependents'],
+      estimatedMonthlyHouseholdIncome: json['estimatedMonthlyHouseholdIncome'],
+      schoolName: json['schoolName'],
+      educationLevel: json['educationLevel'],
+      yearOrGradeLevel: json['yearOrGradeLevel'],
+      schoolIdNumber: json['schoolIdNumber'],
+    );
+  }
+
+  // CopyWith method for easy updates
+  VerifyBadgeRequest copyWith({
+    String? residentId,
+    String? badgeTypeId,
+    String? submittedByUserProfileId,
+    String? fullName,
+    String? birthdate,
+    String? gender,
+    String? homeAddress,
+    String? contactNumber,
+    String? existingSeniorCitizenId,
+    String? typeOfId,
+    String? typeOfDisability,
+    int? numberOfDependents,
+    String? estimatedMonthlyHouseholdIncome,
+    String? schoolName,
+    String? educationLevel,
+    String? yearOrGradeLevel,
+    String? schoolIdNumber,
+  }) {
+    return VerifyBadgeRequest(
+      residentId: residentId ?? this.residentId,
+      badgeTypeId: badgeTypeId ?? this.badgeTypeId,
+      submittedByUserProfileId:
+          submittedByUserProfileId ?? this.submittedByUserProfileId,
+      fullName: fullName ?? this.fullName,
+      birthdate: birthdate ?? this.birthdate,
+      gender: gender ?? this.gender,
+      homeAddress: homeAddress ?? this.homeAddress,
+      contactNumber: contactNumber ?? this.contactNumber,
+      existingSeniorCitizenId:
+          existingSeniorCitizenId ?? this.existingSeniorCitizenId,
+      typeOfId: typeOfId ?? this.typeOfId,
+      typeOfDisability: typeOfDisability ?? this.typeOfDisability,
+      numberOfDependents: numberOfDependents ?? this.numberOfDependents,
+      estimatedMonthlyHouseholdIncome: estimatedMonthlyHouseholdIncome ??
+          this.estimatedMonthlyHouseholdIncome,
+      schoolName: schoolName ?? this.schoolName,
+      educationLevel: educationLevel ?? this.educationLevel,
+      yearOrGradeLevel: yearOrGradeLevel ?? this.yearOrGradeLevel,
+      schoolIdNumber: schoolIdNumber ?? this.schoolIdNumber,
+    );
   }
 }

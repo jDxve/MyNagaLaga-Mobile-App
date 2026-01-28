@@ -5,6 +5,7 @@ import 'package:image_cropper/image_cropper.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/resources/strings.dart';
+import '../../../common/utils/ui_utils.dart'; // ADD THIS IMPORT
 import '../../../common/widgets/secondary_button.dart';
 import '../../../common/widgets/text_input.dart';
 import '../../../common/widgets/error_modal.dart';
@@ -51,16 +52,7 @@ class _DocumentPageState extends State<DocumentPage> {
   int _currentPage = 0;
   String? _selectedIdType;
 
-  final List<String> idTypes = [
-    AppString.nationalId,
-    AppString.driversLicense,
-    AppString.passport,
-    AppString.votersId,
-    AppString.philhealthId,
-    AppString.sssId,
-    AppString.umid,
-    AppString.postalId,
-  ];
+  // REMOVED: local idTypes list - now using UIUtils.idTypes
 
   @override
   void initState() {
@@ -190,17 +182,17 @@ class _DocumentPageState extends State<DocumentPage> {
               child: ListView.separated(
                 padding: EdgeInsets.zero,
                 shrinkWrap: true,
-                itemCount: idTypes.length,
+                itemCount: UIUtils.idTypes.length, // CHANGED: Use UIUtils.idTypes
                 separatorBuilder: (context, index) => const Divider(height: 1),
                 itemBuilder: (context, index) {
                   return ListTile(
-                    title: Text(idTypes[index], style: const TextStyle(fontFamily: 'Segoe UI')),
+                    title: Text(UIUtils.idTypes[index], style: const TextStyle(fontFamily: 'Segoe UI')), // CHANGED
                     onTap: () {
                       setState(() {
-                        _idTypeController.text = idTypes[index];
-                        _selectedIdType = idTypes[index];
+                        _idTypeController.text = UIUtils.idTypes[index]; // CHANGED
+                        _selectedIdType = UIUtils.idTypes[index]; // CHANGED
                       });
-                      widget.onIdTypeChanged(idTypes[index]);
+                      widget.onIdTypeChanged(UIUtils.idTypes[index]); // CHANGED
                       _toggleDropdown();
                       _validateForm();
                     },

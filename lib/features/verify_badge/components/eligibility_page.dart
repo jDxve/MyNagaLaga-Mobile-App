@@ -10,6 +10,7 @@ class EligibilityPage extends StatelessWidget {
   final String selectedBadge;
   final TextEditingController existingIdController;
   final Function(bool isValid, VoidCallback showError)? setIsFormValid;
+  final Function(Map<String, dynamic>)? onDataChanged;
 
   const EligibilityPage({
     super.key,
@@ -17,6 +18,7 @@ class EligibilityPage extends StatelessWidget {
     required this.selectedBadge,
     required this.existingIdController,
     this.setIsFormValid,
+    this.onDataChanged,
   });
 
   @override
@@ -31,21 +33,25 @@ class EligibilityPage extends StatelessWidget {
         return PwdForm(
           existingIdController: existingIdController,
           setIsFormValid: setIsFormValid,
+          onDataChanged: onDataChanged,
         );
       case 'solo_parent':
         return SoloParentForm(
           existingIdController: existingIdController,
           setIsFormValid: setIsFormValid,
+          onDataChanged: onDataChanged,
         );
       case 'indigent':
         return IndigentForm(
           existingIdController: existingIdController,
           setIsFormValid: setIsFormValid,
+          onDataChanged: onDataChanged,
         );
       case 'student':
         return StudentForm(
           existingIdController: existingIdController,
           setIsFormValid: setIsFormValid,
+          onDataChanged: onDataChanged,
         );
       default:
         return const SizedBox.shrink();

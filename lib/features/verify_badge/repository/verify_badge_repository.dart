@@ -4,7 +4,7 @@ import '../../../common/models/dio/data_state.dart';
 abstract class VerifyBadgeRepository {
   /// Submit a badge application
   Future<DataState<dynamic>> submitBadgeApplication({
-    required String residentId,
+    required String mobileUserId,
     required String badgeTypeId,
     required String fullName,
     required String birthdate,

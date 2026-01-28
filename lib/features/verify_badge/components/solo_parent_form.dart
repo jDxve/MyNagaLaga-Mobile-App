@@ -7,11 +7,13 @@ import 'benefits_card.dart';
 class SoloParentForm extends StatefulWidget {
   final TextEditingController existingIdController;
   final Function(bool isValid, VoidCallback showError)? setIsFormValid;
+  final Function(Map<String, dynamic>)? onDataChanged;
 
   const SoloParentForm({
     super.key,
     required this.existingIdController,
     this.setIsFormValid,
+    this.onDataChanged,
   });
 
   @override
@@ -30,6 +32,7 @@ class _SoloParentFormState extends State<SoloParentForm> {
   void _validate() {
     final isValid = _numberOfDependents > 0;
     widget.setIsFormValid?.call(isValid, () {});
+    widget.onDataChanged?.call({'numberOfDependents': _numberOfDependents});
   }
 
   void _incrementDependents() {

@@ -1,12 +1,9 @@
-import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:retrofit/retrofit.dart';
 import '../../../common/models/dio/api_client.dart';
-import '../../../common/models/responses/empty_data_response.dart';
 
 part 'verify_badge_service.g.dart';
-
 
 final verifyBadgeServiceProvider = Provider.autoDispose<VerifyBadgeService>((ref) {
   final apiClient = ApiClient.fromEnv();
@@ -18,10 +15,13 @@ final verifyBadgeServiceProvider = Provider.autoDispose<VerifyBadgeService>((ref
 abstract class VerifyBadgeService {
   factory VerifyBadgeService(Dio dio, {String? baseUrl}) = _VerifyBadgeService;
 
-  @POST('/badge-requests')
+  @GET('/badge-requests/badge-types')
+  Future<HttpResponse> getBadgeTypes(); // CHANGED: Remove <Map<String, dynamic>>
+
+  @POST('/badge-requests/apply')
   @MultiPart()
-  Future<HttpResponse<EmptyDataResponse>> createBadgeApplication({
-    @Part(name: 'residentId') required String residentId,
+  Future<HttpResponse> createBadgeApplication({
+    @Part(name: 'mobileUserId') required String mobileUserId,
     @Part(name: 'badgeTypeId') required String badgeTypeId,
     @Part(name: 'submittedByUserProfileId') String? submittedByUserProfileId,
     @Part(name: 'fullName') required String fullName,
@@ -38,8 +38,8 @@ abstract class VerifyBadgeService {
     @Part(name: 'educationLevel') String? educationLevel,
     @Part(name: 'yearOrGradeLevel') String? yearOrGradeLevel,
     @Part(name: 'schoolIdNumber') String? schoolIdNumber,
-    @Part(name: 'front_id') required File frontId,
-    @Part(name: 'back_id') required File backId,
-    @Part(name: 'supporting_file') File? supportingFile,
+    @Part(name: 'front_id') required MultipartFile frontId,
+    @Part(name: 'back_id') required MultipartFile backId,
+    @Part(name: 'supporting_file') MultipartFile? supportingFile,
   });
 }
