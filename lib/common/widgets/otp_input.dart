@@ -10,7 +10,7 @@ class OtpInput extends StatefulWidget {
   const OtpInput({
     super.key,
     required this.onCompleted,
-    this.length = 6,
+    this.length =7,
   });
 
   @override

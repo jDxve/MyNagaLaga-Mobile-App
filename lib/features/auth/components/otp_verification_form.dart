@@ -1,26 +1,38 @@
+// lib/features/auth/components/otp_verification_form.dart
+
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../common/models/dio/data_state.dart';
 import '../../../common/resources/assets.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/widgets/primary_button.dart';
 import '../../../common/widgets/otp_input.dart';
+import '../../../common/widgets/error_modal.dart';
+import '../../../common/utils/ui_utils.dart';
+import '../notifier/otp_verification_notifier.dart';
+import '../notifier/auth_notifier.dart';
+import '../../home/screens/home_screen.dart';
 
-class OtpVerificationForm extends StatefulWidget {
+class OtpVerificationForm extends ConsumerStatefulWidget {
   final String email;
+  final bool isSignup;
 
   const OtpVerificationForm({
     super.key,
     required this.email,
+    this.isSignup = false,
   });
 
   @override
-  State<OtpVerificationForm> createState() => _OtpVerificationFormState();
+  ConsumerState<OtpVerificationForm> createState() => _OtpVerificationFormState();
 }
 
-class _OtpVerificationFormState extends State<OtpVerificationForm> {
+class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
   int _remainingSeconds = 300;
   Timer? _timer;
+  String _otpCode = '';
 
   @override
   void initState() {
@@ -35,6 +47,7 @@ class _OtpVerificationFormState extends State<OtpVerificationForm> {
   }
 
   void _startTimer() {
+    _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_remainingSeconds > 0) {
         setState(() {
@@ -46,11 +59,24 @@ class _OtpVerificationFormState extends State<OtpVerificationForm> {
     });
   }
 
-  void _resendCode() {
+  void _resendCode() async {
     setState(() {
       _remainingSeconds = 300;
     });
     _startTimer();
+
+    if (widget.isSignup) {
+      showErrorModal(
+        context: context,
+        title: 'OTP Resent',
+        description: 'A new OTP code has been sent to ${widget.email}',
+        icon: Icons.check_circle_outline,
+        iconColor: Colors.green,
+      );
+    } else {
+      final loginNotifier = ref.read(loginNotifierProvider.notifier);
+      await loginNotifier.requestLoginOtp(email: widget.email);
+    }
   }
 
   String _formatTime(int seconds) {
@@ -61,11 +87,80 @@ class _OtpVerificationFormState extends State<OtpVerificationForm> {
 
   void _handleOtpCompleted(String otp) {
     setState(() {
+      _otpCode = otp;
     });
+  }
+
+  void _handleVerifyOtp() async {
+    final otpError = UIUtils.validateOtp(_otpCode);
+    if (otpError != null) {
+      showErrorModal(
+        context: context,
+        title: 'Invalid OTP',
+        description: otpError,
+        icon: Icons.password,
+        iconColor: Colors.orange,
+      );
+      return;
+    }
+
+    final otpNotifier = ref.read(otpVerificationNotifierProvider.notifier);
+
+    await otpNotifier.verifyOtp(
+      email: widget.email,
+      token: _otpCode,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final otpState = ref.watch(otpVerificationNotifierProvider);
+
+    ref.listen(otpVerificationNotifierProvider, (previous, next) {
+      next.when(
+        started: () {},
+        loading: () {},
+        success: (data) {
+          // TODO: Save tokens
+          // _saveAuthData(data);
+          
+          showErrorModal(
+            context: context,
+            title: 'Verification Successful',
+            description: 'Your account has been verified successfully!',
+            icon: Icons.check_circle_outline,
+            iconColor: Colors.green,
+            barrierDismissible: false,
+            onButtonPressed: () {
+              // Close the modal
+              Navigator.pop(context);
+              
+              // Navigate to Home Screen and remove all previous routes
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                HomeScreen.routeName,
+                (route) => false,
+              );
+            },
+          );
+        },
+        error: (error) {
+          showErrorModal(
+            context: context,
+            title: 'Verification Failed',
+            description: error ?? 'Invalid OTP code. Please try again.',
+            icon: Icons.error_outline,
+            iconColor: Colors.red,
+          );
+        },
+      );
+    });
+
+    final isLoading = otpState.maybeWhen(
+      loading: () => true,
+      orElse: () => false,
+    );
+
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -89,7 +184,7 @@ class _OtpVerificationFormState extends State<OtpVerificationForm> {
                 child: Align(
                   alignment: Alignment.topLeft,
                   child: GestureDetector(
-                    onTap: () => Navigator.pop(context),
+                    onTap: isLoading ? null : () => Navigator.pop(context),
                     child: Container(
                       height: 40.h,
                       width: 40.w,
@@ -122,7 +217,7 @@ class _OtpVerificationFormState extends State<OtpVerificationForm> {
                       ),
                       20.gapH,
                       Text(
-                        'Input the 6-digit code',
+                        'Input the 8-digit code',
                         style: TextStyle(
                           fontSize: D.textLG,
                           fontWeight: D.bold,
@@ -132,7 +227,7 @@ class _OtpVerificationFormState extends State<OtpVerificationForm> {
                       ),
                       4.gapH,
                       Text(
-                        'We sent a 6 digit code to ${widget.email}',
+                        'We sent an 8 digit code to ${widget.email}',
                         style: TextStyle(
                           fontSize: D.textSM,
                           fontWeight: D.semiBold,
@@ -141,14 +236,20 @@ class _OtpVerificationFormState extends State<OtpVerificationForm> {
                         ),
                       ),
                       32.gapH,
-                      OtpInput(
-                        onCompleted: _handleOtpCompleted,
-                        length: 6,
+                      AbsorbPointer(
+                        absorbing: isLoading,
+                        child: Opacity(
+                          opacity: isLoading ? 0.5 : 1.0,
+                          child: OtpInput(
+                            onCompleted: _handleOtpCompleted,
+                            length: 8,
+                          ),
+                        ),
                       ),
-               
+                      24.gapH,
                       _remainingSeconds > 0
                           ? Text(
-                              'Resend code in ${_formatTime(_remainingSeconds)} seconds',
+                              'Resend code in ${_formatTime(_remainingSeconds)}',
                               style: TextStyle(
                                 fontSize: D.textSM,
                                 fontWeight: D.medium,
@@ -157,22 +258,22 @@ class _OtpVerificationFormState extends State<OtpVerificationForm> {
                               ),
                             )
                           : GestureDetector(
-                              onTap: _resendCode,
+                              onTap: isLoading ? null : _resendCode,
                               child: Text(
                                 'Resend code',
                                 style: TextStyle(
                                   fontSize: D.textSM,
                                   fontWeight: D.medium,
-                                  color: AppColors.primary,
+                                  color: isLoading ? AppColors.grey : AppColors.primary,
                                   fontFamily: 'Segoe UI',
                                   decoration: TextDecoration.underline,
                                 ),
                               ),
                             ),
-                      55.gapH,
+                      40.gapH,
                       PrimaryButton(
-                        text: 'Verify & Continue',
-                        onPressed: () {},
+                        text: isLoading ? 'Verifying...' : 'Verify & Continue',
+                        onPressed: isLoading ? () {} : _handleVerifyOtp,
                       ),
                     ],
                   ),

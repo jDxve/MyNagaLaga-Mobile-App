@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'; 
 import 'features/welcome/screens/splash_screen.dart';
 import 'router.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await dotenv.load(fileName: ".env");
-
+  
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]).then((_) {
-    runApp(const MyApp());
+    runApp(
+      const ProviderScope( 
+        child: MyApp(),
+      ),
+    );
   });
 }
 
@@ -24,7 +28,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       onGenerateRoute: generateRoute,
-        initialRoute: SplashScreen.routeName,
+      initialRoute: SplashScreen.routeName,
     );
   }
 }

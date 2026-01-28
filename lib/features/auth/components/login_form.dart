@@ -1,31 +1,94 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../common/models/dio/data_state.dart';
 import '../../../common/resources/assets.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/widgets/primary_button.dart';
 import '../../../common/widgets/text_input.dart';
+import '../../../common/utils/ui_utils.dart';
+import '../../../common/widgets/error_modal.dart';
+import '../notifier/auth_notifier.dart';
+import 'otp_verification_form.dart';
 
-class LogInForm extends StatefulWidget {
+class LogInForm extends ConsumerStatefulWidget {
   const LogInForm({super.key});
 
   @override
-  State<LogInForm> createState() => _LoginFormState();
+  ConsumerState<LogInForm> createState() => _LoginFormState();
 }
 
-class _LoginFormState extends State<LogInForm> {
+class _LoginFormState extends ConsumerState<LogInForm> {
   final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  bool _obscurePassword = true;
 
   @override
   void dispose() {
     emailController.dispose();
-    passwordController.dispose();
     super.dispose();
+  }
+
+  bool _validateForm() {
+    final emailError = UIUtils.validateEmail(emailController.text);
+    if (emailError != null) {
+      showErrorModal(
+        context: context,
+        title: 'Invalid Email',
+        description: emailError,
+        icon: Icons.email_outlined,
+        iconColor: Colors.orange,
+      );
+      return false;
+    }
+    return true;
+  }
+
+  void _handleLogin() async {
+    if (!_validateForm()) return;
+
+    final loginNotifier = ref.read(loginNotifierProvider.notifier);
+
+    await loginNotifier.requestLoginOtp(
+      email: emailController.text.trim(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final loginState = ref.watch(loginNotifierProvider);
+
+    ref.listen(loginNotifierProvider, (previous, next) {
+      next.when(
+        started: () {},
+        loading: () {},
+        success: (data) {
+          if (data.sent) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => OtpVerificationForm(
+                  email: emailController.text.trim(),
+                ),
+              ),
+            );
+          }
+        },
+        error: (error) {
+          showErrorModal(
+            context: context,
+            title: 'Login Failed',
+            description: error ?? 'Failed to send OTP. Please try again.',
+            icon: Icons.error_outline,
+            iconColor: Colors.red,
+          );
+        },
+      );
+    });
+
+    final isLoading = loginState.maybeWhen(
+      loading: () => true,
+      orElse: () => false,
+    );
+
     return Container(
       width: double.infinity,
       height: MediaQuery.of(context).size.height,
@@ -73,52 +136,22 @@ class _LoginFormState extends State<LogInForm> {
               30.gapH,
               _buildLabel('Email Address'),
               8.gapH,
-              TextInput(
-                controller: emailController,
-                hintText: 'Enter your email address',
-                prefixIcon: Icon(Icons.email_outlined, color: AppColors.grey),
-                keyboardType: TextInputType.emailAddress,
-              ),
-              15.gapH,
-              _buildLabel('Password'),
-              8.gapH,
-              TextInput(
-                controller: passwordController,
-                hintText: 'Enter your password',
-                prefixIcon: Icon(Icons.lock_outline, color: AppColors.grey),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                    color: AppColors.grey,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
-                ),
-                obscureText: _obscurePassword,
-              ),
-              12.gapH,
-              Align(
-                alignment: Alignment.centerRight,
-                child: GestureDetector(
-                  onTap: () {},
-                  child: Text(
-                    'Forgot Password?',
-                    style: TextStyle(
-                      fontSize: D.textSM,
-                      fontWeight: D.medium,
-                      color: AppColors.primary,
-                      fontFamily: 'Segoe UI',
-                    ),
+              AbsorbPointer(
+                absorbing: isLoading,
+                child: Opacity(
+                  opacity: isLoading ? 0.5 : 1.0,
+                  child: TextInput(
+                    controller: emailController,
+                    hintText: 'Enter your email address',
+                    prefixIcon: Icon(Icons.email_outlined, color: AppColors.grey),
+                    keyboardType: TextInputType.emailAddress,
                   ),
                 ),
               ),
               40.gapH,
               PrimaryButton(
-                text: 'Sign In',
-                onPressed: () {},
+                text: isLoading ? 'Sending OTP...' : 'Sign In',
+                onPressed: isLoading ? () {} : _handleLogin,
               ),
               20.gapH,
               Row(
@@ -133,13 +166,17 @@ class _LoginFormState extends State<LogInForm> {
                     ),
                   ),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: isLoading
+                        ? null
+                        : () {
+                            Navigator.pushNamed(context, '/signup');
+                          },
                     child: Text(
                       'Sign Up',
                       style: TextStyle(
                         fontSize: D.textSM,
                         fontWeight: D.semiBold,
-                        color: AppColors.primary,
+                        color: isLoading ? AppColors.grey : AppColors.primary,
                         fontFamily: 'Segoe UI',
                       ),
                     ),
