@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:mynagalaga_mobile_app/features/auth/screens/login_screen.dart';
 import 'package:mynagalaga_mobile_app/features/auth/screens/signup_screen.dart';
-import 'package:mynagalaga_mobile_app/features/services/screens/track_services_screen.dart';
+import 'package:mynagalaga_mobile_app/features/services/screens/programs/track_services_screen.dart';
 import 'features/account/screens/account_screen.dart';
+import 'features/safety/screens/disaster_resilience_screen.dart';
 import 'features/services/screens/services_screen.dart';
-import 'features/services/screens/women_welfare_screen.dart';
+import 'features/services/screens/programs/women_welfare_screen.dart';
 import 'features/welcome/screens/onboarding_screen.dart';
 import 'features/welcome/screens/splash_screen.dart';
 import 'features/welcome/screens/welcome_screen.dart';
 import 'features/home/screens/home_screen.dart';
 import 'features/verify_badge/screens/verify_badge_screen.dart';
-import 'features/services/screens/children_youth_screen.dart';
-import 'features/services/screens/family_community_screen.dart';
-import 'features/services/screens/crisis_intervention_screen.dart';
-import 'features/services/screens/disaster_response_screen.dart';
+import 'features/services/screens/programs/children_youth_screen.dart';
+import 'features/services/screens/programs/family_community_screen.dart';
+import 'features/services/screens/programs/crisis_intervention_screen.dart';
+import 'features/services/screens/programs/disaster_response_screen.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
@@ -56,6 +57,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case DisasterResponseScreen.routeName:
       return MaterialPageRoute(
         builder: ((context) => const DisasterResponseScreen()),
+      );
+    case DisasterResilienceScreen.routeName:
+      return MaterialPageRoute(
+        builder: ((context) => const DisasterResilienceScreen()),
       );
     case VerifyBadgeScreen.routeName:
       return MaterialPageRoute(

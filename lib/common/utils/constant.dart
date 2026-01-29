@@ -1,3 +1,5 @@
+import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
+
 class Constant {
   static const String forMe = 'for_me';
   static const String forFamily = 'for_family';
@@ -17,29 +19,23 @@ class Constant {
       'Grade 3',
       'Grade 4',
       'Grade 5',
-      'Grade 6'
+      'Grade 6',
     ],
-    'Junior High School': [
-      'Grade 7',
-      'Grade 8',
-      'Grade 9',
-      'Grade 10'
-    ],
-    'Senior High School': [
-      'Grade 11',
-      'Grade 12'
-    ],
-    'College': [
-      '1st Year',
-      '2nd Year',
-      '3rd Year',
-      '4th Year',
-      '5th Year'
-    ],
-    'Graduate School': [
-      '1st Year',
-      '2nd Year',
-      '3rd Year'
-    ],
+    'Junior High School': ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10'],
+    'Senior High School': ['Grade 11', 'Grade 12'],
+    'College': ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'],
+    'Graduate School': ['1st Year', '2nd Year', '3rd Year'],
   };
+
+  static final nagaCityCenter = GeoPoint(
+    latitude: 13.6218,
+    longitude: 123.1948,
+  );
+
+  static final nagaBoundingBox = BoundingBox(
+    east: 123.2770,
+    north: 13.6820,
+    south: 13.5700,
+    west: 123.1400,
+  );
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../common/resources/dimensions.dart';
-import '../../../common/widgets/custom_app_bar.dart';
-import '../components/track_case/top_nav_services.dart';
-import '../components/track_case/track_case_indicator.dart';
+import '../../../../common/resources/dimensions.dart';
+import '../../../../common/widgets/custom_app_bar.dart';
+import '../../components/track_case/top_nav_services.dart';
+import '../../components/track_case/track_case_indicator.dart';
 
 class TrackCasesScreen extends StatefulWidget {
   static const routeName = '/track-cases';

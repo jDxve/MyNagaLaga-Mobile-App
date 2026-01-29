@@ -1,65 +1,52 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
-import '../../../common/resources/assets.dart';
-import '../../../common/resources/strings.dart';
-import '../../../common/utils/constant.dart';
-import '../../../common/widgets/custom_app_bar.dart';
-import '../../../common/widgets/drop_down.dart';
-import '../../../common/widgets/primary_button.dart';
-import '../../../common/widgets/info_card.dart';
-import '../../../common/widgets/toggle.dart';
-import '../../../common/widgets/text_input.dart';
-import '../../../common/widgets/upload_image_card.dart';
+import '../../../../common/resources/colors.dart';
+import '../../../../common/resources/dimensions.dart';
+import '../../../../common/resources/assets.dart';
+import '../../../../common/resources/strings.dart';
+import '../../../../common/utils/constant.dart';
+import '../../../../common/widgets/custom_app_bar.dart';
+import '../../../../common/widgets/drop_down.dart';
+import '../../../../common/widgets/primary_button.dart';
+import '../../../../common/widgets/info_card.dart';
+import '../../../../common/widgets/toggle.dart';
+import '../../../../common/widgets/text_input.dart';
+import '../../../../common/widgets/upload_image_card.dart';
 
-class SanggawadanPage extends StatefulWidget {
+class SeniorCitizenServicesPage extends StatefulWidget {
   final String userName;
   final String userAge;
-  final String userSchool;
-  final String userGradeLevel;
 
-  const SanggawadanPage({
+  const SeniorCitizenServicesPage({
     super.key,
     required this.userName,
     required this.userAge,
-    required this.userSchool,
-    required this.userGradeLevel,
   });
 
   @override
-  State<SanggawadanPage> createState() => _SanggawadanPageState();
+  State<SeniorCitizenServicesPage> createState() =>
+      _SeniorCitizenServicesPageState();
 }
 
-class _SanggawadanPageState extends State<SanggawadanPage> {
+class _SeniorCitizenServicesPageState extends State<SeniorCitizenServicesPage> {
   String? selectedRecipient = Constant.forMe;
   final TextEditingController reasonController = TextEditingController();
   final TextEditingController familyMemberController = TextEditingController();
-  final TextEditingController schoolController = TextEditingController();
-  final TextEditingController educationLevelController =
-      TextEditingController();
-  final TextEditingController gradeLevelController = TextEditingController();
+  final TextEditingController requestTypeController = TextEditingController();
   File? uploadedDocument;
 
   @override
   void initState() {
     super.initState();
     reasonController.addListener(() => setState(() {}));
-    educationLevelController.addListener(() {
-      setState(() {
-        gradeLevelController.clear();
-      });
-    });
   }
 
   @override
   void dispose() {
     reasonController.dispose();
     familyMemberController.dispose();
-    schoolController.dispose();
-    educationLevelController.dispose();
-    gradeLevelController.dispose();
+    requestTypeController.dispose();
     super.dispose();
   }
 
@@ -82,7 +69,7 @@ class _SanggawadanPageState extends State<SanggawadanPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: CustomAppBar(
-        title: AppString.sanggawadanTitle,
+        title: 'Senior Citizen Services',
         onBackPressed: () => Navigator.pop(context),
       ),
       body: SingleChildScrollView(
@@ -109,18 +96,21 @@ class _SanggawadanPageState extends State<SanggawadanPage> {
                       value: widget.userName,
                     ),
                     InfoCardItem(label: AppString.age, value: widget.userAge),
-                    InfoCardItem(
-                      label: AppString.schoolName,
-                      value: widget.userSchool,
-                    ),
-                    InfoCardItem(
-                      label: AppString.yearGradeLevel,
-                      value: widget.userGradeLevel,
-                    ),
                   ],
                 ),
                 20.gapH,
-                _buildReasonSection(),
+                _buildLabel('Senior Request Type'),
+                8.gapH,
+                Dropdown(
+                  controller: requestTypeController,
+                  hintText: 'Select request type',
+                  items: const [
+                    'New OSCA ID Application',
+                    'OSCA ID Renewal',
+                    'Social Pension Release',
+                    'Senior Citizen Assistance',
+                  ],
+                ),
                 20.gapH,
                 _buildAttachedBadge(),
                 24.gapH,
@@ -146,41 +136,29 @@ class _SanggawadanPageState extends State<SanggawadanPage> {
           controller: familyMemberController,
           hintText: AppString.selectFamilyMember,
           items: const [
-            'John Santos (Son)',
-            'Jane Santos (Daughter)',
+            'Juan Dela Cruz (Father)',
             'Maria Santos (Mother)',
-            'Jose Santos (Father)',
+            'Jose Rizal (Grandfather)',
+            'Rosa Cruz (Grandmother)',
           ],
         ),
         20.gapH,
-        _buildLabel(AppString.requestDetails),
-        12.gapH,
-        _buildSubLabel(AppString.schoolName),
-        8.gapH,
-        TextInput(
-          controller: schoolController,
-          hintText: AppString.searchSchoolName,
-        ),
-        16.gapH,
-        _buildSubLabel(AppString.educationLevel),
+        _buildLabel('Senior Request Type'),
         8.gapH,
         Dropdown(
-          controller: educationLevelController,
-          hintText: AppString.selectLevel,
-          items: Constant.educationLevels,
+          controller: requestTypeController,
+          hintText: 'Select type',
+          items: const [
+            'New OSCA ID Application',
+            'OSCA ID Renewal',
+            'Social Pension Release',
+            'Senior Citizen Assistance',
+          ],
         ),
-        16.gapH,
-        _buildSubLabel(AppString.yearGradeLevel),
-        8.gapH,
-        Dropdown(
-          controller: gradeLevelController,
-          hintText: AppString.selectYearLevel,
-          items: Constant.yearLevelMap[educationLevelController.text] ?? [],
-        ),
-        20.gapH,
-        _buildReasonSection(),
         20.gapH,
         _buildUploadSection(),
+        20.gapH,
+        _buildReasonSection(),
         24.gapH,
       ],
     );
@@ -198,18 +176,6 @@ class _SanggawadanPageState extends State<SanggawadanPage> {
     );
   }
 
-  Widget _buildSubLabel(String text) {
-    return Text(
-      text,
-      style: TextStyle(
-        fontSize: D.textSM,
-        fontWeight: D.medium,
-        fontFamily: 'Segoe UI',
-        color: AppColors.black,
-      ),
-    );
-  }
-
   Widget _buildUploadSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,7 +183,7 @@ class _SanggawadanPageState extends State<SanggawadanPage> {
         _buildLabel(AppString.uploadSupportingDocument),
         4.gapH,
         Text(
-          AppString.enrollmentCertExample,
+          'e.g. Senior Citizen ID',
           style: TextStyle(
             fontSize: D.textXS,
             color: AppColors.grey,
@@ -247,7 +213,7 @@ class _SanggawadanPageState extends State<SanggawadanPage> {
         ClipRRect(
           borderRadius: BorderRadius.circular(D.radiusLG),
           child: Image.asset(
-            Assets.studentBadge,
+            Assets.seniorCitizenBadge,
             width: double.infinity,
             fit: BoxFit.cover,
           ),
@@ -269,7 +235,7 @@ class _SanggawadanPageState extends State<SanggawadanPage> {
         ),
         4.gapH,
         Text(
-          '${reasonController.text.length}/1020 ${AppString.charactersMinimum}',
+          '${reasonController.text.length}/20 ${AppString.charactersMinimum}',
           style: TextStyle(
             fontSize: D.textXS,
             color: AppColors.grey,

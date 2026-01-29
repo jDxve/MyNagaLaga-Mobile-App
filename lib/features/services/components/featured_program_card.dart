@@ -29,7 +29,7 @@ class FeaturedProgramCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(D.radiusLG),
-          border: Border.all(color: AppColors.grey.withOpacity(0.1), width: 1),
+          border: Border.all(color: AppColors.grey.withOpacity(0.2), width: 1),
           boxShadow: [
             BoxShadow(
               color: AppColors.black.withOpacity(0.04),

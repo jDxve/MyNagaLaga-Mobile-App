@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mynagalaga_mobile_app/features/services/components/evacuation_center_page.dart';
-import '../components/program_list_page.dart';
+import 'package:mynagalaga_mobile_app/features/services/components/programs_page/evacuation_center_page.dart';
+import '../../components/programs_page/program_list_page.dart';
 
 class DisasterResponseScreen extends StatefulWidget {
   static const routeName = '/disaster-response';

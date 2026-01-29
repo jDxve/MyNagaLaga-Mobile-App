@@ -19,41 +19,50 @@ class OtpVerificationRepositoryImpl implements OtpVerificationRepository {
   }) : _service = service;
 
   @override
-  Future<DataState<VerifyOtpResponse>> verifyOtp({
+  Future<DataState<VerifyOtpResponse>> verifySignupOtp({
     required OtpVerificationRequest request,
   }) async {
-    DataState<VerifyOtpResponse> data;
-
     try {
-      final response = await _service.verifyOtp(request: request);
-
-      if (response.response.statusCode == 200 || response.response.statusCode == 201) {
-        data = DataState.success(data: response.data);
-      } else {
+      final response = await _service.verifySignupOtp(request: request);
+      return DataState.success(data: response.data);
+    } on DioException catch (e) {
+      if (e.response?.data != null) {
         final errorResponse = ErrorResponse.fromMap(
-          response.data as Map<String, dynamic>,
+          e.response!.data as Map<String, dynamic>,
         );
-        data = DataState.error(
+        return DataState.error(
           error: errorResponse.message ?? 'Failed to verify OTP',
         );
       }
+      return DataState.error(
+        error: e.message ?? 'Network error occurred',
+      );
+    } catch (e) {
+      return DataState.error(error: 'An unexpected error occurred: $e');
+    }
+  }
+
+  @override
+  Future<DataState<VerifyOtpResponse>> verifyLoginOtp({
+    required OtpVerificationRequest request,
+  }) async {
+    try {
+      final response = await _service.verifyLoginOtp(request: request);
+      return DataState.success(data: response.data);
     } on DioException catch (e) {
-      if (e.response != null) {
+      if (e.response?.data != null) {
         final errorResponse = ErrorResponse.fromMap(
-          e.response?.data as Map<String, dynamic>,
+          e.response!.data as Map<String, dynamic>,
         );
-        data = DataState.error(
+        return DataState.error(
           error: errorResponse.message ?? 'Invalid OTP',
         );
-      } else {
-        data = DataState.error(
-          error: e.message ?? 'Network error occurred',
-        );
       }
+      return DataState.error(
+        error: e.message ?? 'Network error occurred',
+      );
     } catch (e) {
-      data = DataState.error(error: 'An unexpected error occurred: $e');
+      return DataState.error(error: 'An unexpected error occurred: $e');
     }
-
-    return data;
   }
 }

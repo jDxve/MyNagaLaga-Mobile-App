@@ -49,5 +49,11 @@
 	<string>We need access to your camera to capture your ID document</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We need access to your photo library to upload your ID document</string>
+
+	<!-- Location permissions for map -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs access to location to help you select pickup and delivery locations.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app needs access to location to provide location-based services.</string>
 </dict>
 </plist>

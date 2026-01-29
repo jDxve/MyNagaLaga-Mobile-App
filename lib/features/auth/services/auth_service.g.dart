@@ -63,7 +63,7 @@ class _AuthService implements AuthService {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/mobile-auth/request-otp',
+            '/mobile-auth/login/request-otp',
             queryParameters: queryParameters,
             data: _data,
           )

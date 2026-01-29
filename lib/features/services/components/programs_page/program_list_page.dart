@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
-import '../../../common/widgets/custom_app_bar.dart';
-import '../components/program_list_item.dart';
+import '../../../../common/resources/colors.dart';
+import '../../../../common/resources/dimensions.dart';
+import '../../../../common/widgets/custom_app_bar.dart';
+import '../program_list_item.dart';
 
 class ProgramListPage extends StatelessWidget {
   final String title;

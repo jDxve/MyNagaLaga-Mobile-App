@@ -22,7 +22,7 @@ abstract class AuthService {
     @Body() required SignupRequest request,
   });
 
-  @POST('/mobile-auth/request-otp')
+  @POST('/mobile-auth/login/request-otp')
   Future<HttpResponse<OtpResponse>> requestLoginOtp({
     @Body() required LoginRequest request,
   });

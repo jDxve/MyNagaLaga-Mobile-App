@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../components/program_list_page.dart';
-import '../components/solo_parent_services_page.dart';
+import '../../components/programs_page/program_list_page.dart';
+import '../../components/programs_page/solo_parent_services_page.dart';
 
 class WomenWelfareScreen extends StatefulWidget {
   static const routeName = '/women-welfare';

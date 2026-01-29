@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../components/program_list_page.dart';
-import '../components/sanggawadan_page.dart';
+import '../../components/programs_page/program_list_page.dart';
+import '../../components/programs_page/sanggawadan_page.dart';
 
 class ChildrenYouthScreen extends StatefulWidget {
   static const routeName = '/children-youth';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../components/medical_assistance_page.dart';
-import '../components/program_list_page.dart';
+import '../../components/programs_page/medical_assistance_page.dart';
+import '../../components/programs_page/program_list_page.dart';
 
 class CrisisInterventionScreen extends StatefulWidget {
   static const routeName = '/crisis-intervention';

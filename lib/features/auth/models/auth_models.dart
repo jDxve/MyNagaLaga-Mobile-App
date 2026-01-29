@@ -1,5 +1,3 @@
-// lib/features/auth/models/auth_request_models.dart
-
 class LoginRequest {
   final String email;
 
@@ -33,7 +31,7 @@ class SignupRequest {
       'fullName': fullName,
       'sex': sex,
       'address': address,
-      'phoneNumber': phoneNumber,
+      if (phoneNumber != null) 'phoneNumber': phoneNumber,
     };
   }
 }
@@ -53,4 +51,27 @@ class OtpResponse {
       sent: json['sent'] ?? false,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'sent': sent,
+    };
+  }
+}
+
+class AuthSessionState {
+  final bool isAuthenticated;
+  final String? userId;
+  final String? email;
+  final String? accessToken;
+
+  AuthSessionState({
+    required this.isAuthenticated,
+    this.userId,
+    this.email,
+    this.accessToken,
+  });
+
+  // A helper for the initial unauthenticated state
+  factory AuthSessionState.empty() => AuthSessionState(isAuthenticated: false);
 }

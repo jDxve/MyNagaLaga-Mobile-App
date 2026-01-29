@@ -3,11 +3,11 @@ import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/resources/assets.dart';
 import '../../../common/resources/strings.dart';
-import '../../services/screens/children_youth_screen.dart';
-import '../screens/women_welfare_screen.dart';
-import '../screens/crisis_intervention_screen.dart';
-import '../screens/family_community_screen.dart';
-import '../screens/disaster_response_screen.dart';
+import '../screens/programs/children_youth_screen.dart';
+import '../screens/programs/women_welfare_screen.dart';
+import '../screens/programs/crisis_intervention_screen.dart';
+import '../screens/programs/family_community_screen.dart';
+import '../screens/programs/disaster_response_screen.dart';
 import 'featured_program_card.dart';
 
 class FeaturedProgramSection extends StatelessWidget {

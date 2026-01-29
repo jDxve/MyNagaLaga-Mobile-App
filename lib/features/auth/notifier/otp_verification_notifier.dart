@@ -3,33 +3,62 @@ import '../../../common/models/dio/data_state.dart';
 import '../models/otp_model.dart';
 import '../repository/otp_verification_repository_impl.dart';
 
-final otpVerificationNotifierProvider =
-    NotifierProvider.autoDispose<OtpVerificationNotifier, DataState<VerifyOtpResponse>>(
-  OtpVerificationNotifier.new,
+final signupOtpVerificationNotifierProvider =
+    NotifierProvider.autoDispose<SignupOtpVerificationNotifier, DataState<VerifyOtpResponse>>(
+  SignupOtpVerificationNotifier.new,
 );
 
-class OtpVerificationNotifier extends Notifier<DataState<VerifyOtpResponse>> {
+final loginOtpVerificationNotifierProvider =
+    NotifierProvider.autoDispose<LoginOtpVerificationNotifier, DataState<VerifyOtpResponse>>(
+  LoginOtpVerificationNotifier.new,
+);
+
+class SignupOtpVerificationNotifier extends Notifier<DataState<VerifyOtpResponse>> {
   @override
   DataState<VerifyOtpResponse> build() {
     return const DataState.started();
   }
 
-  Future<void> verifyOtp({
+  Future<void> verifySignupOtp({
     required String email,
     required String token,
   }) async {
     state = const DataState.loading();
 
     final repository = ref.read(otpVerificationRepositoryProvider);
-
     final request = OtpVerificationRequest(
       email: email,
       token: token,
-      type: 'email',
     );
 
-    final result = await repository.verifyOtp(request: request);
+    final result = await repository.verifySignupOtp(request: request);
+    state = result;
+  }
 
+  void reset() {
+    state = const DataState.started();
+  }
+}
+
+class LoginOtpVerificationNotifier extends Notifier<DataState<VerifyOtpResponse>> {
+  @override
+  DataState<VerifyOtpResponse> build() {
+    return const DataState.started();
+  }
+
+  Future<void> verifyLoginOtp({
+    required String email,
+    required String token,
+  }) async {
+    state = const DataState.loading();
+
+    final repository = ref.read(otpVerificationRepositoryProvider);
+    final request = OtpVerificationRequest(
+      email: email,
+      token: token,
+    );
+
+    final result = await repository.verifyLoginOtp(request: request);
     state = result;
   }
 

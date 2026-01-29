@@ -1,15 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:retrofit/retrofit.dart';
+import '../../../common/models/dio/api_client.dart';
 import '../models/otp_model.dart';
 
 part 'otp_verification_service.g.dart';
 
 final otpVerificationServiceProvider = Provider.autoDispose<OtpVerificationService>((ref) {
-  final dio = Dio(BaseOptions(
-    baseUrl: 'https://kqwkwwyoidmfzvoctokb.supabase.co',
-    headers: {'Content-Type': 'application/json'},
-  ));
+  final apiClient = ApiClient.fromEnv();
+  final dio = apiClient.create();
   return OtpVerificationService(dio);
 });
 
@@ -17,8 +16,13 @@ final otpVerificationServiceProvider = Provider.autoDispose<OtpVerificationServi
 abstract class OtpVerificationService {
   factory OtpVerificationService(Dio dio, {String? baseUrl}) = _OtpVerificationService;
 
-  @POST('/auth/v1/verify')
-  Future<HttpResponse<VerifyOtpResponse>> verifyOtp({
+  @POST('/mobile-auth/signup/verify-otp')
+  Future<HttpResponse<VerifyOtpResponse>> verifySignupOtp({
+    @Body() required OtpVerificationRequest request,
+  });
+
+  @POST('/mobile-auth/login/verify-otp')
+  Future<HttpResponse<VerifyOtpResponse>> verifyLoginOtp({
     @Body() required OtpVerificationRequest request,
   });
 }

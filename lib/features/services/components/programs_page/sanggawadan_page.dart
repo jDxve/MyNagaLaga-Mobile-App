@@ -1,52 +1,65 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
-import '../../../common/resources/assets.dart';
-import '../../../common/resources/strings.dart';
-import '../../../common/utils/constant.dart';
-import '../../../common/widgets/custom_app_bar.dart';
-import '../../../common/widgets/drop_down.dart';
-import '../../../common/widgets/primary_button.dart';
-import '../../../common/widgets/info_card.dart';
-import '../../../common/widgets/toggle.dart';
-import '../../../common/widgets/text_input.dart';
-import '../../../common/widgets/upload_image_card.dart';
+import '../../../../common/resources/colors.dart';
+import '../../../../common/resources/dimensions.dart';
+import '../../../../common/resources/assets.dart';
+import '../../../../common/resources/strings.dart';
+import '../../../../common/utils/constant.dart';
+import '../../../../common/widgets/custom_app_bar.dart';
+import '../../../../common/widgets/drop_down.dart';
+import '../../../../common/widgets/primary_button.dart';
+import '../../../../common/widgets/info_card.dart';
+import '../../../../common/widgets/toggle.dart';
+import '../../../../common/widgets/text_input.dart';
+import '../../../../common/widgets/upload_image_card.dart';
 
-class SeniorCitizenServicesPage extends StatefulWidget {
+class SanggawadanPage extends StatefulWidget {
   final String userName;
   final String userAge;
+  final String userSchool;
+  final String userGradeLevel;
 
-  const SeniorCitizenServicesPage({
+  const SanggawadanPage({
     super.key,
     required this.userName,
     required this.userAge,
+    required this.userSchool,
+    required this.userGradeLevel,
   });
 
   @override
-  State<SeniorCitizenServicesPage> createState() =>
-      _SeniorCitizenServicesPageState();
+  State<SanggawadanPage> createState() => _SanggawadanPageState();
 }
 
-class _SeniorCitizenServicesPageState extends State<SeniorCitizenServicesPage> {
+class _SanggawadanPageState extends State<SanggawadanPage> {
   String? selectedRecipient = Constant.forMe;
   final TextEditingController reasonController = TextEditingController();
   final TextEditingController familyMemberController = TextEditingController();
-  final TextEditingController requestTypeController = TextEditingController();
+  final TextEditingController schoolController = TextEditingController();
+  final TextEditingController educationLevelController =
+      TextEditingController();
+  final TextEditingController gradeLevelController = TextEditingController();
   File? uploadedDocument;
 
   @override
   void initState() {
     super.initState();
     reasonController.addListener(() => setState(() {}));
+    educationLevelController.addListener(() {
+      setState(() {
+        gradeLevelController.clear();
+      });
+    });
   }
 
   @override
   void dispose() {
     reasonController.dispose();
     familyMemberController.dispose();
-    requestTypeController.dispose();
+    schoolController.dispose();
+    educationLevelController.dispose();
+    gradeLevelController.dispose();
     super.dispose();
   }
 
@@ -69,7 +82,7 @@ class _SeniorCitizenServicesPageState extends State<SeniorCitizenServicesPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: CustomAppBar(
-        title: 'Senior Citizen Services',
+        title: AppString.sanggawadanTitle,
         onBackPressed: () => Navigator.pop(context),
       ),
       body: SingleChildScrollView(
@@ -96,21 +109,18 @@ class _SeniorCitizenServicesPageState extends State<SeniorCitizenServicesPage> {
                       value: widget.userName,
                     ),
                     InfoCardItem(label: AppString.age, value: widget.userAge),
+                    InfoCardItem(
+                      label: AppString.schoolName,
+                      value: widget.userSchool,
+                    ),
+                    InfoCardItem(
+                      label: AppString.yearGradeLevel,
+                      value: widget.userGradeLevel,
+                    ),
                   ],
                 ),
                 20.gapH,
-                _buildLabel('Senior Request Type'),
-                8.gapH,
-                Dropdown(
-                  controller: requestTypeController,
-                  hintText: 'Select request type',
-                  items: const [
-                    'New OSCA ID Application',
-                    'OSCA ID Renewal',
-                    'Social Pension Release',
-                    'Senior Citizen Assistance',
-                  ],
-                ),
+                _buildReasonSection(),
                 20.gapH,
                 _buildAttachedBadge(),
                 24.gapH,
@@ -136,29 +146,41 @@ class _SeniorCitizenServicesPageState extends State<SeniorCitizenServicesPage> {
           controller: familyMemberController,
           hintText: AppString.selectFamilyMember,
           items: const [
-            'Juan Dela Cruz (Father)',
+            'John Santos (Son)',
+            'Jane Santos (Daughter)',
             'Maria Santos (Mother)',
-            'Jose Rizal (Grandfather)',
-            'Rosa Cruz (Grandmother)',
+            'Jose Santos (Father)',
           ],
         ),
         20.gapH,
-        _buildLabel('Senior Request Type'),
+        _buildLabel(AppString.requestDetails),
+        12.gapH,
+        _buildSubLabel(AppString.schoolName),
+        8.gapH,
+        TextInput(
+          controller: schoolController,
+          hintText: AppString.searchSchoolName,
+        ),
+        16.gapH,
+        _buildSubLabel(AppString.educationLevel),
         8.gapH,
         Dropdown(
-          controller: requestTypeController,
-          hintText: 'Select type',
-          items: const [
-            'New OSCA ID Application',
-            'OSCA ID Renewal',
-            'Social Pension Release',
-            'Senior Citizen Assistance',
-          ],
+          controller: educationLevelController,
+          hintText: AppString.selectLevel,
+          items: Constant.educationLevels,
+        ),
+        16.gapH,
+        _buildSubLabel(AppString.yearGradeLevel),
+        8.gapH,
+        Dropdown(
+          controller: gradeLevelController,
+          hintText: AppString.selectYearLevel,
+          items: Constant.yearLevelMap[educationLevelController.text] ?? [],
         ),
         20.gapH,
-        _buildUploadSection(),
-        20.gapH,
         _buildReasonSection(),
+        20.gapH,
+        _buildUploadSection(),
         24.gapH,
       ],
     );
@@ -176,6 +198,18 @@ class _SeniorCitizenServicesPageState extends State<SeniorCitizenServicesPage> {
     );
   }
 
+  Widget _buildSubLabel(String text) {
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize: D.textSM,
+        fontWeight: D.medium,
+        fontFamily: 'Segoe UI',
+        color: AppColors.black,
+      ),
+    );
+  }
+
   Widget _buildUploadSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,7 +217,7 @@ class _SeniorCitizenServicesPageState extends State<SeniorCitizenServicesPage> {
         _buildLabel(AppString.uploadSupportingDocument),
         4.gapH,
         Text(
-          'e.g. Senior Citizen ID',
+          AppString.enrollmentCertExample,
           style: TextStyle(
             fontSize: D.textXS,
             color: AppColors.grey,
@@ -213,7 +247,7 @@ class _SeniorCitizenServicesPageState extends State<SeniorCitizenServicesPage> {
         ClipRRect(
           borderRadius: BorderRadius.circular(D.radiusLG),
           child: Image.asset(
-            Assets.seniorCitizenBadge,
+            Assets.studentBadge,
             width: double.infinity,
             fit: BoxFit.cover,
           ),
@@ -235,7 +269,7 @@ class _SeniorCitizenServicesPageState extends State<SeniorCitizenServicesPage> {
         ),
         4.gapH,
         Text(
-          '${reasonController.text.length}/20 ${AppString.charactersMinimum}',
+          '${reasonController.text.length}/1020 ${AppString.charactersMinimum}',
           style: TextStyle(
             fontSize: D.textXS,
             color: AppColors.grey,

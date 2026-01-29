@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../components/program_list_page.dart';
-import '../components/senior_citizen_services_page.dart';
+import '../../components/programs_page/program_list_page.dart';
+import '../../components/programs_page/senior_citizen_services_page.dart';
 
 class FamilyCommunityScreen extends StatefulWidget {
   static const routeName = '/family-community';

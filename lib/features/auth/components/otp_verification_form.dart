@@ -1,5 +1,3 @@
-// lib/features/auth/components/otp_verification_form.dart
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,6 +11,7 @@ import '../../../common/widgets/error_modal.dart';
 import '../../../common/utils/ui_utils.dart';
 import '../notifier/otp_verification_notifier.dart';
 import '../notifier/auth_notifier.dart';
+import '../notifier/auth_session_notifier.dart';
 import '../../home/screens/home_screen.dart';
 
 class OtpVerificationForm extends ConsumerStatefulWidget {
@@ -26,7 +25,8 @@ class OtpVerificationForm extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<OtpVerificationForm> createState() => _OtpVerificationFormState();
+  ConsumerState<OtpVerificationForm> createState() =>
+      _OtpVerificationFormState();
 }
 
 class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
@@ -66,6 +66,7 @@ class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
     _startTimer();
 
     if (widget.isSignup) {
+      // TODO: Implement resend for signup
       showErrorModal(
         context: context,
         title: 'OTP Resent',
@@ -104,57 +105,80 @@ class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
       return;
     }
 
-    final otpNotifier = ref.read(otpVerificationNotifierProvider.notifier);
-
-    await otpNotifier.verifyOtp(
-      email: widget.email,
-      token: _otpCode,
-    );
+    if (widget.isSignup) {
+      final signupOtpNotifier = ref.read(
+        signupOtpVerificationNotifierProvider.notifier,
+      );
+      await signupOtpNotifier.verifySignupOtp(
+        email: widget.email,
+        token: _otpCode,
+      );
+    } else {
+      final loginOtpNotifier = ref.read(
+        loginOtpVerificationNotifierProvider.notifier,
+      );
+      await loginOtpNotifier.verifyLoginOtp(
+        email: widget.email,
+        token: _otpCode,
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final otpState = ref.watch(otpVerificationNotifierProvider);
+    final otpState = widget.isSignup
+        ? ref.watch(signupOtpVerificationNotifierProvider)
+        : ref.watch(loginOtpVerificationNotifierProvider);
 
-    ref.listen(otpVerificationNotifierProvider, (previous, next) {
-      next.when(
-        started: () {},
-        loading: () {},
-        success: (data) {
-          // TODO: Save tokens
-          // _saveAuthData(data);
-          
-          showErrorModal(
-            context: context,
-            title: 'Verification Successful',
-            description: 'Your account has been verified successfully!',
-            icon: Icons.check_circle_outline,
-            iconColor: Colors.green,
-            barrierDismissible: false,
-            onButtonPressed: () {
-              // Close the modal
-              Navigator.pop(context);
-              
-              // Navigate to Home Screen and remove all previous routes
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                HomeScreen.routeName,
-                (route) => false,
+    ref.listen(
+      widget.isSignup
+          ? signupOtpVerificationNotifierProvider
+          : loginOtpVerificationNotifierProvider,
+      (previous, next) {
+        next.when(
+          started: () {},
+          loading: () {},
+          success: (data) {
+            // Save session
+            final authSession = ref.read(authSessionProvider.notifier);
+            if (data.session != null) {
+              authSession.saveSession(
+                accessToken: data.session!.accessToken,
+                refreshToken: data.session!.refreshToken,
+                email: data.mobileUser.email,
+                userId: data.userId,
               );
-            },
-          );
-        },
-        error: (error) {
-          showErrorModal(
-            context: context,
-            title: 'Verification Failed',
-            description: error ?? 'Invalid OTP code. Please try again.',
-            icon: Icons.error_outline,
-            iconColor: Colors.red,
-          );
-        },
-      );
-    });
+            }
+
+            showErrorModal(
+              context: context,
+              title: 'Verification Successful',
+              description: 'Your account has been verified successfully!',
+              icon: Icons.check_circle_outline,
+              iconColor: Colors.green,
+              barrierDismissible: false,
+              onButtonPressed: () {
+                Navigator.pop(context);
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  HomeScreen.routeName,
+                  (route) => false,
+                );
+              },
+            );
+          },
+          error: (error) {
+            showErrorModal(
+              context: context,
+              title: 'Verification Failed',
+              description: error ?? 'Invalid OTP code. Please try again.',
+              icon: Icons.error_outline,
+              iconColor: Colors.red,
+            );
+          },
+        );
+      },
+    );
 
     final isLoading = otpState.maybeWhen(
       loading: () => true,
@@ -169,10 +193,7 @@ class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              AppColors.primary,
-              Colors.white,
-            ],
+            colors: [AppColors.primary, Colors.white],
             stops: const [0.0, 0.45],
           ),
         ),
@@ -264,7 +285,9 @@ class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
                                 style: TextStyle(
                                   fontSize: D.textSM,
                                   fontWeight: D.medium,
-                                  color: isLoading ? AppColors.grey : AppColors.primary,
+                                  color: isLoading
+                                      ? AppColors.grey
+                                      : AppColors.primary,
                                   fontFamily: 'Segoe UI',
                                   decoration: TextDecoration.underline,
                                 ),

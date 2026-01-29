@@ -1,50 +1,62 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
-import '../../../common/resources/assets.dart';
-import '../../../common/resources/strings.dart';
-import '../../../common/utils/constant.dart';
-import '../../../common/widgets/custom_app_bar.dart';
-import '../../../common/widgets/drop_down.dart';
-import '../../../common/widgets/primary_button.dart';
-import '../../../common/widgets/info_card.dart';
-import '../../../common/widgets/toggle.dart';
-import '../../../common/widgets/text_input.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../../../common/resources/colors.dart';
+import '../../../../common/resources/dimensions.dart';
+import '../../../../common/resources/assets.dart';
+import '../../../../common/resources/strings.dart';
+import '../../../../common/utils/constant.dart';
+import '../../../../common/widgets/custom_app_bar.dart';
+import '../../../../common/widgets/drop_down.dart';
+import '../../../../common/widgets/primary_button.dart';
+import '../../../../common/widgets/info_card.dart';
+import '../../../../common/widgets/toggle.dart';
+import '../../../../common/widgets/text_input.dart';
+import '../../../../common/widgets/upload_image_card.dart';
 
-class EvacuationCenterPage extends StatefulWidget {
+class MedicalAssistancePage extends StatefulWidget {
   final String userName;
   final String userAge;
 
-  const EvacuationCenterPage({
+  const MedicalAssistancePage({
     super.key,
     required this.userName,
     required this.userAge,
   });
 
   @override
-  State<EvacuationCenterPage> createState() => _EvacuationCenterPageState();
+  State<MedicalAssistancePage> createState() => _MedicalAssistancePageState();
 }
 
-class _EvacuationCenterPageState extends State<EvacuationCenterPage> {
+class _MedicalAssistancePageState extends State<MedicalAssistancePage> {
   String? selectedRecipient = Constant.forMe;
   final TextEditingController familyMemberController = TextEditingController();
-  final TextEditingController requestAssistanceController = TextEditingController();
-  final TextEditingController urgencyController = TextEditingController();
-  final TextEditingController specificDetailsController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    specificDetailsController.addListener(() => setState(() {}));
-  }
+  final TextEditingController hospitalController = TextEditingController();
+  final TextEditingController diagnosisController = TextEditingController();
+  final TextEditingController billAmountController = TextEditingController();
+  File? uploadedDocument;
 
   @override
   void dispose() {
     familyMemberController.dispose();
-    requestAssistanceController.dispose();
-    urgencyController.dispose();
-    specificDetailsController.dispose();
+    hospitalController.dispose();
+    diagnosisController.dispose();
+    billAmountController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final ImagePicker picker = ImagePicker();
+    try {
+      final XFile? pickedFile = await picker.pickImage(source: source);
+      if (pickedFile != null) {
+        setState(() {
+          uploadedDocument = File(pickedFile.path);
+        });
+      }
+    } catch (e) {
+      debugPrint('Error picking image: $e');
+    }
   }
 
   @override
@@ -52,7 +64,7 @@ class _EvacuationCenterPageState extends State<EvacuationCenterPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: CustomAppBar(
-        title: 'Evacuation Center',
+        title: 'Medical Assistance',
         onBackPressed: () => Navigator.pop(context),
       ),
       body: SingleChildScrollView(
@@ -105,34 +117,41 @@ class _EvacuationCenterPageState extends State<EvacuationCenterPage> {
           ],
         ),
         20.gapH,
-        _buildLabel('Request Assistance'),
+        _buildLabel('Hospital/Clinic Name'),
         8.gapH,
         Dropdown(
-          controller: requestAssistanceController,
-          hintText: 'Select request type',
+          controller: hospitalController,
+          hintText: 'Select or enter hospital name',
           items: const [
-            'Emergency Shelter',
-            'Food Assistance',
-            'Medical Support',
-            'Water Supply',
-            'Clothing and Blankets',
+            'Bicol Medical Center',
+            'Albay Provincial Hospital',
+            'Legazpi City General Hospital',
+            'St. Gregory The Great Medical Center',
           ],
         ),
         20.gapH,
-        _buildLabel('Urgency'),
+        _buildLabel('Diagnosis / Medical Condition'),
+        8.gapH,
+        TextInput(
+          controller: diagnosisController,
+          hintText: 'Description',
+          maxLines: 4,
+        ),
+        20.gapH,
+        _buildLabel('Bill Amount'),
         8.gapH,
         Dropdown(
-          controller: urgencyController,
-          hintText: 'Select request type',
+          controller: billAmountController,
+          hintText: 'Select or enter hospital name',
           items: const [
-            'Critical - Immediate',
-            'High - Within 24 hours',
-            'Medium - Within 48 hours',
-            'Low - Within a week',
+            '₱5,000 - ₱10,000',
+            '₱10,000 - ₱20,000',
+            '₱20,000 - ₱50,000',
+            '₱50,000 and above',
           ],
         ),
         20.gapH,
-        _buildSpecificDetailsSection(),
+        _buildUploadSection(),
         20.gapH,
         _buildAttachedBadge(),
         24.gapH,
@@ -157,34 +176,41 @@ class _EvacuationCenterPageState extends State<EvacuationCenterPage> {
           ],
         ),
         20.gapH,
-        _buildLabel('Request Assistance'),
+        _buildLabel('Hospital/Clinic Name'),
         8.gapH,
         Dropdown(
-          controller: requestAssistanceController,
-          hintText: 'Select request type',
+          controller: hospitalController,
+          hintText: 'Select or enter hospital name',
           items: const [
-            'Emergency Shelter',
-            'Food Assistance',
-            'Medical Support',
-            'Water Supply',
-            'Clothing and Blankets',
+            'Bicol Medical Center',
+            'Albay Provincial Hospital',
+            'Legazpi City General Hospital',
+            'St. Gregory The Great Medical Center',
           ],
         ),
         20.gapH,
-        _buildLabel('Urgency'),
+        _buildLabel('Diagnosis / Medical Condition'),
+        8.gapH,
+        TextInput(
+          controller: diagnosisController,
+          hintText: 'Description',
+          maxLines: 4,
+        ),
+        20.gapH,
+        _buildLabel('Bill Amount'),
         8.gapH,
         Dropdown(
-          controller: urgencyController,
-          hintText: 'Select request type',
+          controller: billAmountController,
+          hintText: 'Select or enter hospital name',
           items: const [
-            'Critical - Immediate',
-            'High - Within 24 hours',
-            'Medium - Within 48 hours',
-            'Low - Within a week',
+            '₱5,000 - ₱10,000',
+            '₱10,000 - ₱20,000',
+            '₱20,000 - ₱50,000',
+            '₱50,000 and above',
           ],
         ),
         20.gapH,
-        _buildSpecificDetailsSection(),
+        _buildUploadSection(),
         24.gapH,
       ],
     );
@@ -202,25 +228,29 @@ class _EvacuationCenterPageState extends State<EvacuationCenterPage> {
     );
   }
 
-  Widget _buildSpecificDetailsSection() {
+  Widget _buildUploadSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildLabel('Specific Details'),
-        8.gapH,
-        TextInput(
-          controller: specificDetailsController,
-          hintText: 'Please explain why you need this assistance',
-          maxLines: 4,
-        ),
+        _buildLabel(AppString.uploadSupportingDocument),
         4.gapH,
         Text(
-          '${specificDetailsController.text.length}/20 ${AppString.charactersMinimum}',
+          'e.g. Valid Hospital Bill or Medical Abstract (Signed by Doctor)',
           style: TextStyle(
             fontSize: D.textXS,
             color: AppColors.grey,
             fontFamily: 'Segoe UI',
           ),
+        ),
+        12.gapH,
+        UploadImage(
+          image: uploadedDocument,
+          title: AppString.uploadYourFile,
+          subtitle: AppString.dragOrChoose,
+          height: 150.h,
+          showActions: true,
+          onPickImage: _pickImage,
+          onRemove: () => setState(() => uploadedDocument = null),
         ),
       ],
     );
@@ -235,7 +265,7 @@ class _EvacuationCenterPageState extends State<EvacuationCenterPage> {
         ClipRRect(
           borderRadius: BorderRadius.circular(D.radiusLG),
           child: Image.asset(
-            Assets.indigentFamilyBadge,
+            Assets.seniorCitizenBadge,
             width: double.infinity,
             fit: BoxFit.cover,
           ),

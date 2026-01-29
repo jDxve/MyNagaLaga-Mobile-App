@@ -2,7 +2,7 @@ name: mynagalaga_mobile_app
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -37,6 +37,12 @@ dependencies:
   image_cropper: ^11.0.0
   confetti: ^0.8.0
 
+  flutter_osm_plugin: ^1.4.3
+  permission_handler: ^12.0.1
+  geolocator: ^14.0.2
+  location: ^5.0.3
+  geocoding: ^4.0.0
+
   # Retrofit and API calls:
   dio: ^5.9.0
   retrofit: ^4.9.2
@@ -69,13 +75,12 @@ dev_dependencies:
   build_runner: ^2.10.5
   json_serializable: ^6.8.0
   freezed: ^3.2.3
-  
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -83,10 +88,10 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-     - .env 
-     - assets/images/
-     - assets/icons/
-     - assets/badges/
+    - .env
+    - assets/images/
+    - assets/icons/
+    - assets/badges/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 
@@ -99,17 +104,17 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-     - family: Segoe UI
-       fonts:
-         - asset: assets/fonts/Segoe-UI-Regular.ttf
-         - asset: assets/fonts/Segoe-UI-Semibold.ttf
-         - asset: assets/fonts/Segoe-UI-Bold.ttf
-    
-     - family: Manrope
-       fonts:
-         - asset: assets/fonts/Manrope-Regular.ttf
-         - asset: assets/fonts/Manrope-Medium.ttf
-         - asset: assets/fonts/Manrope-Bold.ttf
+    - family: Segoe UI
+      fonts:
+        - asset: assets/fonts/Segoe-UI-Regular.ttf
+        - asset: assets/fonts/Segoe-UI-Semibold.ttf
+        - asset: assets/fonts/Segoe-UI-Bold.ttf
+
+    - family: Manrope
+      fonts:
+        - asset: assets/fonts/Manrope-Regular.ttf
+        - asset: assets/fonts/Manrope-Medium.ttf
+        - asset: assets/fonts/Manrope-Bold.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

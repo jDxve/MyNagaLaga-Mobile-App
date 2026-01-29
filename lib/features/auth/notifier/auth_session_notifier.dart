@@ -1,55 +1,64 @@
-// lib/features/auth/providers/auth_session_provider.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-/// Auth session notifier - manages authentication state
-class AuthSessionNotifier extends Notifier<bool> {
+import '../models/auth_models.dart';
+
+class AuthSessionNotifier extends Notifier<AuthSessionState> {
   final _storage = const FlutterSecureStorage();
   
   static const _tokenKey = 'access_token';
+  static const _refreshTokenKey = 'refresh_token';
   static const _emailKey = 'user_email';
+  static const _userIdKey = 'user_id';
 
   @override
-  bool build() {
-    _checkSession();
-    return false;
+  AuthSessionState build() {
+    _checkSession(); // Initialize async check
+    return AuthSessionState.empty();
   }
 
-  /// Check if there's an existing session on app start
   Future<void> _checkSession() async {
     final token = await _storage.read(key: _tokenKey);
-    state = token != null && token.isNotEmpty;
+    final email = await _storage.read(key: _emailKey);
+    final userId = await _storage.read(key: _userIdKey);
+
+    if (token != null && token.isNotEmpty) {
+      state = AuthSessionState(
+        isAuthenticated: true,
+        userId: userId,
+        email: email,
+        accessToken: token,
+      );
+    }
   }
 
-  /// Save session after successful OTP verification
   Future<void> saveSession({
     required String accessToken,
+    required String refreshToken,
     required String email,
+    required String userId,
   }) async {
     await _storage.write(key: _tokenKey, value: accessToken);
+    await _storage.write(key: _refreshTokenKey, value: refreshToken);
     await _storage.write(key: _emailKey, value: email);
-    state = true;
+    await _storage.write(key: _userIdKey, value: userId);
+    
+    // Update state with actual data
+    state = AuthSessionState(
+      isAuthenticated: true,
+      userId: userId,
+      email: email,
+      accessToken: accessToken,
+    );
   }
 
-  /// Get the current access token
-  Future<String?> getToken() async {
-    return await _storage.read(key: _tokenKey);
-  }
-
-  /// Get the current user email
-  Future<String?> getEmail() async {
-    return await _storage.read(key: _emailKey);
-  }
-
-  /// Clear session on logout
   Future<void> logout() async {
-    await _storage.delete(key: _tokenKey);
-    await _storage.delete(key: _emailKey);
-    state = false;
+    await _storage.deleteAll();
+    state = AuthSessionState.empty();
   }
 }
 
-/// Provider for auth session state
-final authSessionProvider = NotifierProvider<AuthSessionNotifier, bool>(
+// Updated Provider definition
+final authSessionProvider = NotifierProvider<AuthSessionNotifier, AuthSessionState>(
   AuthSessionNotifier.new,
 );

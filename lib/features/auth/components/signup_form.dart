@@ -129,6 +129,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
               MaterialPageRoute(
                 builder: (context) => OtpVerificationForm(
                   email: emailController.text.trim(),
+                  isSignup: true,
                 ),
               ),
             );

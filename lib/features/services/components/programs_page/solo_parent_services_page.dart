@@ -1,18 +1,18 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
-import '../../../common/resources/assets.dart';
-import '../../../common/resources/strings.dart';
-import '../../../common/utils/constant.dart';
-import '../../../common/widgets/custom_app_bar.dart';
-import '../../../common/widgets/drop_down.dart';
-import '../../../common/widgets/primary_button.dart';
-import '../../../common/widgets/info_card.dart';
-import '../../../common/widgets/toggle.dart';
-import '../../../common/widgets/text_input.dart';
-import '../../../common/widgets/upload_image_card.dart';
+import '../../../../common/resources/colors.dart';
+import '../../../../common/resources/dimensions.dart';
+import '../../../../common/resources/assets.dart';
+import '../../../../common/resources/strings.dart';
+import '../../../../common/utils/constant.dart';
+import '../../../../common/widgets/custom_app_bar.dart';
+import '../../../../common/widgets/drop_down.dart';
+import '../../../../common/widgets/primary_button.dart';
+import '../../../../common/widgets/info_card.dart';
+import '../../../../common/widgets/toggle.dart';
+import '../../../../common/widgets/text_input.dart';
+import '../../../../common/widgets/upload_image_card.dart';
 
 class SoloParentServicesPage extends StatefulWidget {
   final String userName;

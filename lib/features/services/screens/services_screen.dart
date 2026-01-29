@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import '../../../common/resources/dimensions.dart';
 import '../components/case_track_button.dart';
 import '../components/services_header.dart';
+import '../components/services_page/complaint_page.dart';
 import '../components/services_search_section.dart';
 import '../components/featured_program_section.dart';
-import 'track_services_screen.dart';
-
+import '../components/services_section.dart';
+import 'programs/track_services_screen.dart';
 
 class ServicesScreen extends StatefulWidget {
   static const routeName = '/services';
@@ -41,7 +42,20 @@ class _ServicesScreenState extends State<ServicesScreen> {
   }
 
   void _handleTrackCaseTap() {
-    Navigator.pushNamed(context, TrackCasesScreen.routeName); // UPDATED THIS LINE
+    Navigator.pushNamed(context, TrackCasesScreen.routeName);
+  }
+
+  void _handleRequestServicesTap() {
+    print('Request Services tapped');
+    // TODO: Navigate to request services screen
+    // Navigator.pushNamed(context, RequestServicesScreen.routeName);
+  }
+
+  void _handleComplaintsTap() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ComplaintPage()),
+    );
   }
 
   @override
@@ -58,9 +72,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     16.gapH,
-                    ServicesHeader(
-                      onNotificationTap: _handleNotificationTap,
-                    ),
+                    ServicesHeader(onNotificationTap: _handleNotificationTap),
                     20.gapH,
                     ServicesSearchSection(
                       searchController: _searchController,
@@ -68,8 +80,15 @@ class _ServicesScreenState extends State<ServicesScreen> {
                       onFilterTap: _handleFilterTap,
                       onCashAssistanceTap: _handleCashAssistanceTap,
                     ),
+
                     24.gapH,
-                    const FeaturedProgramSection(),
+                    FeaturedProgramSection(),
+                    24.gapH,
+
+                    ServicesSection(
+                      onRequestServicesTap: _handleRequestServicesTap,
+                      onComplaintsTap: _handleComplaintsTap,
+                    ),
                     24.gapH,
                   ],
                 ),
@@ -78,10 +97,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
             Positioned(
               right: 20.w,
               bottom: 20.h,
-              child: TrackCaseButton(
-                caseCount: 3,
-                onTap: _handleTrackCaseTap,
-              ),
+              child: TrackCaseButton(caseCount: 3, onTap: _handleTrackCaseTap),
             ),
           ],
         ),

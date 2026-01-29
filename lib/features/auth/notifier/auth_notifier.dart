@@ -29,7 +29,6 @@ class SignupNotifier extends Notifier<DataState<OtpResponse>> {
     state = const DataState.loading();
 
     final repository = ref.read(authRepositoryProvider);
-
     final request = SignupRequest(
       email: email,
       fullName: fullName,
@@ -39,7 +38,6 @@ class SignupNotifier extends Notifier<DataState<OtpResponse>> {
     );
 
     final result = await repository.requestSignupOtp(request: request);
-
     state = result;
   }
 
@@ -60,11 +58,9 @@ class LoginNotifier extends Notifier<DataState<OtpResponse>> {
     state = const DataState.loading();
 
     final repository = ref.read(authRepositoryProvider);
-
     final request = LoginRequest(email: email);
 
     final result = await repository.requestLoginOtp(request: request);
-
     state = result;
   }
 
