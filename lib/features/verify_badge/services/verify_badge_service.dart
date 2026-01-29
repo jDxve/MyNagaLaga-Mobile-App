@@ -16,7 +16,7 @@ abstract class VerifyBadgeService {
   factory VerifyBadgeService(Dio dio, {String? baseUrl}) = _VerifyBadgeService;
 
   @GET('/badge-requests/badge-types')
-  Future<HttpResponse> getBadgeTypes(); // CHANGED: Remove <Map<String, dynamic>>
+  Future<HttpResponse> getBadgeTypes();
 
   @POST('/badge-requests/apply')
   @MultiPart()

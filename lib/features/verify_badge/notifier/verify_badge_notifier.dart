@@ -36,12 +36,9 @@ class VerifyBadgeNotifier extends Notifier<DataState<dynamic>> {
     String? yearOrGradeLevel,
     String? schoolIdNumber,
   }) async {
-    print('🔔 VerifyBadgeNotifier: submitBadge called');
-    print('📋 Notifier State: Setting to loading...');
     state = const DataState.loading();
 
     final repository = ref.read(verifyBadgeRepositoryProvider);
-    print('📞 Notifier: Calling repository...');
 
     final result = await repository.submitBadgeApplication(
       mobileUserId: mobileUserId,
@@ -66,26 +63,10 @@ class VerifyBadgeNotifier extends Notifier<DataState<dynamic>> {
       schoolIdNumber: schoolIdNumber,
     );
 
-    print('📦 Notifier: Repository returned result');
-    result.when(
-      started: () => print('⚪ Result: started'),
-      loading: () => print('🔄 Result: loading'),
-      success: (data) {
-        print('✅ Result: SUCCESS');
-        print('📦 Data: $data');
-      },
-      error: (error) {
-        print('❌ Result: ERROR');
-        print('❌ Error: $error');
-      },
-    );
-
     state = result;
-    print('📋 Notifier State updated');
   }
 
   void reset() {
-    print('🔄 Notifier: Resetting state');
     state = const DataState.started();
   }
 }

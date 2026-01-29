@@ -3,23 +3,19 @@ class VerifyBadgeRequest {
   final String badgeTypeId;
   final String? submittedByUserProfileId;
   
-  // Personal Info
   final String fullName;
-  final String birthdate; // Format: YYYY-MM-DD
-  final String gender; // "Male" or "Female"
+  final String birthdate;
+  final String gender;
   final String homeAddress;
   final String contactNumber;
   
-  // ID Info
   final String? existingSeniorCitizenId;
   final String typeOfId;
   
-  // Badge-specific fields (optional, depends on badge type)
   final String? typeOfDisability;
   final int? numberOfDependents;
   final String? estimatedMonthlyHouseholdIncome;
   
-  // Student fields (optional, for student badges)
   final String? schoolName;
   final String? educationLevel;
   final String? yearOrGradeLevel;
@@ -47,7 +43,7 @@ class VerifyBadgeRequest {
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{
-      'mobileUserId': residentId, // Fixed: matches server expectation
+      'mobileUserId': residentId,
       'badgeTypeId': badgeTypeId,
       'fullName': fullName,
       'birthdate': birthdate,
@@ -57,7 +53,6 @@ class VerifyBadgeRequest {
       'typeOfId': typeOfId,
     };
 
-    // Only include optional fields if they have values
     if (submittedByUserProfileId != null) {
       json['submittedByUserProfileId'] = submittedByUserProfileId;
     }
@@ -89,7 +84,6 @@ class VerifyBadgeRequest {
     return json;
   }
 
-  // Factory constructor for creating from JSON
   factory VerifyBadgeRequest.fromJson(Map<String, dynamic> json) {
     return VerifyBadgeRequest(
       residentId: json['residentId'] ?? json['mobileUserId'],
@@ -112,7 +106,6 @@ class VerifyBadgeRequest {
     );
   }
 
-  // CopyWith method for easy updates
   VerifyBadgeRequest copyWith({
     String? residentId,
     String? badgeTypeId,

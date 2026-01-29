@@ -41,24 +41,15 @@ class VerifyBadgeRepositoryImpl implements VerifyBadgeRepository {
     String? schoolIdNumber,
   }) async {
     try {
-      print('🚀 Repository: Starting submission');
-      print('📋 mobileUserId: $mobileUserId');
-      print('📋 badgeTypeId: $badgeTypeId');
-      print('📋 fullName: $fullName');
-      print('📋 birthdate: $birthdate');
-      print('📋 gender: $gender');
-      
       final frontIdMultipart = await MultipartFile.fromFile(
         frontId.path,
         filename: frontId.path.split('/').last,
       );
-      print('✅ Front ID: ${frontIdMultipart.filename}');
 
       final backIdMultipart = await MultipartFile.fromFile(
         backId.path,
         filename: backId.path.split('/').last,
       );
-      print('✅ Back ID: ${backIdMultipart.filename}');
 
       MultipartFile? supportingFileMultipart;
       if (supportingFile != null) {
@@ -66,10 +57,8 @@ class VerifyBadgeRepositoryImpl implements VerifyBadgeRepository {
           supportingFile.path,
           filename: supportingFile.path.split('/').last,
         );
-        print('✅ Supporting: ${supportingFileMultipart.filename}');
       }
 
-      print('🌐 Calling service...');
       final response = await _service.createBadgeApplication(
         mobileUserId: mobileUserId,
         badgeTypeId: badgeTypeId,
@@ -93,25 +82,13 @@ class VerifyBadgeRepositoryImpl implements VerifyBadgeRepository {
         supportingFile: supportingFileMultipart,
       );
 
-      print('📡 Response Status: ${response.response.statusCode}');
-      print('📦 Response Data: ${response.data}');
-      print('📦 Response Headers: ${response.response.headers}');
-
       if (response.response.statusCode == 201 ||
           response.response.statusCode == 200) {
-        print('✅ SUCCESS!');
         return DataState.success(data: response.data);
       }
 
-      print('❌ Non-success status code');
       return DataState.error(error: 'Failed to submit badge application');
     } on DioException catch (e) {
-      print('❌ DIO EXCEPTION');
-      print('❌ Type: ${e.type}');
-      print('❌ Message: ${e.message}');
-      print('❌ Response Status: ${e.response?.statusCode}');
-      print('❌ Response Data: ${e.response?.data}');
-      
       if (e.response?.data != null) {
         final errorData = e.response!.data;
         if (errorData is Map<String, dynamic>) {
@@ -120,9 +97,7 @@ class VerifyBadgeRepositoryImpl implements VerifyBadgeRepository {
         }
       }
       return DataState.error(error: e.message ?? 'Network error occurred');
-    } catch (e, stack) {
-      print('❌ UNEXPECTED ERROR: $e');
-      print('❌ Stack: $stack');
+    } catch (e) {
       return DataState.error(error: 'An unexpected error occurred');
     }
   }

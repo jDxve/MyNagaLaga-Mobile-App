@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../common/resources/dimensions.dart';
 import '../../../common/models/dio/data_state.dart';
+import '../../../common/resources/dimensions.dart';
 import '../../../common/utils/ui_utils.dart';
 import '../../home/screens/home_screen.dart';
 import '../components/application_submitted.dart';
@@ -14,7 +14,7 @@ import '../components/review_page.dart';
 import '../components/select_badges.dart';
 import '../components/top_verify.dart';
 import '../models/badge_type_model.dart';
-import '../notifier/verify_badge_notifier.dart'; // ADD THIS LINE
+import '../notifier/verify_badge_notifier.dart';
 
 class VerifyBadgeScreen extends ConsumerStatefulWidget {
   static const routeName = '/verify_badge';
@@ -25,7 +25,7 @@ class VerifyBadgeScreen extends ConsumerStatefulWidget {
 }
 
 class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
-  BadgeType? _selectedBadge; // Changed from String? to BadgeType?
+  BadgeType? _selectedBadge;
   int _currentStep = 1;
   final int _totalSteps = 6;
   bool _isFormValid = false;
@@ -45,7 +45,6 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
   File? _backIdImage;
   File? _supportingFile;
 
-  // Additional fields for different badge types
   String? _typeOfDisability;
   int? _numberOfDependents;
   double? _estimatedMonthlyIncome;
@@ -65,7 +64,6 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
   }
 
   void _handleNext() {
-    // Validate forms on steps 2-5
     if ((_currentStep == 2 ||
             _currentStep == 3 ||
             _currentStep == 4 ||
@@ -76,11 +74,9 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
     }
 
     setState(() {
-      // On step 5 (review page), submit the application
       if (_currentStep == 5) {
         _submitApplication();
       } else if (_currentStep < _totalSteps) {
-        // For all other steps, just move to next step
         _currentStep++;
       }
     });
@@ -95,27 +91,12 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
   }
 
   void _submitApplication() {
-    print('🔘🔘🔘 SUBMIT APPLICATION CALLED 🔘🔘🔘');
     const String mobileUserId = '7';
-
-    final birthdate = UIUtils.convertDateToApiFormat(
-      _dateOfBirthController.text,
-    );
+    final birthdate = UIUtils.convertDateToApiFormat(_dateOfBirthController.text);
     final gender = UIUtils.convertGenderToApiFormat(_selectedGender);
-    final typeOfId = UIUtils.convertIdTypeToApiFormat(
-      _selectedIdType,
-    ); // ← ADD THIS LINE
+    final typeOfId = UIUtils.convertIdTypeToApiFormat(_selectedIdType);
 
-    print('📋 Badge Type ID: ${_selectedBadge?.id}');
-    print('📋 Badge Type Name: ${_selectedBadge?.name}');
-    print('📋 Full Name: ${_fullNameController.text}');
-    print('📋 Birthdate: $birthdate');
-    print('📋 Gender: $gender');
-    print('📋 Type of ID: $typeOfId'); // ← ADD THIS LINE TO SEE CONVERTED VALUE
-
-    ref
-        .read(verifyBadgeNotifierProvider.notifier)
-        .submitBadge(
+    ref.read(verifyBadgeNotifierProvider.notifier).submitBadge(
           mobileUserId: mobileUserId,
           badgeTypeId: _selectedBadge?.id ?? '1',
           fullName: _fullNameController.text.trim(),
@@ -123,7 +104,7 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
           gender: gender,
           homeAddress: _addressController.text.trim(),
           contactNumber: _phoneController.text.trim(),
-          typeOfId: typeOfId, // ← CHANGE FROM _selectedIdType to typeOfId
+          typeOfId: typeOfId,
           frontId: _frontIdImage!,
           backId: _backIdImage!,
           supportingFile: _supportingFile,
@@ -133,8 +114,8 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
               : _existingIdController.text.trim(),
           typeOfDisability: _typeOfDisability,
           numberOfDependents: _numberOfDependents,
-          estimatedMonthlyHouseholdIncome: _estimatedMonthlyIncome
-              ?.toStringAsFixed(0),
+          estimatedMonthlyHouseholdIncome:
+              _estimatedMonthlyIncome?.toStringAsFixed(0),
           schoolName: _schoolName,
           educationLevel: _educationLevel,
           yearOrGradeLevel: _yearOrGradeLevel,
@@ -200,8 +181,7 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
           phoneController: _phoneController,
           setIsFormValid: (callback) {
             setState(() {
-              _isFormValid =
-                  _fullNameController.text.trim().isNotEmpty &&
+              _isFormValid = _fullNameController.text.trim().isNotEmpty &&
                   _dateOfBirthController.text.trim().isNotEmpty &&
                   _addressController.text.trim().isNotEmpty &&
                   _phoneController.text.trim().isNotEmpty &&
@@ -300,9 +280,10 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
           referenceNumber: _generatedReferenceNumber,
           onStartNewApplication: _resetForm,
           onBackToHome: () {
-            Navigator.of(
-              context,
-            ).pushNamedAndRemoveUntil(HomeScreen.routeName, (route) => false);
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              HomeScreen.routeName,
+              (route) => false,
+            );
           },
         );
 
@@ -369,7 +350,10 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
         child: Column(
           children: [
             if (_currentStep < 6)
-              topVerify(currentStep: _currentStep, totalSteps: _totalSteps - 1),
+              topVerify(
+                currentStep: _currentStep,
+                totalSteps: _totalSteps - 1,
+              ),
             Expanded(
               child: _currentStep == 6
                   ? _buildStepContent()
@@ -382,8 +366,7 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
               previousNextButton(
                 onPrevious: _handlePrevious,
                 onNext: _handleNext,
-                isDisabled:
-                    (_currentStep == 2 ||
+                isDisabled: (_currentStep == 2 ||
                         _currentStep == 3 ||
                         _currentStep == 4 ||
                         _currentStep == 5) &&
