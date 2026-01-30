@@ -1,19 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
 import '../models/auth_models.dart';
 
 class AuthSessionNotifier extends Notifier<AuthSessionState> {
   final _storage = const FlutterSecureStorage();
   
   static const _tokenKey = 'access_token';
-  static const _refreshTokenKey = 'refresh_token';
   static const _emailKey = 'user_email';
   static const _userIdKey = 'user_id';
 
   @override
   AuthSessionState build() {
-    _checkSession(); // Initialize async check
+    _checkSession();
     return AuthSessionState.empty();
   }
 
@@ -34,16 +32,13 @@ class AuthSessionNotifier extends Notifier<AuthSessionState> {
 
   Future<void> saveSession({
     required String accessToken,
-    required String refreshToken,
     required String email,
     required String userId,
   }) async {
     await _storage.write(key: _tokenKey, value: accessToken);
-    await _storage.write(key: _refreshTokenKey, value: refreshToken);
     await _storage.write(key: _emailKey, value: email);
     await _storage.write(key: _userIdKey, value: userId);
-    
-    // Update state with actual data
+
     state = AuthSessionState(
       isAuthenticated: true,
       userId: userId,
@@ -58,7 +53,6 @@ class AuthSessionNotifier extends Notifier<AuthSessionState> {
   }
 }
 
-// Updated Provider definition
 final authSessionProvider = NotifierProvider<AuthSessionNotifier, AuthSessionState>(
   AuthSessionNotifier.new,
 );

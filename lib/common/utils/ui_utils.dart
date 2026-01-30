@@ -62,7 +62,7 @@ class UIUtils {
     if (value == null || value.trim().isEmpty) {
       return 'OTP is required';
     }
-    if (value.trim().length != 8) {
+    if (value.trim().length != 6) {
       return 'OTP must be 6 digits';
     }
     if (!RegExp(r'^\d+$').hasMatch(value.trim())) {

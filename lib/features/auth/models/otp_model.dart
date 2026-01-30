@@ -19,32 +19,24 @@ class OtpVerificationRequest {
 
 class SessionData {
   final String accessToken;
-  final String refreshToken;
   final String tokenType;
-  final int expiresIn;
 
   SessionData({
     required this.accessToken,
-    required this.refreshToken,
     required this.tokenType,
-    required this.expiresIn,
   });
 
   factory SessionData.fromJson(Map<String, dynamic> json) {
     return SessionData(
       accessToken: json['access_token'] ?? '',
-      refreshToken: json['refresh_token'] ?? '',
       tokenType: json['token_type'] ?? 'bearer',
-      expiresIn: json['expires_in'] ?? 3600,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'access_token': accessToken,
-      'refresh_token': refreshToken,
       'token_type': tokenType,
-      'expires_in': expiresIn,
     };
   }
 }
@@ -63,13 +55,16 @@ class VerifyOtpResponse {
   });
 
   factory VerifyOtpResponse.fromJson(Map<String, dynamic> json) {
+    // Backend wraps response in { success: true, data: {...} }
+    final data = json['data'] ?? json;
+    
     return VerifyOtpResponse(
-      session: json['session'] != null 
-          ? SessionData.fromJson(json['session']) 
+      session: data['session'] != null 
+          ? SessionData.fromJson(data['session']) 
           : null,
-      userId: json['user']?['id'] ?? '',
-      userEmail: json['user']?['email'],
-      mobileUser: User.fromJson(json['mobile_user'] ?? {}),
+      userId: data['user']?['id']?.toString() ?? '',
+      userEmail: data['user']?['email'],
+      mobileUser: User.fromJson(data['mobile_user'] ?? {}),
     );
   }
 }

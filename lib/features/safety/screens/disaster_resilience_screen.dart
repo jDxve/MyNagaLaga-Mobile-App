@@ -23,40 +23,39 @@ class _DisasterResilienceScreenState extends State<DisasterResilienceScreen> {
   // Sample shelter data
   final List<ShelterData> _shelters = [
     ShelterData(
-      name: 'San Isidro Elementary School',
-      address: 'Rizal Street, Barangay San Isidro',
+      name: 'Cabasan Elementary School',
+      address: 'Barangay Cabasan, Bacacay, Albay',
       capacity: '45/200',
       status: ShelterStatus.available,
-      latitude: 13.62,
-      longitude: 123.19,
+      latitude: 13.3250,
+      longitude: 123.8794,
       seniors: 12,
       infants: 5,
       pwd: 3,
     ),
     ShelterData(
-      name: 'Bagumbayan Elementary School',
-      address: 'Rizal Street, Barangay San Isidro',
+      name: 'Bacacay National High School',
+      address: 'Poblacion, Bacacay, Albay',
       capacity: '180/200',
       status: ShelterStatus.limited,
-      latitude: 13.63,
-      longitude: 123.20,
+      latitude: 13.3280,
+      longitude: 123.8820,
       seniors: 12,
       infants: 5,
       pwd: 3,
     ),
     ShelterData(
-      name: 'Concepcion Grande High School',
-      address: 'Del Rosario Street, Concepcion Grande',
+      name: 'Bacacay Covered Court',
+      address: 'Centro, Bacacay, Albay',
       capacity: '200/200',
       status: ShelterStatus.full,
-      latitude: 13.61,
-      longitude: 123.18,
+      latitude: 13.3220,
+      longitude: 123.8760,
       seniors: 15,
       infants: 8,
       pwd: 5,
     ),
   ];
-
   @override
   void dispose() {
     _searchController.dispose();

@@ -118,7 +118,7 @@ class AppString {
   static const String fullNameHint = "Ex. Juan Dela Cruz";
   static const String dateOfBirth = "Date of Birth";
   static const String dateOfBirthHint = "MM/DD/YYYY";
-  static const String gender = "Gender";
+  static const String sex = "Sex";
   static const String male = "Male";
   static const String female = "Female";
   static const String homeAddress = "Home Address";

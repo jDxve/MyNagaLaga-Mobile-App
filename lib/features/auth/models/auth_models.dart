@@ -42,6 +42,7 @@ class OtpResponse {
   OtpResponse({required this.sent});
 
   factory OtpResponse.fromJson(Map<String, dynamic> json) {
+    // Backend returns { success: true, data: { sent: true } }
     if (json.containsKey('data') && json['data'] is Map<String, dynamic>) {
       return OtpResponse(
         sent: json['data']['sent'] ?? false,
@@ -50,12 +51,6 @@ class OtpResponse {
     return OtpResponse(
       sent: json['sent'] ?? false,
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'sent': sent,
-    };
   }
 }
 

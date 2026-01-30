@@ -11,7 +11,6 @@ import '../../../common/widgets/error_modal.dart';
 import '../../../common/utils/ui_utils.dart';
 import '../notifier/otp_verification_notifier.dart';
 import '../notifier/auth_notifier.dart';
-import '../notifier/auth_session_notifier.dart';
 import '../../home/screens/home_screen.dart';
 
 class OtpVerificationForm extends ConsumerStatefulWidget {
@@ -66,7 +65,15 @@ class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
     _startTimer();
 
     if (widget.isSignup) {
-      // TODO: Implement resend for signup
+      // Resend OTP for signup
+      final signupNotifier = ref.read(signupNotifierProvider.notifier);
+      await signupNotifier.requestSignupOtp(
+        email: widget.email,
+        fullName: '', // These will be ignored by backend for resend
+        sex: 'Male',
+        address: '',
+      );
+      
       showErrorModal(
         context: context,
         title: 'OTP Resent',
@@ -139,17 +146,7 @@ class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
           started: () {},
           loading: () {},
           success: (data) {
-            // Save session
-            final authSession = ref.read(authSessionProvider.notifier);
-            if (data.session != null) {
-              authSession.saveSession(
-                accessToken: data.session!.accessToken,
-                refreshToken: data.session!.refreshToken,
-                email: data.mobileUser.email,
-                userId: data.userId,
-              );
-            }
-
+            // Session is already saved by the notifier
             showErrorModal(
               context: context,
               title: 'Verification Successful',
@@ -238,7 +235,7 @@ class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
                       ),
                       20.gapH,
                       Text(
-                        'Input the 8-digit code',
+                        'Input the 6-digit code',
                         style: TextStyle(
                           fontSize: D.textLG,
                           fontWeight: D.bold,
@@ -248,7 +245,7 @@ class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
                       ),
                       4.gapH,
                       Text(
-                        'We sent an 8 digit code to ${widget.email}',
+                        'We sent a 6 digit code to ${widget.email}',
                         style: TextStyle(
                           fontSize: D.textSM,
                           fontWeight: D.semiBold,
@@ -263,7 +260,7 @@ class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
                           opacity: isLoading ? 0.5 : 1.0,
                           child: OtpInput(
                             onCompleted: _handleOtpCompleted,
-                            length: 8,
+                            length: 6,
                           ),
                         ),
                       ),

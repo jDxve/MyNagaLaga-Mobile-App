@@ -183,7 +183,7 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
         ),
         20.gapH,
         Text(
-          AppString.gender,
+          AppString.sex,
           style: TextStyle(
             fontSize: D.textBase,
             fontWeight: D.semiBold,

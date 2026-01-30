@@ -56,7 +56,7 @@ class _ReviewPageState extends State<ReviewPage> {
     }
   }
 
-  String _getGenderDisplayName(String? gender) {
+  String _getSexDisplayName(String? gender) {
     if (gender == 'male') return AppString.male;
     if (gender == 'female') return AppString.female;
     return '';
@@ -167,7 +167,7 @@ class _ReviewPageState extends State<ReviewPage> {
           items: [
             InfoCardItem(label: AppString.fullName, value: widget.fullName),
             InfoCardItem(label: AppString.dateOfBirth, value: widget.dateOfBirth),
-            InfoCardItem(label: AppString.gender, value: _getGenderDisplayName(widget.gender)),
+            InfoCardItem(label: AppString.sex, value: _getSexDisplayName(widget.gender)),
             InfoCardItem(label: AppString.homeAddress, value: widget.address),
             InfoCardItem(label: AppString.contactNumber, value: '+63 ${widget.contactNumber}'),
           ],

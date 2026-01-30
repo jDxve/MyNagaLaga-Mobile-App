@@ -67,7 +67,7 @@ class ShelterCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Capacity:',
+                'Capacity',
                 style: TextStyle(
                   fontSize: D.textSM,
                   fontWeight: D.medium,
@@ -84,6 +84,18 @@ class ShelterCard extends StatelessWidget {
               ),
             ],
           ),
+          8.gapH,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: _getCapacityPercentage(shelter.capacity),
+              backgroundColor: AppColors.grey.withOpacity(0.2),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                _getStatusTextColor(shelter.status),
+              ),
+              minHeight: 6,
+            ),
+          ),
           12.gapH,
           Row(
             children: [
@@ -97,6 +109,16 @@ class ShelterCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  double _getCapacityPercentage(String capacity) {
+    final parts = capacity.split('/');
+    if (parts.length == 2) {
+      final current = int.tryParse(parts[0]) ?? 0;
+      final total = int.tryParse(parts[1]) ?? 1;
+      return current / total;
+    }
+    return 0.0;
   }
 
   String _getStatusText(ShelterStatus status) {

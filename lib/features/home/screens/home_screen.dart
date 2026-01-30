@@ -4,6 +4,7 @@ import '../../../common/resources/dimensions.dart';
 import '../../../common/widgets/nav_bar.dart';
 import '../../../common/widgets/search_input.dart';
 import '../../account/screens/account_screen.dart';
+import '../../family/screens/family_ledger_screen.dart';
 import '../../safety/screens/disaster_resilience_screen.dart';
 import '../../services/screens/services_screen.dart';
 import '../components/badges.dart';
@@ -24,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _screens = [
     const _HomeTab(),
-    const Center(child: Text('Family')),
+    const FamilyLedgerScreen(),
     const ServicesScreen(),
     const DisasterResilienceScreen(),
     const AccountScreen(),
@@ -33,6 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     D.init(context);
+    
     return Scaffold(
       body: _screens[_currentIndex],
       bottomNavigationBar: BottomNavigation(
