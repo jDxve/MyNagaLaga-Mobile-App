@@ -11,14 +11,14 @@ class AuthGuard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final session = ref.watch(authSessionProvider);
 
+    if (session.isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     if (!session.isAuthenticated) {
-      // Use microtask to avoid building during state transition
-      Future.microtask(() {
-        Navigator.of(
-          context,
-        ).pushNamedAndRemoveUntil(LogInScreen.routeName, (route) => false);
-      });
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const LogInScreen();
     }
 
     return child;

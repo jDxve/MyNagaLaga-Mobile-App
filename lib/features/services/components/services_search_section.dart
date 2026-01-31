@@ -1,28 +1,28 @@
 import 'package:flutter/material.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
-import '../../../common/resources/assets.dart';
 import '../../../common/widgets/search_input.dart';
+
+import 'posting_list.dart'; // ✅ Updated import
 
 class ServicesSearchSection extends StatelessWidget {
   final TextEditingController searchController;
   final ValueChanged<String>? onSearchChanged;
   final VoidCallback? onFilterTap;
-  final VoidCallback? onCashAssistanceTap;
 
   const ServicesSearchSection({
     super.key,
     required this.searchController,
     this.onSearchChanged,
     this.onFilterTap,
-    this.onCashAssistanceTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Search Bar and Filter Button
+        // Search Bar + Filter
         Row(
           children: [
             Expanded(
@@ -39,8 +39,30 @@ class ServicesSearchSection extends StatelessWidget {
 
         20.gapH,
 
-        // Cash Assistance Banner
-        _buildCashAssistanceBanner(),
+        // ✅ Available Postings Title
+        Text(
+          "Available Assistance Postings",
+          style: TextStyle(
+            fontSize: 16.f, // Slightly larger
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+        ),
+
+        14.gapH,
+
+        // ✅ Horizontal Posting List
+        PostingHorizontalList(
+          onTap: (posting) {
+            debugPrint("Tapped Posting: ${posting.title}");
+            // TODO: Navigate to posting details
+            // Navigator.pushNamed(
+            //   context,
+            //   PostingDetailScreen.routeName,
+            //   arguments: posting,
+            // );
+          },
+        ),
       ],
     );
   }
@@ -65,30 +87,6 @@ class ServicesSearchSection extends StatelessWidget {
           ],
         ),
         child: Icon(Icons.tune, color: AppColors.grey, size: D.iconMD),
-      ),
-    );
-  }
-
-  Widget _buildCashAssistanceBanner() {
-    return GestureDetector(
-      onTap: onCashAssistanceTap,
-      child: Container(
-        width: double.infinity,
-        height: 140.h,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(D.radiusLG),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(D.radiusLG),
-          child: Image.asset(Assets.cashAssistance, fit: BoxFit.cover),
-        ),
       ),
     );
   }

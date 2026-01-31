@@ -5,6 +5,7 @@ import '../../../common/models/dio/data_state.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/utils/ui_utils.dart';
 import '../../home/screens/home_screen.dart';
+import '../../auth/notifier/auth_session_notifier.dart';
 import '../components/application_submitted.dart';
 import '../components/basic_info_page.dart';
 import '../components/document_page.dart';
@@ -91,14 +92,18 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
   }
 
   void _submitApplication() {
-    const String mobileUserId = '7';
-    final birthdate = UIUtils.convertDateToApiFormat(_dateOfBirthController.text);
+    final session = ref.read(authSessionProvider);
+    if (session.userId == null) return;
+    if (_selectedBadge == null) return;
+
+    final birthdate =
+        UIUtils.convertDateToApiFormat(_dateOfBirthController.text);
     final gender = UIUtils.convertGenderToApiFormat(_selectedGender);
     final typeOfId = UIUtils.convertIdTypeToApiFormat(_selectedIdType);
 
     ref.read(verifyBadgeNotifierProvider.notifier).submitBadge(
-          mobileUserId: mobileUserId,
-          badgeTypeId: _selectedBadge?.id ?? '1',
+          mobileUserId: session.userId!,
+          badgeTypeId: _selectedBadge!.id,
           fullName: _fullNameController.text.trim(),
           birthdate: birthdate,
           gender: gender,

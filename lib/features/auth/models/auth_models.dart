@@ -56,17 +56,22 @@ class OtpResponse {
 
 class AuthSessionState {
   final bool isAuthenticated;
+  final bool isLoading;
   final String? userId;
   final String? email;
   final String? accessToken;
 
-  AuthSessionState({
+  const AuthSessionState({
     required this.isAuthenticated,
+    required this.isLoading,
     this.userId,
     this.email,
     this.accessToken,
   });
 
-  // A helper for the initial unauthenticated state
-  factory AuthSessionState.empty() => AuthSessionState(isAuthenticated: false);
+  factory AuthSessionState.loading() =>
+      const AuthSessionState(isAuthenticated: false, isLoading: true);
+
+  factory AuthSessionState.empty() =>
+      const AuthSessionState(isAuthenticated: false, isLoading: false);
 }

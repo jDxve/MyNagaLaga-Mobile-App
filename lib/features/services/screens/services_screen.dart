@@ -10,6 +10,7 @@ import 'programs/track_services_screen.dart';
 
 class ServicesScreen extends StatefulWidget {
   static const routeName = '/services';
+  
   const ServicesScreen({super.key});
 
   @override
@@ -35,10 +36,6 @@ class _ServicesScreenState extends State<ServicesScreen> {
 
   void _handleFilterTap() {
     print('Filter tapped');
-  }
-
-  void _handleCashAssistanceTap() {
-    print('Cash Assistance tapped');
   }
 
   void _handleTrackCaseTap() {
@@ -78,13 +75,11 @@ class _ServicesScreenState extends State<ServicesScreen> {
                       searchController: _searchController,
                       onSearchChanged: _handleSearchChanged,
                       onFilterTap: _handleFilterTap,
-                      onCashAssistanceTap: _handleCashAssistanceTap,
+                      // ✅ Removed onCashAssistanceTap
                     ),
-
                     24.gapH,
                     FeaturedProgramSection(),
                     24.gapH,
-
                     ServicesSection(
                       onRequestServicesTap: _handleRequestServicesTap,
                       onComplaintsTap: _handleComplaintsTap,

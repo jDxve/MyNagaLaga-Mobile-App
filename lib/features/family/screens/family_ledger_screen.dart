@@ -35,7 +35,7 @@ class _FamilyLedgerScreenState extends State<FamilyLedgerScreen> {
           padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
           child: Column(
             children: [
-              // Banner and Info Section
+              100.gapH,
               const FamilyLedgerBanner(),
 
               // Add Family Member Button

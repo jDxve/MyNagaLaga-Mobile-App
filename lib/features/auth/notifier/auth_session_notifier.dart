@@ -4,7 +4,7 @@ import '../models/auth_models.dart';
 
 class AuthSessionNotifier extends Notifier<AuthSessionState> {
   final _storage = const FlutterSecureStorage();
-  
+
   static const _tokenKey = 'access_token';
   static const _emailKey = 'user_email';
   static const _userIdKey = 'user_id';
@@ -12,7 +12,7 @@ class AuthSessionNotifier extends Notifier<AuthSessionState> {
   @override
   AuthSessionState build() {
     _checkSession();
-    return AuthSessionState.empty();
+    return AuthSessionState.loading(); // ✅ NOT empty
   }
 
   Future<void> _checkSession() async {
@@ -23,10 +23,13 @@ class AuthSessionNotifier extends Notifier<AuthSessionState> {
     if (token != null && token.isNotEmpty) {
       state = AuthSessionState(
         isAuthenticated: true,
+        isLoading: false,
         userId: userId,
         email: email,
         accessToken: token,
       );
+    } else {
+      state = AuthSessionState.empty(); // unauthenticated
     }
   }
 
@@ -41,6 +44,7 @@ class AuthSessionNotifier extends Notifier<AuthSessionState> {
 
     state = AuthSessionState(
       isAuthenticated: true,
+      isLoading: false,
       userId: userId,
       email: email,
       accessToken: accessToken,

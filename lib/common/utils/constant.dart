@@ -38,4 +38,13 @@ class Constant {
     south: 13.5700,
     west: 123.1400,
   );
+
+  static const List<String> monthsShort = [
+    '', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ];
+
+  static String formatDateRange(DateTime start, DateTime end) {
+    return '${monthsShort[start.month]} ${start.day} - ${monthsShort[end.month]} ${end.day}, ${end.year}';
+  }
 }

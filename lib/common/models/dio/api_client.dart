@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'auth_interceptor.dart';
 import 'logging_interceptor.dart';
 
 class ApiClient {
@@ -17,6 +18,7 @@ class ApiClient {
 
   Dio create() => Dio(_createBaseOptions())
     ..interceptors.addAll([
+      AuthInterceptor(),
       LoggingInterceptor(),
     ]);
 
