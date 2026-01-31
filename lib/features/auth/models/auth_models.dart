@@ -54,24 +54,35 @@ class OtpResponse {
   }
 }
 
+// auth_models.dart
 class AuthSessionState {
   final bool isAuthenticated;
   final bool isLoading;
   final String? userId;
   final String? email;
+  final String? fullName;  // ← Add this
   final String? accessToken;
 
-  const AuthSessionState({
+  AuthSessionState({
     required this.isAuthenticated,
     required this.isLoading,
     this.userId,
     this.email,
+    this.fullName,  // ← Add this
     this.accessToken,
   });
 
-  factory AuthSessionState.loading() =>
-      const AuthSessionState(isAuthenticated: false, isLoading: true);
+  factory AuthSessionState.empty() {
+    return AuthSessionState(
+      isAuthenticated: false,
+      isLoading: false,
+    );
+  }
 
-  factory AuthSessionState.empty() =>
-      const AuthSessionState(isAuthenticated: false, isLoading: false);
+  factory AuthSessionState.loading() {
+    return AuthSessionState(
+      isAuthenticated: false,
+      isLoading: true,
+    );
+  }
 }

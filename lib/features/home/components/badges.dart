@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../../common/resources/assets.dart';
 import '../../../common/resources/dimensions.dart';
-
-enum BadgeType { student, soloParent, seniorCitizen, pwd, indigentFamily }
+import '../models/user_badge_model.dart';
 
 class BadgeDisplay extends StatefulWidget {
-  final List<BadgeType> badges;
+  final List<BadgeModel> badges;
 
   const BadgeDisplay({super.key, required this.badges});
 
@@ -62,6 +61,8 @@ class _BadgeDisplayState extends State<BadgeDisplay>
         return Assets.pwdBadge;
       case BadgeType.indigentFamily:
         return Assets.indigentFamilyBadge;
+      case BadgeType.other:
+        return Assets.studentBadge;
     }
   }
 
@@ -131,7 +132,6 @@ class _BadgeDisplayState extends State<BadgeDisplay>
 
     return GestureDetector(
       onVerticalDragEnd: (details) {
-        // Only allow swiping if there is more than one card
         if (total <= 1) return;
 
         if (details.primaryVelocity! < 0) {
@@ -170,7 +170,7 @@ class _BadgeDisplayState extends State<BadgeDisplay>
                       child: FadeTransition(
                         opacity: _fadeAnimation,
                         child: Image.asset(
-                          _getBadgeImage(widget.badges[_currentIndex]),
+                          _getBadgeImage(widget.badges[_currentIndex].badgeTypeKey),
                           height: 200.h,
                           fit: BoxFit.contain,
                         ),
@@ -192,7 +192,7 @@ class _BadgeDisplayState extends State<BadgeDisplay>
                     child: Transform.scale(
                       scale: scale.clamp(0.8, 1.0),
                       child: Image.asset(
-                        _getBadgeImage(widget.badges[badgeIndex]),
+                        _getBadgeImage(widget.badges[badgeIndex].badgeTypeKey),
                         height: 200.h,
                         fit: BoxFit.contain,
                       ),

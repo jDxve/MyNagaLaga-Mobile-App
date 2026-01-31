@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../common/models/dio/data_state.dart';
 import '../../../common/widgets/background_gradient.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/widgets/nav_bar.dart';
 import '../../../common/widgets/search_input.dart';
 import '../../account/screens/account_screen.dart';
+import '../../auth/notifier/auth_session_notifier.dart';
 import '../../family/screens/family_ledger_screen.dart';
 import '../../safety/screens/disaster_resilience_screen.dart';
 import '../../services/screens/services_screen.dart';
@@ -11,9 +14,11 @@ import '../components/badges.dart';
 import '../components/circular_notif.dart';
 import '../components/home_greetings.dart';
 import '../components/quik_actions.dart';
+import '../notifier/user_badge_notifier.dart';
 
 class HomeScreen extends StatefulWidget {
   static const routeName = '/home';
+
   const HomeScreen({super.key});
 
   @override
@@ -34,7 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     D.init(context);
-    
     return Scaffold(
       body: _screens[_currentIndex],
       bottomNavigationBar: BottomNavigation(
@@ -49,11 +53,23 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _HomeTab extends StatelessWidget {
+class _HomeTab extends ConsumerWidget {
   const _HomeTab();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final session = ref.watch(authSessionProvider);
+    final badgesState = ref.watch(badgesNotifierProvider);
+
+    // Fetch badges when user ID is available
+    ref.listen(authSessionProvider, (previous, next) {
+      if (next.isAuthenticated && next.userId != null) {
+        ref.read(badgesNotifierProvider.notifier).fetchBadges(
+              mobileUserId: next.userId!,
+            );
+      }
+    });
+
     return gradientBackground(
       child: SafeArea(
         child: Column(
@@ -61,7 +77,9 @@ class _HomeTab extends StatelessWidget {
           children: [
             Padding(
               padding: EdgeInsets.only(left: 32.w, top: 24.h),
-              child: greetingText(userName: 'John Dave Bañas'),
+              child: greetingText(
+                userName: session.fullName ?? "",
+              ),
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 16.h),
@@ -74,8 +92,15 @@ class _HomeTab extends StatelessWidget {
               ),
             ),
             12.gapH,
-            const BadgeDisplay(
-              badges: [BadgeType.student, BadgeType.soloParent, BadgeType.pwd],
+            // Display badges based on state
+            badgesState.when(
+              started: () => const SizedBox.shrink(),
+              loading: () => SizedBox(
+                height: 210.h,
+                child: const Center(child: CircularProgressIndicator()),
+              ),
+              success: (data) => BadgeDisplay(badges: data.badges),
+              error: (message) => const SizedBox.shrink(),
             ),
             10.gapH,
             quickActions(context),

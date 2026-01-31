@@ -32,4 +32,6 @@ class BadgeType {
     if (n.contains('indigent')) return 'indigent';
     return 'other';
   }
+
+  static get student => null;
 }
