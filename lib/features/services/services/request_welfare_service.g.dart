@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'welfare_programs_service.dart';
+part of 'request_welfare_service.dart';
 
 // dart format off
 
@@ -10,8 +10,8 @@ part of 'welfare_programs_service.dart';
 
 // ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations,unused_element_parameter,avoid_unused_constructor_parameters,unreachable_from_main
 
-class _WelfareProgramsService implements WelfareProgramsService {
-  _WelfareProgramsService(this._dio, {this.baseUrl, this.errorLogger});
+class _RequestWelfareService implements RequestWelfareService {
+  _RequestWelfareService(this._dio, {this.baseUrl, this.errorLogger});
 
   final Dio _dio;
 
@@ -20,27 +20,19 @@ class _WelfareProgramsService implements WelfareProgramsService {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<HttpResponse<dynamic>> fetchPostings({
-    String? programId,
-    String? status,
-    int page = 1,
-    int limit = 10,
-  }) async {
+  Future<HttpResponse<dynamic>> submitServiceRequest(
+    String postingId,
+    FormData formData,
+  ) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{
-      r'programId': programId,
-      r'status': status,
-      r'page': page,
-      r'limit': limit,
-    };
-    queryParameters.removeWhere((k, v) => v == null);
+    final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    const Map<String, dynamic>? _data = null;
+    final _data = formData;
     final _options = _setStreamType<HttpResponse<dynamic>>(
-      Options(method: 'GET', headers: _headers, extra: _extra)
+      Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/welfare-programs/postings',
+            '/welfare-programs/mobile/postings/${postingId}/requests',
             queryParameters: queryParameters,
             data: _data,
           )

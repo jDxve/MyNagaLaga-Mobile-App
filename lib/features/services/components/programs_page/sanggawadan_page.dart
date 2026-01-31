@@ -1,6 +1,9 @@
+// sanggawadan_page.dart
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../../common/models/dio/data_state.dart';
 import '../../../../common/resources/colors.dart';
 import '../../../../common/resources/dimensions.dart';
 import '../../../../common/resources/assets.dart';
@@ -13,67 +16,290 @@ import '../../../../common/widgets/info_card.dart';
 import '../../../../common/widgets/toggle.dart';
 import '../../../../common/widgets/text_input.dart';
 import '../../../../common/widgets/upload_image_card.dart';
+import '../../../auth/notifier/auth_session_notifier.dart';
+import '../../models/welfare_request_model.dart';
+import '../../models/posting_requirement_model.dart';
+import '../../notifier/request_welfare_notifier.dart';
 
-class SanggawadanPage extends StatefulWidget {
+class SanggawadanPage extends ConsumerStatefulWidget {
+  final String postingId;
+  final String postingTitle;
   final String userName;
   final String userAge;
   final String userSchool;
   final String userGradeLevel;
+  final String? userBadgeType;
+  final int? userBadgeId;
+  final List<int>? requirementIds;
+  final List<PostingRequirement>? requirements;
 
   const SanggawadanPage({
     super.key,
+    required this.postingId,
+    required this.postingTitle,
     required this.userName,
     required this.userAge,
     required this.userSchool,
     required this.userGradeLevel,
+    this.userBadgeType,
+    this.userBadgeId,
+    this.requirementIds,
+    this.requirements,
   });
 
   @override
-  State<SanggawadanPage> createState() => _SanggawadanPageState();
+  ConsumerState<SanggawadanPage> createState() => _SanggawadanPageState();
 }
 
-class _SanggawadanPageState extends State<SanggawadanPage> {
+class _SanggawadanPageState extends ConsumerState<SanggawadanPage> {
   String? selectedRecipient = Constant.forMe;
   final TextEditingController reasonController = TextEditingController();
-  final TextEditingController familyMemberController = TextEditingController();
-  final TextEditingController schoolController = TextEditingController();
-  final TextEditingController educationLevelController =
-      TextEditingController();
-  final TextEditingController gradeLevelController = TextEditingController();
-  File? uploadedDocument;
+
+  // Dynamic file storage - one File per requirement
+  final Map<int, File?> uploadedFiles = {};
+  bool _isSubmitting = false;
 
   @override
   void initState() {
     super.initState();
     reasonController.addListener(() => setState(() {}));
-    educationLevelController.addListener(() {
-      setState(() {
-        gradeLevelController.clear();
-      });
-    });
+
+    // Initialize uploadedFiles map for each requirement
+    if (widget.requirements != null) {
+      for (var req in widget.requirements!) {
+        uploadedFiles[req.id] = null;
+      }
+    }
   }
 
   @override
   void dispose() {
     reasonController.dispose();
-    familyMemberController.dispose();
-    schoolController.dispose();
-    educationLevelController.dispose();
-    gradeLevelController.dispose();
     super.dispose();
   }
 
-  Future<void> _pickImage(ImageSource source) async {
+  Future<void> _pickFile(int requirementId, ImageSource source) async {
     final ImagePicker picker = ImagePicker();
     try {
       final XFile? pickedFile = await picker.pickImage(source: source);
       if (pickedFile != null) {
         setState(() {
-          uploadedDocument = File(pickedFile.path);
+          uploadedFiles[requirementId] = File(pickedFile.path);
         });
       }
     } catch (e) {
-      debugPrint('Error picking image: $e');
+      debugPrint('Error picking file for requirement $requirementId: $e');
+    }
+  }
+
+  String _getBadgeImage(String? badgeType) {
+    if (badgeType == null) return Assets.studentBadge;
+
+    switch (badgeType.toLowerCase()) {
+      case 'student':
+        return Assets.studentBadge;
+      case 'senior citizen':
+        return Assets.seniorCitizenBadge;
+      case 'pwd':
+        return Assets.pwdBadge;
+      case 'solo parent':
+        return Assets.soloParentBadge;
+      case 'indigent family':
+        return Assets.indigentFamilyBadge;
+      default:
+        return Assets.studentBadge;
+    }
+  }
+
+  void _showSuccessModal() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(D.radiusXL),
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(24.w),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Success Icon
+                Container(
+                  width: 80.w,
+                  height: 80.h,
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.check_circle,
+                    size: 50,
+                    color: Colors.green,
+                  ),
+                ),
+                20.gapH,
+                
+                // Title
+                Text(
+                  'Success!',
+                  style: TextStyle(
+                    fontSize: D.textXL,
+                    fontWeight: D.bold,
+                    color: AppColors.black,
+                  ),
+                ),
+                12.gapH,
+                
+                // Message
+                Text(
+                  'Your request has been submitted successfully. You will be notified once it has been reviewed.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: D.textSM,
+                    color: AppColors.grey,
+                    height: 1.5,
+                  ),
+                ),
+                24.gapH,
+                
+                // Close Button
+                SizedBox(
+                  width: double.infinity,
+                  child: PrimaryButton(
+                    text: 'Done',
+                    onPressed: () {
+                      Navigator.pop(context); // Close modal
+                      Navigator.pop(context); // Go back to previous screen
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _handleSubmit() async {
+    if (_isSubmitting) return;
+
+    if (reasonController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please provide a reason for your request'),
+        ),
+      );
+      return;
+    }
+
+    // CRITICAL: Collect files in the EXACT order of requirementIds
+    // The backend expects files to match the requirementIds array by index
+    final List<String> filePaths = [];
+    final List<String> missingRequirements = [];
+
+    if (widget.requirementIds != null && widget.requirements != null) {
+      debugPrint('📋 Collecting files for ${widget.requirementIds!.length} requirements');
+      
+      // Iterate through requirementIds (which are already in the correct order)
+      for (int i = 0; i < widget.requirementIds!.length; i++) {
+        final requirementId = widget.requirementIds![i];
+        final file = uploadedFiles[requirementId];
+        
+        // Find the requirement details for better error messages
+        final requirement = widget.requirements!.firstWhere(
+          (req) => req.id == requirementId,
+          orElse: () => PostingRequirement(
+            id: requirementId,
+            label: 'Requirement $requirementId',
+            category: '',
+            type: 'file',
+            required: true,
+            order: i + 1,
+          ),
+        );
+        
+        if (file != null) {
+          filePaths.add(file.path);
+          debugPrint('✅ Req ${requirement.order}: ${requirement.label} - File: ${file.path}');
+        } else if (requirement.required) {
+          missingRequirements.add('${requirement.order}. ${requirement.label}');
+          debugPrint('❌ Req ${requirement.order}: ${requirement.label} - MISSING');
+        }
+      }
+    }
+
+    debugPrint('📦 Collected ${filePaths.length} files from ${widget.requirementIds!.length} requirements');
+
+    if (missingRequirements.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Please upload the following required documents:\n${missingRequirements.join("\n")}',
+          ),
+          duration: const Duration(seconds: 4),
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isSubmitting = true);
+
+    try {
+      final authSession = ref.read(authSessionProvider);
+
+      if (!authSession.isAuthenticated || authSession.userId == null) {
+        throw Exception('User not authenticated');
+      }
+
+      debugPrint('🚀 Creating request:');
+      debugPrint('   Posting ID: ${widget.postingId}');
+      debugPrint('   User ID: ${authSession.userId}');
+      debugPrint('   Requirement IDs: ${widget.requirementIds}');
+      debugPrint('   File Paths: $filePaths');
+      debugPrint('   Badge ID: ${widget.userBadgeId}');
+
+      final request = WelfareRequestModel(
+        postingId: widget.postingId,
+        mobileUserId: authSession.userId!,
+        reason: reasonController.text.trim(),
+        requirementIds: widget.requirementIds!,
+        badgeId: widget.userBadgeId?.toString(),
+        filePaths: filePaths,
+      );
+
+      final success = await ref
+          .read(requestWelfareNotifierProvider.notifier)
+          .submitRequest(request);
+
+      if (!mounted) return;
+
+      if (success) {
+        _showSuccessModal();
+      } else {
+        final state = ref.read(requestWelfareNotifierProvider);
+        final errorMessage = state.when(
+          started: () => 'Failed to submit request',
+          loading: () => 'Failed to submit request',
+          success: (data) => 'Failed to submit request',
+          error: (error) => error ?? 'Failed to submit request',
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMessage)),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
     }
   }
 
@@ -82,7 +308,7 @@ class _SanggawadanPageState extends State<SanggawadanPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: CustomAppBar(
-        title: AppString.sanggawadanTitle,
+        title: 'Sanggawadan',
         onBackPressed: () => Navigator.pop(context),
       ),
       body: SingleChildScrollView(
@@ -91,43 +317,35 @@ class _SanggawadanPageState extends State<SanggawadanPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Toggle(
-                selectedValue: selectedRecipient,
-                onChanged: (value) => setState(() => selectedRecipient = value),
-                firstLabel: AppString.forMe,
-                firstValue: Constant.forMe,
-                secondLabel: AppString.forFamilyMember,
-                secondValue: Constant.forFamily,
+              InfoCard(
+                title: AppString.applicantDetails,
+                items: [
+                  InfoCardItem(
+                    label: AppString.fullName,
+                    value: widget.userName,
+                  ),
+                  InfoCardItem(label: AppString.age, value: widget.userAge),
+                  InfoCardItem(
+                    label: AppString.schoolName,
+                    value: widget.userSchool,
+                  ),
+                  InfoCardItem(
+                    label: AppString.yearGradeLevel,
+                    value: widget.userGradeLevel,
+                  ),
+                ],
               ),
               20.gapH,
-              if (selectedRecipient == Constant.forMe) ...[
-                InfoCard(
-                  title: AppString.applicantDetails,
-                  items: [
-                    InfoCardItem(
-                      label: AppString.fullName,
-                      value: widget.userName,
-                    ),
-                    InfoCardItem(label: AppString.age, value: widget.userAge),
-                    InfoCardItem(
-                      label: AppString.schoolName,
-                      value: widget.userSchool,
-                    ),
-                    InfoCardItem(
-                      label: AppString.yearGradeLevel,
-                      value: widget.userGradeLevel,
-                    ),
-                  ],
-                ),
-                20.gapH,
-                _buildReasonSection(),
-                20.gapH,
-                _buildAttachedBadge(),
-                24.gapH,
-              ] else ...[
-                _buildFamilyMemberForm(),
-              ],
-              PrimaryButton(text: AppString.submitRequest, onPressed: () {}),
+              _buildReasonSection(),
+              20.gapH,
+              _buildAttachedBadge(),
+              20.gapH,
+              _buildRequirementsSection(),
+              24.gapH,
+              PrimaryButton(
+                text: _isSubmitting ? 'Submitting...' : AppString.submitRequest,
+                onPressed: _isSubmitting ? () {} : _handleSubmit,
+              ),
               20.gapH,
             ],
           ),
@@ -136,53 +354,192 @@ class _SanggawadanPageState extends State<SanggawadanPage> {
     );
   }
 
-  Widget _buildFamilyMemberForm() {
+  Widget _buildRequirementsSection() {
+    if (widget.requirements == null || widget.requirements!.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    // Sort requirements by order
+    final sortedRequirements = List<PostingRequirement>.from(
+      widget.requirements!,
+    )..sort((a, b) => a.order.compareTo(b.order));
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildLabel(AppString.familyMember),
+        _buildLabel('Required Documents'),
         8.gapH,
-        Dropdown(
-          controller: familyMemberController,
-          hintText: AppString.selectFamilyMember,
-          items: const [
-            'John Santos (Son)',
-            'Jane Santos (Daughter)',
-            'Maria Santos (Mother)',
-            'Jose Santos (Father)',
-          ],
-        ),
-        20.gapH,
-        _buildLabel(AppString.requestDetails),
-        12.gapH,
-        _buildSubLabel(AppString.schoolName),
-        8.gapH,
-        TextInput(
-          controller: schoolController,
-          hintText: AppString.searchSchoolName,
+        Container(
+          padding: EdgeInsets.all(12.w),
+          decoration: BoxDecoration(
+            color: AppColors.primary.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(D.radiusLG),
+            border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.info_outline, size: 16, color: AppColors.primary),
+                  8.gapW,
+                  Expanded(
+                    child: Text(
+                      'Please upload all required documents to complete your request',
+                      style: TextStyle(
+                        fontSize: D.textXS,
+                        color: AppColors.primary,
+                        fontWeight: D.medium,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
         16.gapH,
-        _buildSubLabel(AppString.educationLevel),
-        8.gapH,
-        Dropdown(
-          controller: educationLevelController,
-          hintText: AppString.selectLevel,
-          items: Constant.educationLevels,
+        ...sortedRequirements.map(
+          (requirement) => Padding(
+            padding: EdgeInsets.only(bottom: 16.h),
+            child: _buildRequirementUpload(requirement),
+          ),
         ),
-        16.gapH,
-        _buildSubLabel(AppString.yearGradeLevel),
-        8.gapH,
-        Dropdown(
-          controller: gradeLevelController,
-          hintText: AppString.selectYearLevel,
-          items: Constant.yearLevelMap[educationLevelController.text] ?? [],
-        ),
-        20.gapH,
-        _buildReasonSection(),
-        20.gapH,
-        _buildUploadSection(),
-        24.gapH,
       ],
+    );
+  }
+
+  Widget _buildRequirementUpload(PostingRequirement requirement) {
+    final isUploaded = uploadedFiles[requirement.id] != null;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(D.radiusLG),
+        border: Border.all(
+          color: requirement.required && !isUploaded
+              ? Colors.red.withOpacity(0.3)
+              : AppColors.grey.withOpacity(0.2),
+          width: 1.5,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+            decoration: BoxDecoration(
+              color: isUploaded
+                  ? Colors.green.withOpacity(0.05)
+                  : AppColors.grey.withOpacity(0.05),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(D.radiusLG),
+                topRight: Radius.circular(D.radiusLG),
+              ),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 32.w,
+                  height: 32.h,
+                  decoration: BoxDecoration(
+                    color: isUploaded ? Colors.green : AppColors.primary,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: isUploaded
+                        ? Icon(Icons.check, color: AppColors.white, size: 18)
+                        : Text(
+                            '${requirement.order}',
+                            style: TextStyle(
+                              fontSize: D.textSM,
+                              fontWeight: D.bold,
+                              color: AppColors.white,
+                            ),
+                          ),
+                  ),
+                ),
+                12.gapW,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              requirement.label,
+                              style: TextStyle(
+                                fontSize: D.textSM,
+                                fontWeight: D.semiBold,
+                                color: AppColors.black,
+                              ),
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (requirement.required) ...[
+                            4.gapW,
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 6.w,
+                                vertical: 2.h,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.red.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                'Required',
+                                style: TextStyle(
+                                  fontSize: D.textXS,
+                                  fontWeight: D.medium,
+                                  color: Colors.red,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      if (requirement.notes != null) ...[
+                        4.gapH,
+                        Text(
+                          requirement.notes!,
+                          style: TextStyle(
+                            fontSize: D.textXS,
+                            color: AppColors.grey,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(12.w),
+            child: UploadImage(
+              image: uploadedFiles[requirement.id],
+              title: isUploaded
+                  ? 'Document uploaded'
+                  : 'Upload document ${requirement.order}',
+              subtitle: isUploaded
+                  ? 'Tap to change'
+                  : 'Take photo or choose file',
+              height: 120.h,
+              showActions: true,
+              onPickImage: (source) => _pickFile(requirement.id, source),
+              onRemove: () =>
+                  setState(() => uploadedFiles[requirement.id] = null),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -198,58 +555,49 @@ class _SanggawadanPageState extends State<SanggawadanPage> {
     );
   }
 
-  Widget _buildSubLabel(String text) {
-    return Text(
-      text,
-      style: TextStyle(
-        fontSize: D.textSM,
-        fontWeight: D.medium,
-        fontFamily: 'Segoe UI',
-        color: AppColors.black,
-      ),
-    );
-  }
-
-  Widget _buildUploadSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildLabel(AppString.uploadSupportingDocument),
-        4.gapH,
-        Text(
-          AppString.enrollmentCertExample,
-          style: TextStyle(
-            fontSize: D.textXS,
-            color: AppColors.grey,
-            fontFamily: 'Segoe UI',
-          ),
-        ),
-        12.gapH,
-        UploadImage(
-          image: uploadedDocument,
-          title: AppString.uploadYourFile,
-          subtitle: AppString.dragOrChoose,
-          height: 150.h,
-          showActions: true,
-          onPickImage: _pickImage,
-          onRemove: () => setState(() => uploadedDocument = null),
-        ),
-      ],
-    );
-  }
-
   Widget _buildAttachedBadge() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildLabel(AppString.attachedBadge),
         12.gapH,
-        ClipRRect(
-          borderRadius: BorderRadius.circular(D.radiusLG),
-          child: Image.asset(
-            Assets.studentBadge,
-            width: double.infinity,
-            fit: BoxFit.cover,
+        Container(
+          padding: EdgeInsets.all(16.w),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(D.radiusLG),
+            border: Border.all(color: AppColors.grey.withOpacity(0.3)),
+          ),
+          child: Column(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(D.radiusLG),
+                child: Image.asset(
+                  _getBadgeImage(widget.userBadgeType),
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              if (widget.userBadgeType != null) ...[
+                16.gapH,
+                Row(
+                  children: [
+                    Icon(Icons.verified, color: AppColors.primary, size: 20),
+                    8.gapH,
+                    Expanded(
+                      child: Text(
+                        widget.userBadgeType!,
+                        style: TextStyle(
+                          fontSize: D.textSM,
+                          fontWeight: D.semiBold,
+                          color: AppColors.black,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ],
           ),
         ),
       ],

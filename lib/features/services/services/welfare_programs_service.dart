@@ -18,6 +18,7 @@ abstract class WelfareProgramsService {
 
   @GET('/welfare-programs/postings')
   Future<HttpResponse<dynamic>> fetchPostings({
+    @Query("programId") String? programId,  // ✅ Add this
     @Query("status") String? status,
     @Query("page") int page = 1,
     @Query("limit") int limit = 10,

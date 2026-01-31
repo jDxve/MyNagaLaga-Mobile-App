@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'welfare_programs_service.dart';
+part of 'user_badge_service.dart';
 
 // dart format off
 
@@ -10,8 +10,8 @@ part of 'welfare_programs_service.dart';
 
 // ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations,unused_element_parameter,avoid_unused_constructor_parameters,unreachable_from_main
 
-class _WelfareProgramsService implements WelfareProgramsService {
-  _WelfareProgramsService(this._dio, {this.baseUrl, this.errorLogger});
+class _UserBadgeService implements UserBadgeService {
+  _UserBadgeService(this._dio, {this.baseUrl, this.errorLogger});
 
   final Dio _dio;
 
@@ -20,27 +20,42 @@ class _WelfareProgramsService implements WelfareProgramsService {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<HttpResponse<dynamic>> fetchPostings({
-    String? programId,
-    String? status,
-    int page = 1,
-    int limit = 10,
+  Future<HttpResponse<dynamic>> getApprovedBadges({
+    required String mobileUserId,
   }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{
-      r'programId': programId,
-      r'status': status,
-      r'page': page,
-      r'limit': limit,
-    };
-    queryParameters.removeWhere((k, v) => v == null);
+    final queryParameters = <String, dynamic>{r'mobileUserId': mobileUserId};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<HttpResponse<dynamic>>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/welfare-programs/postings',
+            '/badge-requests/approved/badges',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch(_options);
+    final _value = _result.data;
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<dynamic>> getBadgeInfo({
+    required String mobileUserId,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'mobileUserId': mobileUserId};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<HttpResponse<dynamic>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/badge-requests/badge-info',
             queryParameters: queryParameters,
             data: _data,
           )
