@@ -3,7 +3,9 @@ import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 import '../models/shelter_data_model.dart';
 import 'shelter_card.dart';
-import 'shelter_map_fullpage.dart'; // Ensure this is imported
+
+import 'shelter_detail_sheet.dart';
+import 'shelter_map_fullpage.dart';
 
 class SheltersList extends StatelessWidget {
   final List<ShelterData> shelters;
@@ -33,23 +35,27 @@ class SheltersList extends StatelessWidget {
               itemCount: shelters.length,
               itemBuilder: (context, index) {
                 final shelter = shelters[index];
-                
-                return GestureDetector(
+                return ShelterCard(
+                  shelter: shelter,
                   onTap: () {
-                    Navigator.push(
+                    // Show the details sheet when card is tapped
+                    ShelterDetailsSheet.show(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => ShelterMapFullPage(
-                          shelters: shelters,
-                          initialShelter: shelter,
-                        ),
-                      ),
+                      shelter,
+                      () {
+                        // Navigate to full map when directions button is clicked
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ShelterMapFullPage(
+                              shelters: shelters,
+                              initialShelter: shelter,
+                            ),
+                          ),
+                        );
+                      },
                     );
                   },
-                  child: Padding(
-                    padding: EdgeInsets.only(bottom: 12.h),
-                    child: ShelterCard(shelter: shelter),
-                  ),
                 );
               },
             ),

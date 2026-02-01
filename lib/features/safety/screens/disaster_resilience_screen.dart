@@ -3,7 +3,6 @@ import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/widgets/search_input.dart';
 import '../../home/components/circular_notif.dart';
-
 import '../compnents/shelter_map.dart';
 import '../compnents/shelters_list.dart';
 import '../models/shelter_data_model.dart';
@@ -56,6 +55,7 @@ class _DisasterResilienceScreenState extends State<DisasterResilienceScreen> {
       pwd: 5,
     ),
   ];
+
   @override
   void dispose() {
     _searchController.dispose();
@@ -65,7 +65,6 @@ class _DisasterResilienceScreenState extends State<DisasterResilienceScreen> {
   @override
   Widget build(BuildContext context) {
     D.init(context);
-
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
