@@ -1,4 +1,3 @@
-// sanggawadan_page.dart
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,7 +7,6 @@ import '../../../../common/resources/colors.dart';
 import '../../../../common/resources/dimensions.dart';
 import '../../../../common/resources/assets.dart';
 import '../../../../common/resources/strings.dart';
-import '../../../../common/utils/constant.dart';
 import '../../../../common/widgets/custom_app_bar.dart';
 import '../../../../common/widgets/primary_button.dart';
 import '../../../../common/widgets/info_card.dart';
@@ -50,10 +48,7 @@ class SanggawadanPage extends ConsumerStatefulWidget {
 }
 
 class _SanggawadanPageState extends ConsumerState<SanggawadanPage> {
-  String? selectedRecipient = Constant.forMe;
   final TextEditingController reasonController = TextEditingController();
-
-  // Dynamic file storage - one File per requirement
   final Map<int, File?> uploadedFiles = {};
   bool _isSubmitting = false;
 
@@ -61,8 +56,6 @@ class _SanggawadanPageState extends ConsumerState<SanggawadanPage> {
   void initState() {
     super.initState();
     reasonController.addListener(() => setState(() {}));
-
-    // Initialize uploadedFiles map for each requirement
     if (widget.requirements != null) {
       for (var req in widget.requirements!) {
         uploadedFiles[req.id] = null;
@@ -86,13 +79,16 @@ class _SanggawadanPageState extends ConsumerState<SanggawadanPage> {
         });
       }
     } catch (e) {
-      debugPrint('Error picking file for requirement $requirementId: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to pick file: $e')),
+        );
+      }
     }
   }
 
   String _getBadgeImage(String? badgeType) {
     if (badgeType == null) return Assets.studentBadge;
-
     switch (badgeType.toLowerCase()) {
       case 'student':
         return Assets.studentBadge;
@@ -123,7 +119,6 @@ class _SanggawadanPageState extends ConsumerState<SanggawadanPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Success Icon
                 Container(
                   width: 80.w,
                   height: 80.h,
@@ -131,15 +126,13 @@ class _SanggawadanPageState extends ConsumerState<SanggawadanPage> {
                     color: Colors.green.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.check_circle,
                     size: 50,
                     color: Colors.green,
                   ),
                 ),
                 20.gapH,
-                
-                // Title
                 Text(
                   'Success!',
                   style: TextStyle(
@@ -149,8 +142,6 @@ class _SanggawadanPageState extends ConsumerState<SanggawadanPage> {
                   ),
                 ),
                 12.gapH,
-                
-                // Message
                 Text(
                   'Your request has been submitted successfully. You will be notified once it has been reviewed.',
                   textAlign: TextAlign.center,
@@ -161,15 +152,13 @@ class _SanggawadanPageState extends ConsumerState<SanggawadanPage> {
                   ),
                 ),
                 24.gapH,
-                
-                // Close Button
                 SizedBox(
                   width: double.infinity,
                   child: PrimaryButton(
                     text: 'Done',
                     onPressed: () {
-                      Navigator.pop(context); // Close modal
-                      Navigator.pop(context); // Go back to previous screen
+                      Navigator.pop(context);
+                      Navigator.pop(context);
                     },
                   ),
                 ),
@@ -193,20 +182,14 @@ class _SanggawadanPageState extends ConsumerState<SanggawadanPage> {
       return;
     }
 
-    // CRITICAL: Collect files in the EXACT order of requirementIds
-    // The backend expects files to match the requirementIds array by index
     final List<String> filePaths = [];
     final List<String> missingRequirements = [];
 
     if (widget.requirementIds != null && widget.requirements != null) {
-      debugPrint('📋 Collecting files for ${widget.requirementIds!.length} requirements');
-      
-      // Iterate through requirementIds (which are already in the correct order)
       for (int i = 0; i < widget.requirementIds!.length; i++) {
         final requirementId = widget.requirementIds![i];
         final file = uploadedFiles[requirementId];
-        
-        // Find the requirement details for better error messages
+
         final requirement = widget.requirements!.firstWhere(
           (req) => req.id == requirementId,
           orElse: () => PostingRequirement(
@@ -218,18 +201,14 @@ class _SanggawadanPageState extends ConsumerState<SanggawadanPage> {
             order: i + 1,
           ),
         );
-        
+
         if (file != null) {
           filePaths.add(file.path);
-          debugPrint('✅ Req ${requirement.order}: ${requirement.label} - File: ${file.path}');
         } else if (requirement.required) {
           missingRequirements.add('${requirement.order}. ${requirement.label}');
-          debugPrint('❌ Req ${requirement.order}: ${requirement.label} - MISSING');
         }
       }
     }
-
-    debugPrint('📦 Collected ${filePaths.length} files from ${widget.requirementIds!.length} requirements');
 
     if (missingRequirements.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -247,17 +226,9 @@ class _SanggawadanPageState extends ConsumerState<SanggawadanPage> {
 
     try {
       final authSession = ref.read(authSessionProvider);
-
       if (!authSession.isAuthenticated || authSession.userId == null) {
         throw Exception('User not authenticated');
       }
-
-      debugPrint('🚀 Creating request:');
-      debugPrint('   Posting ID: ${widget.postingId}');
-      debugPrint('   User ID: ${authSession.userId}');
-      debugPrint('   Requirement IDs: ${widget.requirementIds}');
-      debugPrint('   File Paths: $filePaths');
-      debugPrint('   Badge ID: ${widget.userBadgeId}');
 
       final request = WelfareRequestModel(
         postingId: widget.postingId,
@@ -284,7 +255,6 @@ class _SanggawadanPageState extends ConsumerState<SanggawadanPage> {
           success: (data) => 'Failed to submit request',
           error: (error) => error ?? 'Failed to submit request',
         );
-
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(errorMessage)),
         );
@@ -306,7 +276,7 @@ class _SanggawadanPageState extends ConsumerState<SanggawadanPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: CustomAppBar(
-        title: 'Sanggawadan',
+        title: widget.postingTitle,
         onBackPressed: () => Navigator.pop(context),
       ),
       body: SingleChildScrollView(
@@ -357,7 +327,6 @@ class _SanggawadanPageState extends ConsumerState<SanggawadanPage> {
       return const SizedBox.shrink();
     }
 
-    // Sort requirements by order
     final sortedRequirements = List<PostingRequirement>.from(
       widget.requirements!,
     )..sort((a, b) => a.order.compareTo(b.order));
@@ -374,24 +343,19 @@ class _SanggawadanPageState extends ConsumerState<SanggawadanPage> {
             borderRadius: BorderRadius.circular(D.radiusLG),
             border: Border.all(color: AppColors.primary.withOpacity(0.2)),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
-              Row(
-                children: [
-                  Icon(Icons.info_outline, size: 16, color: AppColors.primary),
-                  8.gapW,
-                  Expanded(
-                    child: Text(
-                      'Please upload all required documents to complete your request',
-                      style: TextStyle(
-                        fontSize: D.textXS,
-                        color: AppColors.primary,
-                        fontWeight: D.medium,
-                      ),
-                    ),
+              Icon(Icons.info_outline, size: 16, color: AppColors.primary),
+              8.gapW,
+              Expanded(
+                child: Text(
+                  'Please upload all required documents to complete your request',
+                  style: TextStyle(
+                    fontSize: D.textXS,
+                    color: AppColors.primary,
+                    fontWeight: D.medium,
                   ),
-                ],
+                ),
               ),
             ],
           ),
@@ -526,9 +490,8 @@ class _SanggawadanPageState extends ConsumerState<SanggawadanPage> {
               title: isUploaded
                   ? 'Document uploaded'
                   : 'Upload document ${requirement.order}',
-              subtitle: isUploaded
-                  ? 'Tap to change'
-                  : 'Take photo or choose file',
+              subtitle:
+                  isUploaded ? 'Tap to change' : 'Take photo or choose file',
               height: 120.h,
               showActions: true,
               onPickImage: (source) => _pickFile(requirement.id, source),
@@ -615,7 +578,7 @@ class _SanggawadanPageState extends ConsumerState<SanggawadanPage> {
         ),
         4.gapH,
         Text(
-          '${reasonController.text.length}/1020 ${AppString.charactersMinimum}',
+          '${reasonController.text.length}/20 ${AppString.charactersMinimum}',
           style: TextStyle(
             fontSize: D.textXS,
             color: AppColors.grey,

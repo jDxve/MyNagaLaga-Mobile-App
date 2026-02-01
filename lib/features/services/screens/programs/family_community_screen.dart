@@ -17,7 +17,8 @@ class FamilyCommunityScreen extends ConsumerStatefulWidget {
   const FamilyCommunityScreen({super.key});
 
   @override
-  ConsumerState<FamilyCommunityScreen> createState() => _FamilyCommunityScreenState();
+  ConsumerState<FamilyCommunityScreen> createState() =>
+      _FamilyCommunityScreenState();
 }
 
 class _FamilyCommunityScreenState extends ConsumerState<FamilyCommunityScreen> {
@@ -34,141 +35,147 @@ class _FamilyCommunityScreenState extends ConsumerState<FamilyCommunityScreen> {
     });
   }
 
-  Future<void> _handleProgramTap(String postingId, String postingTitle) async {
-    if (_isProcessing) return;
+  
+Future<void> _handleProgramTap(String postingId, String postingTitle) async {
+  if (_isProcessing) return;
 
-    final session = ref.read(authSessionProvider);
+  final session = ref.read(authSessionProvider);
+  if (session.userId == null) {
+    if (!mounted) return;
+    _showSnackBar('Please log in first');
+    return;
+  }
 
-    if (session.userId == null) {
-      if (!mounted) return;
-      _showSnackBar('Please log in first');
+  setState(() => _isProcessing = true);
+
+  if (!mounted) return;
+  _showLoadingDialog();
+
+  try {
+    // Fetch user data in parallel (both return void)
+    await Future.wait([
+      ref.read(badgeInfoNotifierProvider.notifier).fetchBadgeInfo(
+            mobileUserId: session.userId!,
+          ),
+      ref.read(badgesNotifierProvider.notifier).fetchBadges(
+            mobileUserId: session.userId!,
+          ),
+    ]);
+
+    // Fetch posting requirements separately (returns a value)
+    final postingResponse = await ref.read(postingServiceProvider).getPosting(postingId);
+
+    if (!mounted) return;
+    Navigator.pop(context); // Close loading dialog
+
+    // Extract posting response
+    final postingData =
+        postingResponse.data['data'] as Map<String, dynamic>? ??
+            postingResponse.data;
+    final requirementsList =
+        postingData['assistance_posting_requirements'] as List?;
+
+    final requirementIds = <int>[];
+    final requirements = <PostingRequirement>[];
+
+    if (requirementsList != null) {
+      for (int index = 0; index < requirementsList.length; index++) {
+        try {
+          final req = requirementsList[index] as Map<String, dynamic>;
+          var requirement = PostingRequirement.fromJson(req);
+
+          if (requirement.order == 0) {
+            requirement = PostingRequirement(
+              id: requirement.id,
+              label: requirement.label,
+              category: requirement.category,
+              type: requirement.type,
+              required: requirement.required,
+              notes: requirement.notes,
+              order: index + 1,
+            );
+          }
+
+          requirementIds.add(requirement.id);
+          requirements.add(requirement);
+        } catch (e) {
+          continue;
+        }
+      }
+    }
+
+    final badgeInfoState = ref.read(badgeInfoNotifierProvider);
+    final badgesState = ref.read(badgesNotifierProvider);
+
+    int? userBadgeId;
+    String? userBadgeType;
+
+    badgesState.when(
+      started: () {},
+      loading: () {},
+      success: (badgesResponse) {
+        if (badgesResponse.badges.isNotEmpty) {
+          final firstBadge = badgesResponse.badges.first;
+          userBadgeId = int.tryParse(firstBadge.id.toString());
+          userBadgeType = firstBadge.badgeTypeName;
+        }
+      },
+      error: (_) {},
+    );
+
+    final hasError = badgeInfoState.when(
+      started: () => true,
+      loading: () => true,
+      success: (_) => false,
+      error: (_) => true,
+    );
+
+    if (hasError) {
+      if (mounted) {
+        _showSnackBar('Failed to load user data');
+        setState(() => _isProcessing = false);
+      }
       return;
     }
 
-    setState(() => _isProcessing = true);
-
-    if (!mounted) return;
-    _showLoadingDialog();
-
-    try {
-      await ref
-          .read(badgeInfoNotifierProvider.notifier)
-          .fetchBadgeInfo(mobileUserId: session.userId!);
-
-      await ref
-          .read(badgesNotifierProvider.notifier)
-          .fetchBadges(mobileUserId: session.userId!);
-
-      if (!mounted) return;
-
-      final postingService = ref.read(postingServiceProvider);
-      final postingResponse = await postingService.getPosting(postingId);
-
-      if (!mounted) return;
-
-      Navigator.pop(context);
-
-      final postingData = postingResponse.data['data'] as Map<String, dynamic>? ??
-          postingResponse.data;
-      final requirementsList =
-          postingData['assistance_posting_requirements'] as List?;
-
-      final requirementIds = <int>[];
-      final requirements = <PostingRequirement>[];
-
-      if (requirementsList != null) {
-        for (int index = 0; index < requirementsList.length; index++) {
-          try {
-            final req = requirementsList[index] as Map<String, dynamic>;
-            var requirement = PostingRequirement.fromJson(req);
-
-            if (requirement.order == 0) {
-              requirement = PostingRequirement(
-                id: requirement.id,
-                label: requirement.label,
-                category: requirement.category,
-                type: requirement.type,
-                required: requirement.required,
-                notes: requirement.notes,
-                order: index + 1,
-              );
-            }
-
-            requirementIds.add(requirement.id);
-            requirements.add(requirement);
-          } catch (e) {
-            continue;
-          }
-        }
-      }
-
-      final badgeInfoState = ref.read(badgeInfoNotifierProvider);
-      final badgesState = ref.read(badgesNotifierProvider);
-
-      int? userBadgeId;
-      String? userBadgeType;
-
-      badgesState.when(
-        started: () {},
-        loading: () {},
-        success: (badgesResponse) {
-          if (badgesResponse.badges.isNotEmpty) {
-            final firstBadge = badgesResponse.badges.first;
-            userBadgeId = int.tryParse(firstBadge.id.toString());
-            userBadgeType = firstBadge.badgeTypeName;
-          }
-        },
-        error: (_) {},
-      );
-
-      badgeInfoState.when(
-        started: () {
-          if (mounted) {
-            _showSnackBar('Data not loaded. Please try again.');
-            setState(() => _isProcessing = false);
-          }
-        },
-        loading: () {
-          if (mounted) {
-            _showSnackBar('Still loading. Please wait.');
-            setState(() => _isProcessing = false);
-          }
-        },
-        success: (badgeInfo) {
-          if (mounted) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => FamilyCommunityPage(
-                  postingId: postingId,
-                  postingTitle: postingTitle,
-                  userName: badgeInfo.fullName,
-                  userAge: badgeInfo.age,
-                  userBadgeType: userBadgeType,
-                  userBadgeId: userBadgeId,
-                  requirementIds: requirementIds,
-                  requirements: requirements,
-                ),
+    badgeInfoState.when(
+      started: () {},
+      loading: () {},
+      success: (badgeInfo) {
+        if (mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => FamilyCommunityPage(
+                postingId: postingId,
+                postingTitle: postingTitle,
+                userName: badgeInfo.fullName,
+                userAge: badgeInfo.age,
+                userBadgeType: userBadgeType,
+                userBadgeId: userBadgeId,
+                requirementIds: requirementIds,
+                requirements: requirements,
               ),
-            ).then((_) {
-              if (mounted) setState(() => _isProcessing = false);
-            });
-          }
-        },
-        error: (message) {
-          if (mounted) {
-            _showSnackBar('Error: $message');
-            setState(() => _isProcessing = false);
-          }
-        },
-      );
-    } catch (e) {
-      if (!mounted) return;
-      Navigator.pop(context);
-      _showSnackBar('Unexpected error: $e');
-      setState(() => _isProcessing = false);
-    }
+            ),
+          ).then((_) {
+            if (mounted) setState(() => _isProcessing = false);
+          });
+        }
+      },
+      error: (message) {
+        if (mounted) {
+          _showSnackBar('Error: $message');
+          setState(() => _isProcessing = false);
+        }
+      },
+    );
+  } catch (e) {
+    if (!mounted) return;
+    Navigator.pop(context);
+    _showSnackBar('Unexpected error: $e');
+    setState(() => _isProcessing = false);
   }
+}
 
   void _showLoadingDialog() {
     showDialog(

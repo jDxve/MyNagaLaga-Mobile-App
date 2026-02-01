@@ -17,7 +17,8 @@ class ChildrenYouthScreen extends ConsumerStatefulWidget {
   const ChildrenYouthScreen({super.key});
 
   @override
-  ConsumerState<ChildrenYouthScreen> createState() => _ChildrenYouthScreenState();
+  ConsumerState<ChildrenYouthScreen> createState() =>
+      _ChildrenYouthScreenState();
 }
 
 class _ChildrenYouthScreenState extends ConsumerState<ChildrenYouthScreen> {
@@ -38,7 +39,6 @@ class _ChildrenYouthScreenState extends ConsumerState<ChildrenYouthScreen> {
     if (_isProcessing) return;
 
     final session = ref.read(authSessionProvider);
-
     if (session.userId == null) {
       if (!mounted) return;
       _showSnackBar('Please log in first');
@@ -51,13 +51,14 @@ class _ChildrenYouthScreenState extends ConsumerState<ChildrenYouthScreen> {
     _showLoadingDialog();
 
     try {
-      await ref
-          .read(badgeInfoNotifierProvider.notifier)
-          .fetchBadgeInfo(mobileUserId: session.userId!);
-
-      await ref
-          .read(badgesNotifierProvider.notifier)
-          .fetchBadges(mobileUserId: session.userId!);
+      await Future.wait([
+        ref.read(badgeInfoNotifierProvider.notifier).fetchBadgeInfo(
+              mobileUserId: session.userId!,
+            ),
+        ref.read(badgesNotifierProvider.notifier).fetchBadges(
+              mobileUserId: session.userId!,
+            ),
+      ]);
 
       if (!mounted) return;
 
@@ -65,11 +66,11 @@ class _ChildrenYouthScreenState extends ConsumerState<ChildrenYouthScreen> {
       final postingResponse = await postingService.getPosting(postingId);
 
       if (!mounted) return;
-
       Navigator.pop(context);
 
-      final postingData = postingResponse.data['data'] as Map<String, dynamic>? ??
-          postingResponse.data;
+      final postingData =
+          postingResponse.data['data'] as Map<String, dynamic>? ??
+              postingResponse.data;
       final requirementsList =
           postingData['assistance_posting_requirements'] as List?;
 
@@ -121,19 +122,24 @@ class _ChildrenYouthScreenState extends ConsumerState<ChildrenYouthScreen> {
         error: (_) {},
       );
 
+      final hasError = badgeInfoState.when(
+        started: () => true,
+        loading: () => true,
+        success: (_) => false,
+        error: (_) => true,
+      );
+
+      if (hasError) {
+        if (mounted) {
+          _showSnackBar('Failed to load user data');
+          setState(() => _isProcessing = false);
+        }
+        return;
+      }
+
       badgeInfoState.when(
-        started: () {
-          if (mounted) {
-            _showSnackBar('Data not loaded. Please try again.');
-            setState(() => _isProcessing = false);
-          }
-        },
-        loading: () {
-          if (mounted) {
-            _showSnackBar('Still loading. Please wait.');
-            setState(() => _isProcessing = false);
-          }
-        },
+        started: () {},
+        loading: () {},
         success: (badgeInfo) {
           if (mounted) {
             Navigator.push(

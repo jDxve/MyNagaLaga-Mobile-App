@@ -51,9 +51,6 @@ class _FamilyCommunityPageState extends ConsumerState<FamilyCommunityPage> {
   String? selectedRecipient = Constant.forMe;
   final TextEditingController reasonController = TextEditingController();
   final TextEditingController familyMemberController = TextEditingController();
-  final TextEditingController requestTypeController = TextEditingController();
-
-  // Dynamic file storage - one File per requirement
   final Map<int, File?> uploadedFiles = {};
   bool _isSubmitting = false;
 
@@ -61,8 +58,6 @@ class _FamilyCommunityPageState extends ConsumerState<FamilyCommunityPage> {
   void initState() {
     super.initState();
     reasonController.addListener(() => setState(() {}));
-
-    // Initialize uploadedFiles map for each requirement
     if (widget.requirements != null) {
       for (var req in widget.requirements!) {
         uploadedFiles[req.id] = null;
@@ -74,7 +69,6 @@ class _FamilyCommunityPageState extends ConsumerState<FamilyCommunityPage> {
   void dispose() {
     reasonController.dispose();
     familyMemberController.dispose();
-    requestTypeController.dispose();
     super.dispose();
   }
 
@@ -88,13 +82,16 @@ class _FamilyCommunityPageState extends ConsumerState<FamilyCommunityPage> {
         });
       }
     } catch (e) {
-      debugPrint('Error picking file for requirement $requirementId: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to pick file: $e')),
+        );
+      }
     }
   }
 
   String _getBadgeImage(String? badgeType) {
     if (badgeType == null) return Assets.seniorCitizenBadge;
-
     switch (badgeType.toLowerCase()) {
       case 'student':
         return Assets.studentBadge;
@@ -125,7 +122,6 @@ class _FamilyCommunityPageState extends ConsumerState<FamilyCommunityPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Success Icon
                 Container(
                   width: 80.w,
                   height: 80.h,
@@ -140,8 +136,6 @@ class _FamilyCommunityPageState extends ConsumerState<FamilyCommunityPage> {
                   ),
                 ),
                 20.gapH,
-
-                // Title
                 Text(
                   'Success!',
                   style: TextStyle(
@@ -151,8 +145,6 @@ class _FamilyCommunityPageState extends ConsumerState<FamilyCommunityPage> {
                   ),
                 ),
                 12.gapH,
-
-                // Message
                 Text(
                   'Your request has been submitted successfully. You will be notified once it has been reviewed.',
                   textAlign: TextAlign.center,
@@ -163,15 +155,13 @@ class _FamilyCommunityPageState extends ConsumerState<FamilyCommunityPage> {
                   ),
                 ),
                 24.gapH,
-
-                // Close Button
                 SizedBox(
                   width: double.infinity,
                   child: PrimaryButton(
                     text: 'Done',
                     onPressed: () {
-                      Navigator.pop(context); // Close modal
-                      Navigator.pop(context); // Go back to previous screen
+                      Navigator.pop(context);
+                      Navigator.pop(context);
                     },
                   ),
                 ),
@@ -195,15 +185,10 @@ class _FamilyCommunityPageState extends ConsumerState<FamilyCommunityPage> {
       return;
     }
 
-    // Collect files in the EXACT order of requirementIds
     final List<String> filePaths = [];
     final List<String> missingRequirements = [];
 
     if (widget.requirementIds != null && widget.requirements != null) {
-      debugPrint(
-        '📋 Collecting files for ${widget.requirementIds!.length} requirements',
-      );
-
       for (int i = 0; i < widget.requirementIds!.length; i++) {
         final requirementId = widget.requirementIds![i];
         final file = uploadedFiles[requirementId];
@@ -222,21 +207,11 @@ class _FamilyCommunityPageState extends ConsumerState<FamilyCommunityPage> {
 
         if (file != null) {
           filePaths.add(file.path);
-          debugPrint(
-            '✅ Req ${requirement.order}: ${requirement.label} - File: ${file.path}',
-          );
         } else if (requirement.required) {
           missingRequirements.add('${requirement.order}. ${requirement.label}');
-          debugPrint(
-            '❌ Req ${requirement.order}: ${requirement.label} - MISSING',
-          );
         }
       }
     }
-
-    debugPrint(
-      '📦 Collected ${filePaths.length} files from ${widget.requirementIds!.length} requirements',
-    );
 
     if (missingRequirements.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -254,17 +229,9 @@ class _FamilyCommunityPageState extends ConsumerState<FamilyCommunityPage> {
 
     try {
       final authSession = ref.read(authSessionProvider);
-
       if (!authSession.isAuthenticated || authSession.userId == null) {
         throw Exception('User not authenticated');
       }
-
-      debugPrint('🚀 Creating request:');
-      debugPrint('   Posting ID: ${widget.postingId}');
-      debugPrint('   User ID: ${authSession.userId}');
-      debugPrint('   Requirement IDs: ${widget.requirementIds}');
-      debugPrint('   File Paths: $filePaths');
-      debugPrint('   Badge ID: ${widget.userBadgeId}');
 
       final request = WelfareRequestModel(
         postingId: widget.postingId,
@@ -291,7 +258,6 @@ class _FamilyCommunityPageState extends ConsumerState<FamilyCommunityPage> {
           success: (data) => 'Failed to submit request',
           error: (error) => error ?? 'Failed to submit request',
         );
-
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(errorMessage)),
         );
@@ -559,7 +525,8 @@ class _FamilyCommunityPageState extends ConsumerState<FamilyCommunityPage> {
               title: isUploaded
                   ? 'Document uploaded'
                   : 'Upload document ${requirement.order}',
-              subtitle: isUploaded ? 'Tap to change' : 'Take photo or choose file',
+              subtitle:
+                  isUploaded ? 'Tap to change' : 'Take photo or choose file',
               height: 120.h,
               showActions: true,
               onPickImage: (source) => _pickFile(requirement.id, source),
