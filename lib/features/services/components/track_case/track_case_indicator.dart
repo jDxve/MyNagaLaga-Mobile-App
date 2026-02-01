@@ -1,11 +1,12 @@
+// lib/features/tracking/components/track_case/track_case_indicator.dart
 import 'package:flutter/material.dart';
 import '../../../../common/resources/colors.dart';
 import '../../../../common/resources/dimensions.dart';
 import 'rate_service.dart';
 
 class TrackCaseCard extends StatelessWidget {
-  final String caseId;
-  final String title;
+  final String? caseId;
+  final String? title;
   final String status;
   final String description;
   final String updatedDate;
@@ -22,38 +23,66 @@ class TrackCaseCard extends StatelessWidget {
   });
 
   Color _getStatusColor() {
-    switch (status.toLowerCase()) {
-      case 'pending':
-        return Colors.orange;
-      case 'under review':
-        return Colors.blue;
-      case 'ready':
-        return Colors.teal;
-      case 'closed':
-        return Colors.grey;
-      default:
-        return AppColors.grey;
+    final statusLower = status.toLowerCase();
+    
+    if (statusLower == 'pending' || statusLower == 'submitted') {
+      return Colors.orange;
     }
+    
+    if (statusLower == 'under review' || statusLower == 'in progress') {
+      return Colors.blue;
+    }
+    
+    if (statusLower == 'action required') {
+      return Colors.red;
+    }
+    
+    if (statusLower == 'ready' || 
+        statusLower == 'approved' || 
+        statusLower == 'verified') {
+      return Colors.green;
+    }
+    
+    if (statusLower == 'closed' || statusLower == 'resolved') {
+      return Colors.grey;
+    }
+    
+    if (statusLower == 'rejected' || statusLower == 'cancelled') {
+      return Colors.red.shade700;
+    }
+    
+    return AppColors.grey;
   }
 
   int _getCurrentStep() {
-    switch (status.toLowerCase()) {
-      case 'pending':
-        return 1;
-      case 'under review':
-        return 2;
-      case 'ready':
-        return 3;
-      case 'closed':
-        return 4;
-      default:
-        return 0;
+    final statusLower = status.toLowerCase();
+    
+    if (statusLower == 'pending' || statusLower == 'submitted') {
+      return 1;
     }
+    if (statusLower == 'under review' || statusLower == 'in progress' || statusLower == 'action required') {
+      return 2;
+    }
+    if (statusLower == 'ready' || statusLower == 'approved' || statusLower == 'verified') {
+      return 3;
+    }
+    if (statusLower == 'closed' || statusLower == 'resolved') {
+      return 4;
+    }
+    if (statusLower == 'rejected' || statusLower == 'cancelled') {
+      return 0;
+    }
+    
+    return 0;
   }
 
   Widget _buildProgressIndicator() {
     final statusColor = _getStatusColor();
     final currentStep = _getCurrentStep();
+    
+    if (currentStep == 0) {
+      return const SizedBox.shrink();
+    }
 
     return Row(
       children: List.generate(4, (index) {
@@ -77,6 +106,7 @@ class TrackCaseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final statusColor = _getStatusColor();
+    final currentStep = _getCurrentStep();
 
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
@@ -104,7 +134,7 @@ class TrackCaseCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      caseId,
+                      caseId ?? 'N/A',
                       style: TextStyle(
                         fontSize: D.textXS,
                         color: AppColors.grey,
@@ -113,7 +143,7 @@ class TrackCaseCard extends StatelessWidget {
                     ),
                     4.gapH,
                     Text(
-                      title,
+                      title ?? 'Untitled',
                       style: TextStyle(
                         fontSize: D.textBase,
                         fontWeight: D.semiBold,
@@ -142,8 +172,10 @@ class TrackCaseCard extends StatelessWidget {
               ),
             ],
           ),
-          12.gapH,
-          _buildProgressIndicator(),
+          if (currentStep > 0) ...[
+            12.gapH,
+            _buildProgressIndicator(),
+          ],
           12.gapH,
           Text(
             description,
@@ -168,8 +200,8 @@ class TrackCaseCard extends StatelessWidget {
               onTap: () {
                 RateServiceDialog.show(
                   context: context,
-                  serviceType: title,
-                  caseId: caseId,
+                  serviceType: title ?? 'Service',
+                  caseId: caseId ?? '',
                   onSubmit: (rating) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(

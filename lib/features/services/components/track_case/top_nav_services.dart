@@ -31,11 +31,11 @@ class TopNavTrack extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 20.w),
         child: Row(
           children: [
-            _buildTab('All', 0),
+            _buildTab('Programs', 0),
             12.gapW,
-            _buildTab('Services', 1),
+            _buildTab('Badges', 1),
             12.gapW,
-            _buildTab('Request', 2),
+            _buildTab('Services', 2),
             12.gapW,
             _buildTab('Complaints', 3),
           ],
@@ -46,7 +46,7 @@ class TopNavTrack extends StatelessWidget {
 
   Widget _buildTab(String label, int index) {
     final isSelected = selectedIndex == index;
-    
+
     return GestureDetector(
       onTap: () => onTabChanged(index),
       child: Container(
