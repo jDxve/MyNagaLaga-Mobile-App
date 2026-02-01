@@ -1,3 +1,4 @@
+// lib/features/home/screens/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../common/models/dio/data_state.dart';
@@ -9,7 +10,9 @@ import '../../account/screens/account_screen.dart';
 import '../../auth/notifier/auth_session_notifier.dart';
 import '../../family/screens/family_ledger_screen.dart';
 import '../../safety/screens/disaster_resilience_screen.dart';
+import '../../services/components/track_case/all_track.dart';
 import '../../services/screens/services_screen.dart';
+
 import '../components/badges.dart';
 import '../components/circular_notif.dart';
 import '../components/home_greetings.dart';
@@ -18,7 +21,6 @@ import '../notifier/user_badge_notifier.dart';
 
 class HomeScreen extends StatefulWidget {
   static const routeName = '/home';
-
   const HomeScreen({super.key});
 
   @override
@@ -61,7 +63,6 @@ class _HomeTab extends ConsumerWidget {
     final session = ref.watch(authSessionProvider);
     final badgesState = ref.watch(badgesNotifierProvider);
 
-    // Fetch badges when user ID is available
     ref.listen(authSessionProvider, (previous, next) {
       if (next.isAuthenticated && next.userId != null) {
         ref.read(badgesNotifierProvider.notifier).fetchBadges(
@@ -77,9 +78,7 @@ class _HomeTab extends ConsumerWidget {
           children: [
             Padding(
               padding: EdgeInsets.only(left: 32.w, top: 24.h),
-              child: greetingText(
-                userName: session.fullName ?? "",
-              ),
+              child: greetingText(userName: session.fullName ?? ""),
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 16.h),
@@ -92,7 +91,6 @@ class _HomeTab extends ConsumerWidget {
               ),
             ),
             12.gapH,
-            // Display badges based on state
             badgesState.when(
               started: () => const SizedBox.shrink(),
               loading: () => SizedBox(
@@ -104,6 +102,13 @@ class _HomeTab extends ConsumerWidget {
             ),
             10.gapH,
             quickActions(context),
+            18.gapH,
+            const Expanded(
+              child: AllRequestsListWidget(
+                showHeader: true,
+                headerTitle: 'My Requests',
+              ),
+            ),
           ],
         ),
       ),

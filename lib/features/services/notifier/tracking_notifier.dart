@@ -8,6 +8,10 @@ import '../repository/tracking_repository.dart';
 import '../repository/tracking_repository_impl.dart';
 import '../services/tracking_service.dart';
 
+// ============================================================================
+// ALL TRACKING NOTIFIER
+// ============================================================================
+
 final allTrackingNotifierProvider =
     NotifierProvider<AllTrackingNotifier, DataState<TrackingResponseModel>>(
   AllTrackingNotifier.new,
@@ -22,6 +26,7 @@ class AllTrackingNotifier extends Notifier<DataState<TrackingResponseModel>> {
   String? _currentModule;
   String? _currentStatus;
   String? _currentSearch;
+  bool _hasInitialLoad = false;
 
   @override
   DataState<TrackingResponseModel> build() {
@@ -33,7 +38,7 @@ class AllTrackingNotifier extends Notifier<DataState<TrackingResponseModel>> {
       _pollingService.dispose();
     });
 
-    return const DataState.started();
+    return state;
   }
 
   Future<void> fetchAllTracking({
@@ -44,7 +49,21 @@ class AllTrackingNotifier extends Notifier<DataState<TrackingResponseModel>> {
     String? status,
     String? search,
     bool silent = false,
+    bool forceRefresh = false,
   }) async {
+    // Use cached data if available and parameters haven't changed
+    if (!forceRefresh &&
+        _hasInitialLoad &&
+        _currentMobileUserId == mobileUserId &&
+        _currentPage == page &&
+        _currentLimit == limit &&
+        _currentModule == module &&
+        _currentStatus == status &&
+        _currentSearch == search &&
+        state is Success) {
+      return;
+    }
+
     _currentMobileUserId = mobileUserId;
     _currentPage = page;
     _currentLimit = limit;
@@ -52,7 +71,7 @@ class AllTrackingNotifier extends Notifier<DataState<TrackingResponseModel>> {
     _currentStatus = status;
     _currentSearch = search;
 
-    if (!silent) {
+    if (!silent && state is! Success) {
       state = const DataState.loading();
     }
 
@@ -67,6 +86,9 @@ class AllTrackingNotifier extends Notifier<DataState<TrackingResponseModel>> {
 
     if (ref.mounted) {
       state = result;
+      if (result is Success) {
+        _hasInitialLoad = true;
+      }
     }
   }
 
@@ -84,6 +106,7 @@ class AllTrackingNotifier extends Notifier<DataState<TrackingResponseModel>> {
           status: _currentStatus,
           search: _currentSearch,
           silent: true,
+          forceRefresh: true,
         );
       },
     );
@@ -97,8 +120,13 @@ class AllTrackingNotifier extends Notifier<DataState<TrackingResponseModel>> {
     stopAutoRefresh();
     state = const DataState.started();
     _currentMobileUserId = null;
+    _hasInitialLoad = false;
   }
 }
+
+// ============================================================================
+// BADGE TRACKING NOTIFIER
+// ============================================================================
 
 final badgeTrackingNotifierProvider =
     NotifierProvider<BadgeTrackingNotifier, DataState<BadgeRequestsResponseModel>>(
@@ -114,6 +142,7 @@ class BadgeTrackingNotifier
   int _currentLimit = 20;
   String? _currentStatus;
   String? _currentSearch;
+  bool _hasInitialLoad = false;
 
   @override
   DataState<BadgeRequestsResponseModel> build() {
@@ -125,7 +154,7 @@ class BadgeTrackingNotifier
       _pollingService.dispose();
     });
 
-    return const DataState.started();
+    return state;
   }
 
   Future<void> fetchBadgeRequests({
@@ -135,14 +164,27 @@ class BadgeTrackingNotifier
     String? status,
     String? search,
     bool silent = false,
+    bool forceRefresh = false,
   }) async {
+    // Use cached data if available and parameters haven't changed
+    if (!forceRefresh &&
+        _hasInitialLoad &&
+        _currentMobileUserId == mobileUserId &&
+        _currentPage == page &&
+        _currentLimit == limit &&
+        _currentStatus == status &&
+        _currentSearch == search &&
+        state is Success) {
+      return;
+    }
+
     _currentMobileUserId = mobileUserId;
     _currentPage = page;
     _currentLimit = limit;
     _currentStatus = status;
     _currentSearch = search;
 
-    if (!silent) {
+    if (!silent && state is! Success) {
       state = const DataState.loading();
     }
 
@@ -156,6 +198,9 @@ class BadgeTrackingNotifier
 
     if (ref.mounted) {
       state = result;
+      if (result is Success) {
+        _hasInitialLoad = true;
+      }
     }
   }
 
@@ -172,6 +217,7 @@ class BadgeTrackingNotifier
           status: _currentStatus,
           search: _currentSearch,
           silent: true,
+          forceRefresh: true,
         );
       },
     );
@@ -185,8 +231,13 @@ class BadgeTrackingNotifier
     stopAutoRefresh();
     state = const DataState.started();
     _currentMobileUserId = null;
+    _hasInitialLoad = false;
   }
 }
+
+// ============================================================================
+// APPLICATIONS TRACKING NOTIFIER
+// ============================================================================
 
 final applicationsTrackingNotifierProvider =
     NotifierProvider<ApplicationsTrackingNotifier, DataState<ApplicationsResponseModel>>(
@@ -202,6 +253,7 @@ class ApplicationsTrackingNotifier
   int _currentLimit = 20;
   String? _currentStatus;
   String? _currentSearch;
+  bool _hasInitialLoad = false;
 
   @override
   DataState<ApplicationsResponseModel> build() {
@@ -213,7 +265,7 @@ class ApplicationsTrackingNotifier
       _pollingService.dispose();
     });
 
-    return const DataState.started();
+    return state;
   }
 
   Future<void> fetchApplications({
@@ -223,14 +275,27 @@ class ApplicationsTrackingNotifier
     String? status,
     String? search,
     bool silent = false,
+    bool forceRefresh = false,
   }) async {
+    // Use cached data if available and parameters haven't changed
+    if (!forceRefresh &&
+        _hasInitialLoad &&
+        _currentMobileUserId == mobileUserId &&
+        _currentPage == page &&
+        _currentLimit == limit &&
+        _currentStatus == status &&
+        _currentSearch == search &&
+        state is Success) {
+      return;
+    }
+
     _currentMobileUserId = mobileUserId;
     _currentPage = page;
     _currentLimit = limit;
     _currentStatus = status;
     _currentSearch = search;
 
-    if (!silent) {
+    if (!silent && state is! Success) {
       state = const DataState.loading();
     }
 
@@ -244,6 +309,9 @@ class ApplicationsTrackingNotifier
 
     if (ref.mounted) {
       state = result;
+      if (result is Success) {
+        _hasInitialLoad = true;
+      }
     }
   }
 
@@ -260,6 +328,7 @@ class ApplicationsTrackingNotifier
           status: _currentStatus,
           search: _currentSearch,
           silent: true,
+          forceRefresh: true,
         );
       },
     );
@@ -273,8 +342,13 @@ class ApplicationsTrackingNotifier
     stopAutoRefresh();
     state = const DataState.started();
     _currentMobileUserId = null;
+    _hasInitialLoad = false;
   }
 }
+
+// ============================================================================
+// PROGRAMS TRACKING NOTIFIER
+// ============================================================================
 
 final programsTrackingNotifierProvider =
     NotifierProvider<ProgramsTrackingNotifier, DataState<ProgramsTrackingResponseModel>>(
@@ -290,6 +364,7 @@ class ProgramsTrackingNotifier
   int _currentLimit = 20;
   String? _currentStatus;
   String? _currentSearch;
+  bool _hasInitialLoad = false;
 
   @override
   DataState<ProgramsTrackingResponseModel> build() {
@@ -301,7 +376,7 @@ class ProgramsTrackingNotifier
       _pollingService.dispose();
     });
 
-    return const DataState.started();
+    return state;
   }
 
   Future<void> fetchPrograms({
@@ -311,14 +386,27 @@ class ProgramsTrackingNotifier
     String? status,
     String? search,
     bool silent = false,
+    bool forceRefresh = false,
   }) async {
+    // Use cached data if available and parameters haven't changed
+    if (!forceRefresh &&
+        _hasInitialLoad &&
+        _currentMobileUserId == mobileUserId &&
+        _currentPage == page &&
+        _currentLimit == limit &&
+        _currentStatus == status &&
+        _currentSearch == search &&
+        state is Success) {
+      return;
+    }
+
     _currentMobileUserId = mobileUserId;
     _currentPage = page;
     _currentLimit = limit;
     _currentStatus = status;
     _currentSearch = search;
 
-    if (!silent) {
+    if (!silent && state is! Success) {
       state = const DataState.loading();
     }
 
@@ -332,6 +420,9 @@ class ProgramsTrackingNotifier
 
     if (ref.mounted) {
       state = result;
+      if (result is Success) {
+        _hasInitialLoad = true;
+      }
     }
   }
 
@@ -348,6 +439,7 @@ class ProgramsTrackingNotifier
           status: _currentStatus,
           search: _currentSearch,
           silent: true,
+          forceRefresh: true,
         );
       },
     );
@@ -361,8 +453,13 @@ class ProgramsTrackingNotifier
     stopAutoRefresh();
     state = const DataState.started();
     _currentMobileUserId = null;
+    _hasInitialLoad = false;
   }
 }
+
+// ============================================================================
+// SERVICES TRACKING NOTIFIER
+// ============================================================================
 
 final servicesTrackingNotifierProvider =
     NotifierProvider<ServicesTrackingNotifier, DataState<ServicesTrackingResponseModel>>(
@@ -378,6 +475,7 @@ class ServicesTrackingNotifier
   int _currentLimit = 20;
   String? _currentStatus;
   String? _currentSearch;
+  bool _hasInitialLoad = false;
 
   @override
   DataState<ServicesTrackingResponseModel> build() {
@@ -389,7 +487,7 @@ class ServicesTrackingNotifier
       _pollingService.dispose();
     });
 
-    return const DataState.started();
+    return state;
   }
 
   Future<void> fetchServices({
@@ -399,14 +497,27 @@ class ServicesTrackingNotifier
     String? status,
     String? search,
     bool silent = false,
+    bool forceRefresh = false,
   }) async {
+    // Use cached data if available and parameters haven't changed
+    if (!forceRefresh &&
+        _hasInitialLoad &&
+        _currentMobileUserId == mobileUserId &&
+        _currentPage == page &&
+        _currentLimit == limit &&
+        _currentStatus == status &&
+        _currentSearch == search &&
+        state is Success) {
+      return;
+    }
+
     _currentMobileUserId = mobileUserId;
     _currentPage = page;
     _currentLimit = limit;
     _currentStatus = status;
     _currentSearch = search;
 
-    if (!silent) {
+    if (!silent && state is! Success) {
       state = const DataState.loading();
     }
 
@@ -420,6 +531,9 @@ class ServicesTrackingNotifier
 
     if (ref.mounted) {
       state = result;
+      if (result is Success) {
+        _hasInitialLoad = true;
+      }
     }
   }
 
@@ -436,6 +550,7 @@ class ServicesTrackingNotifier
           status: _currentStatus,
           search: _currentSearch,
           silent: true,
+          forceRefresh: true,
         );
       },
     );
@@ -449,8 +564,13 @@ class ServicesTrackingNotifier
     stopAutoRefresh();
     state = const DataState.started();
     _currentMobileUserId = null;
+    _hasInitialLoad = false;
   }
 }
+
+// ============================================================================
+// COMPLAINTS TRACKING NOTIFIER
+// ============================================================================
 
 final complaintsTrackingNotifierProvider =
     NotifierProvider<ComplaintsTrackingNotifier, DataState<ComplaintsResponseModel>>(
@@ -466,6 +586,7 @@ class ComplaintsTrackingNotifier
   int _currentLimit = 20;
   String? _currentStatus;
   String? _currentSearch;
+  bool _hasInitialLoad = false;
 
   @override
   DataState<ComplaintsResponseModel> build() {
@@ -477,7 +598,7 @@ class ComplaintsTrackingNotifier
       _pollingService.dispose();
     });
 
-    return const DataState.started();
+    return state;
   }
 
   Future<void> fetchComplaints({
@@ -487,14 +608,27 @@ class ComplaintsTrackingNotifier
     String? status,
     String? search,
     bool silent = false,
+    bool forceRefresh = false,
   }) async {
+    // Use cached data if available and parameters haven't changed
+    if (!forceRefresh &&
+        _hasInitialLoad &&
+        _currentMobileUserId == mobileUserId &&
+        _currentPage == page &&
+        _currentLimit == limit &&
+        _currentStatus == status &&
+        _currentSearch == search &&
+        state is Success) {
+      return;
+    }
+
     _currentMobileUserId = mobileUserId;
     _currentPage = page;
     _currentLimit = limit;
     _currentStatus = status;
     _currentSearch = search;
 
-    if (!silent) {
+    if (!silent && state is! Success) {
       state = const DataState.loading();
     }
 
@@ -508,6 +642,9 @@ class ComplaintsTrackingNotifier
 
     if (ref.mounted) {
       state = result;
+      if (result is Success) {
+        _hasInitialLoad = true;
+      }
     }
   }
 
@@ -524,6 +661,7 @@ class ComplaintsTrackingNotifier
           status: _currentStatus,
           search: _currentSearch,
           silent: true,
+          forceRefresh: true,
         );
       },
     );
@@ -537,5 +675,6 @@ class ComplaintsTrackingNotifier
     stopAutoRefresh();
     state = const DataState.started();
     _currentMobileUserId = null;
+    _hasInitialLoad = false;
   }
 }
