@@ -1,8 +1,11 @@
+// lib/features/services/screens/services_screen.dart
+
 import 'package:flutter/material.dart';
 import '../../../common/resources/dimensions.dart';
 import '../components/case_track_button.dart';
 import '../components/services_header.dart';
 import '../components/services_page/complaint_page.dart';
+import '../components/services_page/service_request_page.dart'; // ✅ ADD THIS
 import '../components/services_search_section.dart';
 import '../components/featured_program_section.dart';
 import '../components/services_section.dart';
@@ -10,7 +13,6 @@ import 'programs/track_services_screen.dart';
 
 class ServicesScreen extends StatefulWidget {
   static const routeName = '/services';
-  
   const ServicesScreen({super.key});
 
   @override
@@ -43,9 +45,11 @@ class _ServicesScreenState extends State<ServicesScreen> {
   }
 
   void _handleRequestServicesTap() {
-    print('Request Services tapped');
-    // TODO: Navigate to request services screen
-    // Navigator.pushNamed(context, RequestServicesScreen.routeName);
+    // ✅ UPDATE THIS
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ServiceRequestPage()),
+    );
   }
 
   void _handleComplaintsTap() {
@@ -75,7 +79,6 @@ class _ServicesScreenState extends State<ServicesScreen> {
                       searchController: _searchController,
                       onSearchChanged: _handleSearchChanged,
                       onFilterTap: _handleFilterTap,
-                      // ✅ Removed onCashAssistanceTap
                     ),
                     24.gapH,
                     FeaturedProgramSection(),

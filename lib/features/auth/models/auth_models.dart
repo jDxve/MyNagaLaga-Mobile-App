@@ -53,14 +53,13 @@ class OtpResponse {
     );
   }
 }
-
-// auth_models.dart
 class AuthSessionState {
   final bool isAuthenticated;
   final bool isLoading;
   final String? userId;
   final String? email;
-  final String? fullName;  // ← Add this
+  final String? fullName;
+  final String? barangayId;  // ← Add this
   final String? accessToken;
 
   AuthSessionState({
@@ -68,7 +67,8 @@ class AuthSessionState {
     required this.isLoading,
     this.userId,
     this.email,
-    this.fullName,  // ← Add this
+    this.fullName,
+    this.barangayId,  // ← Add this
     this.accessToken,
   });
 
