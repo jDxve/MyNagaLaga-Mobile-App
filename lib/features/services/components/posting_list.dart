@@ -6,10 +6,10 @@ import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/utils/constant.dart';
 
-import '../notifier/welfare_program_notifier.dart';
 import '../models/welfare_program_model.dart';
+import '../notifier/welfare_program_notifier.dart';
 
-class PostingHorizontalList extends ConsumerWidget {
+class PostingHorizontalList extends ConsumerStatefulWidget {
   final void Function(WelfarePostingModel posting)? onTap;
 
   const PostingHorizontalList({
@@ -18,17 +18,31 @@ class PostingHorizontalList extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(welfarePostingsNotifierProvider);
+  ConsumerState<PostingHorizontalList> createState() => _PostingHorizontalListState();
+}
+
+class _PostingHorizontalListState extends ConsumerState<PostingHorizontalList> {
+  @override
+  void initState() {
+    super.initState();
+    // ✅ Just call fetch - the notifier handles caching
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(allPostingsNotifierProvider.notifier).fetchAllPostings();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(allPostingsNotifierProvider);
 
     return state.when(
-      started: () => const SizedBox(),
-
+      started: () => const SizedBox.shrink(),
+      
       loading: () => SizedBox(
         height: 200.h,
         child: const Center(child: CircularProgressIndicator()),
       ),
-
+      
       error: (err) => Padding(
         padding: EdgeInsets.symmetric(vertical: 12.h),
         child: Text(
@@ -36,7 +50,7 @@ class PostingHorizontalList extends ConsumerWidget {
           style: TextStyle(color: Colors.red, fontSize: 14.f),
         ),
       ),
-
+      
       success: (postings) {
         if (postings.isEmpty) {
           return Padding(
@@ -60,10 +74,9 @@ class PostingHorizontalList extends ConsumerWidget {
             separatorBuilder: (_, __) => 16.gapW,
             itemBuilder: (context, index) {
               final post = postings[index];
-
               return _PostingCard(
                 posting: post,
-                onTap: () => onTap?.call(post),
+                onTap: () => widget.onTap?.call(post),
               );
             },
           ),
@@ -97,6 +110,8 @@ class _PostingCard extends StatelessWidget {
       return AppColors.orange;
     } else if (lowerName.contains('disaster') || lowerName.contains('response')) {
       return AppColors.red;
+    } else if (lowerName.contains('senior') || lowerName.contains('elderly')) {
+      return AppColors.primary;
     }
 
     return AppColors.lightGrey;
@@ -137,7 +152,6 @@ class _PostingCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Title
               Text(
                 posting.title,
                 maxLines: 3,
@@ -149,10 +163,9 @@ class _PostingCard extends StatelessWidget {
                   color: AppColors.black,
                 ),
               ),
-
+              
               10.gapH,
-
-              // Program Name Badge with WHITE background
+              
               Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: 12.w,
@@ -177,10 +190,9 @@ class _PostingCard extends StatelessWidget {
                   ),
                 ),
               ),
-
+              
               const Spacer(),
-
-              // Date Range
+              
               if (posting.endAt != null)
                 Row(
                   children: [

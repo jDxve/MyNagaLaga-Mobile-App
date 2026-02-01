@@ -1,85 +1,256 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../common/models/dio/data_state.dart';
+import '../../../auth/notifier/auth_session_notifier.dart';
+import '../../../home/notifier/user_badge_notifier.dart';
 import '../../components/programs_page/program_list_page.dart';
-import '../../components/programs_page/senior_citizen_services_page.dart';
+import '../../components/programs_page/family_community_page.dart';
+import '../../models/posting_requirement_model.dart';
+import '../../notifier/user_badge_info_notifier.dart';
+import '../../notifier/welfare_program_notifier.dart';
+import '../../services/posting_service.dart';
 
-class FamilyCommunityScreen extends StatefulWidget {
+class FamilyCommunityScreen extends ConsumerStatefulWidget {
   static const routeName = '/family-community';
+  static const String programId = '3';
 
   const FamilyCommunityScreen({super.key});
 
   @override
-  State<FamilyCommunityScreen> createState() => _FamilyCommunityScreenState();
+  ConsumerState<FamilyCommunityScreen> createState() => _FamilyCommunityScreenState();
 }
 
-class _FamilyCommunityScreenState extends State<FamilyCommunityScreen> {
-  // Programs data - matching the screenshot
-  static const List<Map<String, String>> _programs = [
-    {
-      'title': 'Pre-Marriage Counseling',
-      'description':
-          'Mandatory counseling session for couples applying for a marriage license.',
-    },
-    {
-      'title': 'Senior Citizen Services',
-      'description':
-          'OSCA ID issuance and release of Social Pension for indigent seniors.',
-    },
-    {
-      'title': 'ERPAT (Fathers)',
-      'description':
-          'Empowerment and Reaffirmation of Paternal Abilities training for fathers.',
-    },
-    {
-      'title': 'Parent Effectiveness (PES)',
-      'description':
-          'Seminars on parenting, child development, and family values.',
-    },
-  ];
+class _FamilyCommunityScreenState extends ConsumerState<FamilyCommunityScreen> {
+  bool _isProcessing = false;
 
-  void _handleProgramTap(String programTitle) {
-    print('$programTitle tapped');
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(welfarePostingsNotifierProvider.notifier).fetchPostings(
+            programId: FamilyCommunityScreen.programId,
+            status: 'Published',
+          );
+    });
+  }
 
-    // Use switch case for navigation
-    switch (programTitle) {
-      case 'Pre-Marriage Counseling':
-        // TODO: Navigate to Pre-Marriage Counseling page
-        print('Pre-Marriage Counseling navigation - Coming soon');
-        break;
+  Future<void> _handleProgramTap(String postingId, String postingTitle) async {
+    if (_isProcessing) return;
 
-      case 'Senior Citizen Services':
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const SeniorCitizenServicesPage(
-              userName: 'Maria Santos', // TODO: Get from user data
-              userAge: '35', // TODO: Get from user data
-            ),
-          ),
-        );
-        break;
+    final session = ref.read(authSessionProvider);
 
-      case 'ERPAT (Fathers)':
-        // TODO: Navigate to ERPAT page
-        print('ERPAT navigation - Coming soon');
-        break;
-
-      case 'Parent Effectiveness (PES)':
-        // TODO: Navigate to Parent Effectiveness page
-        print('Parent Effectiveness navigation - Coming soon');
-        break;
-
-      default:
-        print('Unknown program: $programTitle');
+    if (session.userId == null) {
+      if (!mounted) return;
+      _showSnackBar('Please log in first');
+      return;
     }
+
+    setState(() => _isProcessing = true);
+
+    if (!mounted) return;
+    _showLoadingDialog();
+
+    try {
+      await ref
+          .read(badgeInfoNotifierProvider.notifier)
+          .fetchBadgeInfo(mobileUserId: session.userId!);
+
+      await ref
+          .read(badgesNotifierProvider.notifier)
+          .fetchBadges(mobileUserId: session.userId!);
+
+      if (!mounted) return;
+
+      final postingService = ref.read(postingServiceProvider);
+      final postingResponse = await postingService.getPosting(postingId);
+
+      if (!mounted) return;
+
+      Navigator.pop(context);
+
+      final postingData = postingResponse.data['data'] as Map<String, dynamic>? ??
+          postingResponse.data;
+      final requirementsList =
+          postingData['assistance_posting_requirements'] as List?;
+
+      final requirementIds = <int>[];
+      final requirements = <PostingRequirement>[];
+
+      if (requirementsList != null) {
+        for (int index = 0; index < requirementsList.length; index++) {
+          try {
+            final req = requirementsList[index] as Map<String, dynamic>;
+            var requirement = PostingRequirement.fromJson(req);
+
+            if (requirement.order == 0) {
+              requirement = PostingRequirement(
+                id: requirement.id,
+                label: requirement.label,
+                category: requirement.category,
+                type: requirement.type,
+                required: requirement.required,
+                notes: requirement.notes,
+                order: index + 1,
+              );
+            }
+
+            requirementIds.add(requirement.id);
+            requirements.add(requirement);
+          } catch (e) {
+            continue;
+          }
+        }
+      }
+
+      final badgeInfoState = ref.read(badgeInfoNotifierProvider);
+      final badgesState = ref.read(badgesNotifierProvider);
+
+      int? userBadgeId;
+      String? userBadgeType;
+
+      badgesState.when(
+        started: () {},
+        loading: () {},
+        success: (badgesResponse) {
+          if (badgesResponse.badges.isNotEmpty) {
+            final firstBadge = badgesResponse.badges.first;
+            userBadgeId = int.tryParse(firstBadge.id.toString());
+            userBadgeType = firstBadge.badgeTypeName;
+          }
+        },
+        error: (_) {},
+      );
+
+      badgeInfoState.when(
+        started: () {
+          if (mounted) {
+            _showSnackBar('Data not loaded. Please try again.');
+            setState(() => _isProcessing = false);
+          }
+        },
+        loading: () {
+          if (mounted) {
+            _showSnackBar('Still loading. Please wait.');
+            setState(() => _isProcessing = false);
+          }
+        },
+        success: (badgeInfo) {
+          if (mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => FamilyCommunityPage(
+                  postingId: postingId,
+                  postingTitle: postingTitle,
+                  userName: badgeInfo.fullName,
+                  userAge: badgeInfo.age,
+                  userBadgeType: userBadgeType,
+                  userBadgeId: userBadgeId,
+                  requirementIds: requirementIds,
+                  requirements: requirements,
+                ),
+              ),
+            ).then((_) {
+              if (mounted) setState(() => _isProcessing = false);
+            });
+          }
+        },
+        error: (message) {
+          if (mounted) {
+            _showSnackBar('Error: $message');
+            setState(() => _isProcessing = false);
+          }
+        },
+      );
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.pop(context);
+      _showSnackBar('Unexpected error: $e');
+      setState(() => _isProcessing = false);
+    }
+  }
+
+  void _showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return ProgramListPage(
-      title: 'Family & Community Welfare',
-      subtitle: 'Strengthening family bonds and supporting vulnerable adults.',
-      onProgramTap: _handleProgramTap,
-      programs: _programs,
+    final postingsState = ref.watch(welfarePostingsNotifierProvider);
+
+    return postingsState.when(
+      started: () => const Scaffold(
+        body: Center(child: Text('Getting started...')),
+      ),
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      success: (postings) {
+        if (postings.isEmpty) {
+          return Scaffold(
+            appBar: AppBar(title: const Text('Family & Community Welfare')),
+            body: const Center(
+              child: Text('No programs available at the moment'),
+            ),
+          );
+        }
+
+        final programs = postings
+            .map(
+              (posting) => {
+                'id': posting.id,
+                'title': posting.title,
+                'description': posting.description ?? 'No description available',
+              },
+            )
+            .toList();
+
+        return ProgramListPage(
+          title: 'Family & Community Welfare',
+          subtitle: 'Strengthening family bonds and supporting vulnerable adults.',
+          onProgramTap: (programTitle) {
+            final posting = postings.firstWhere(
+              (p) => p.title == programTitle,
+              orElse: () => postings.first,
+            );
+            _handleProgramTap(posting.id, posting.title);
+          },
+          programs: programs,
+        );
+      },
+      error: (message) => Scaffold(
+        appBar: AppBar(title: const Text('Family & Community Welfare')),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 48, color: Colors.red),
+              const SizedBox(height: 16),
+              Text('Error: $message'),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  ref.read(welfarePostingsNotifierProvider.notifier).fetchPostings(
+                        programId: FamilyCommunityScreen.programId,
+                        status: 'Published',
+                      );
+                },
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

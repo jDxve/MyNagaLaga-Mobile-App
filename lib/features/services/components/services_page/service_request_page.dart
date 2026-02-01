@@ -32,7 +32,6 @@ class _ServiceRequestPageState extends ConsumerState<ServiceRequestPage> {
 
   final List<File> _uploadedDocuments = [];
   bool _isSubmitting = false;
-  static const int maxDocuments = 3;
 
   // Maps to store case types data from backend
   Map<String, dynamic> _programToCaseTypeId = {};  // ✅ Changed to dynamic to handle both int and String
