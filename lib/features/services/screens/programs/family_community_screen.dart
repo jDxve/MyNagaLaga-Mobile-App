@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../common/models/dio/data_state.dart';
 import '../../../auth/notifier/auth_session_notifier.dart';
 import '../../../home/notifier/user_badge_notifier.dart';
+import '../../components/accessibility_setting.dart';
 import '../../components/programs_page/program_list_page.dart';
 import '../../components/programs_page/family_community_page.dart';
 import '../../models/posting_requirement_model.dart';
@@ -35,147 +36,142 @@ class _FamilyCommunityScreenState extends ConsumerState<FamilyCommunityScreen> {
     });
   }
 
-  
-Future<void> _handleProgramTap(String postingId, String postingTitle) async {
-  if (_isProcessing) return;
+  Future<void> _handleProgramTap(String postingId, String postingTitle) async {
+    if (_isProcessing) return;
 
-  final session = ref.read(authSessionProvider);
-  if (session.userId == null) {
-    if (!mounted) return;
-    _showSnackBar('Please log in first');
-    return;
-  }
-
-  setState(() => _isProcessing = true);
-
-  if (!mounted) return;
-  _showLoadingDialog();
-
-  try {
-    // Fetch user data in parallel (both return void)
-    await Future.wait([
-      ref.read(badgeInfoNotifierProvider.notifier).fetchBadgeInfo(
-            mobileUserId: session.userId!,
-          ),
-      ref.read(badgesNotifierProvider.notifier).fetchBadges(
-            mobileUserId: session.userId!,
-          ),
-    ]);
-
-    // Fetch posting requirements separately (returns a value)
-    final postingResponse = await ref.read(postingServiceProvider).getPosting(postingId);
-
-    if (!mounted) return;
-    Navigator.pop(context); // Close loading dialog
-
-    // Extract posting response
-    final postingData =
-        postingResponse.data['data'] as Map<String, dynamic>? ??
-            postingResponse.data;
-    final requirementsList =
-        postingData['assistance_posting_requirements'] as List?;
-
-    final requirementIds = <int>[];
-    final requirements = <PostingRequirement>[];
-
-    if (requirementsList != null) {
-      for (int index = 0; index < requirementsList.length; index++) {
-        try {
-          final req = requirementsList[index] as Map<String, dynamic>;
-          var requirement = PostingRequirement.fromJson(req);
-
-          if (requirement.order == 0) {
-            requirement = PostingRequirement(
-              id: requirement.id,
-              label: requirement.label,
-              category: requirement.category,
-              type: requirement.type,
-              required: requirement.required,
-              notes: requirement.notes,
-              order: index + 1,
-            );
-          }
-
-          requirementIds.add(requirement.id);
-          requirements.add(requirement);
-        } catch (e) {
-          continue;
-        }
-      }
-    }
-
-    final badgeInfoState = ref.read(badgeInfoNotifierProvider);
-    final badgesState = ref.read(badgesNotifierProvider);
-
-    int? userBadgeId;
-    String? userBadgeType;
-
-    badgesState.when(
-      started: () {},
-      loading: () {},
-      success: (badgesResponse) {
-        if (badgesResponse.badges.isNotEmpty) {
-          final firstBadge = badgesResponse.badges.first;
-          userBadgeId = int.tryParse(firstBadge.id.toString());
-          userBadgeType = firstBadge.badgeTypeName;
-        }
-      },
-      error: (_) {},
-    );
-
-    final hasError = badgeInfoState.when(
-      started: () => true,
-      loading: () => true,
-      success: (_) => false,
-      error: (_) => true,
-    );
-
-    if (hasError) {
-      if (mounted) {
-        _showSnackBar('Failed to load user data');
-        setState(() => _isProcessing = false);
-      }
+    final session = ref.read(authSessionProvider);
+    if (session.userId == null) {
+      if (!mounted) return;
+      _showSnackBar('Please log in first');
       return;
     }
 
-    badgeInfoState.when(
-      started: () {},
-      loading: () {},
-      success: (badgeInfo) {
-        if (mounted) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => FamilyCommunityPage(
-                postingId: postingId,
-                postingTitle: postingTitle,
-                userName: badgeInfo.fullName,
-                userAge: badgeInfo.age,
-                userBadgeType: userBadgeType,
-                userBadgeId: userBadgeId,
-                requirementIds: requirementIds,
-                requirements: requirements,
-              ),
+    setState(() => _isProcessing = true);
+
+    if (!mounted) return;
+    _showLoadingDialog();
+
+    try {
+      await Future.wait([
+        ref.read(badgeInfoNotifierProvider.notifier).fetchBadgeInfo(
+              mobileUserId: session.userId!,
             ),
-          ).then((_) {
-            if (mounted) setState(() => _isProcessing = false);
-          });
+        ref.read(badgesNotifierProvider.notifier).fetchBadges(
+              mobileUserId: session.userId!,
+            ),
+      ]);
+
+      final postingResponse =
+          await ref.read(postingServiceProvider).getPosting(postingId);
+
+      if (!mounted) return;
+      Navigator.pop(context);
+
+      final postingData =
+          postingResponse.data['data'] as Map<String, dynamic>? ??
+              postingResponse.data;
+      final requirementsList =
+          postingData['assistance_posting_requirements'] as List?;
+
+      final requirementIds = <int>[];
+      final requirements = <PostingRequirement>[];
+
+      if (requirementsList != null) {
+        for (int index = 0; index < requirementsList.length; index++) {
+          try {
+            final req = requirementsList[index] as Map<String, dynamic>;
+            var requirement = PostingRequirement.fromJson(req);
+            if (requirement.order == 0) {
+              requirement = PostingRequirement(
+                id: requirement.id,
+                label: requirement.label,
+                category: requirement.category,
+                type: requirement.type,
+                required: requirement.required,
+                notes: requirement.notes,
+                order: index + 1,
+              );
+            }
+            requirementIds.add(requirement.id);
+            requirements.add(requirement);
+          } catch (e) {
+            continue;
+          }
         }
-      },
-      error: (message) {
+      }
+
+      final badgeInfoState = ref.read(badgeInfoNotifierProvider);
+      final badgesState = ref.read(badgesNotifierProvider);
+
+      int? userBadgeId;
+      String? userBadgeType;
+
+      badgesState.when(
+        started: () {},
+        loading: () {},
+        success: (badgesResponse) {
+          if (badgesResponse.badges.isNotEmpty) {
+            final firstBadge = badgesResponse.badges.first;
+            userBadgeId = int.tryParse(firstBadge.id.toString());
+            userBadgeType = firstBadge.badgeTypeName;
+          }
+        },
+        error: (_) {},
+      );
+
+      final hasError = badgeInfoState.when(
+        started: () => true,
+        loading: () => true,
+        success: (_) => false,
+        error: (_) => true,
+      );
+
+      if (hasError) {
         if (mounted) {
-          _showSnackBar('Error: $message');
+          _showSnackBar('Failed to load user data');
           setState(() => _isProcessing = false);
         }
-      },
-    );
-  } catch (e) {
-    if (!mounted) return;
-    Navigator.pop(context);
-    _showSnackBar('Unexpected error: $e');
-    setState(() => _isProcessing = false);
+        return;
+      }
+
+      badgeInfoState.when(
+        started: () {},
+        loading: () {},
+        success: (badgeInfo) {
+          if (mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => FamilyCommunityPage(
+                  postingId: postingId,
+                  postingTitle: postingTitle,
+                  userName: badgeInfo.fullName,
+                  userAge: badgeInfo.age,
+                  userBadgeType: userBadgeType,
+                  userBadgeId: userBadgeId,
+                  requirementIds: requirementIds,
+                  requirements: requirements,
+                ),
+              ),
+            ).then((_) {
+              if (mounted) setState(() => _isProcessing = false);
+            });
+          }
+        },
+        error: (message) {
+          if (mounted) {
+            _showSnackBar('Error: $message');
+            setState(() => _isProcessing = false);
+          }
+        },
+      );
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.pop(context);
+      _showSnackBar('Unexpected error: $e');
+      setState(() => _isProcessing = false);
+    }
   }
-}
 
   void _showLoadingDialog() {
     showDialog(
@@ -188,6 +184,13 @@ Future<void> _handleProgramTap(String postingId, String postingTitle) async {
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
+    );
+  }
+
+  void _showAccessibilitySettings() {
+    showDialog(
+      context: context,
+      builder: (context) => const AccessibilitySettingsDialog(),
     );
   }
 
@@ -208,6 +211,14 @@ Future<void> _handleProgramTap(String postingId, String postingTitle) async {
             appBar: AppBar(title: const Text('Family & Community Welfare')),
             body: const Center(
               child: Text('No programs available at the moment'),
+            ),
+            floatingActionButton: FloatingActionButton(
+              onPressed: _showAccessibilitySettings,
+              backgroundColor: const Color(0xFF17B3A6),
+              child: const Icon(
+                Icons.accessibility_new,
+                color: Colors.white,
+              ),
             ),
           );
         }
@@ -233,6 +244,7 @@ Future<void> _handleProgramTap(String postingId, String postingTitle) async {
             _handleProgramTap(posting.id, posting.title);
           },
           programs: programs,
+     
         );
       },
       error: (message) => Scaffold(
@@ -255,6 +267,14 @@ Future<void> _handleProgramTap(String postingId, String postingTitle) async {
                 child: const Text('Retry'),
               ),
             ],
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: _showAccessibilitySettings,
+          backgroundColor: const Color(0xFF17B3A6),
+          child: const Icon(
+            Icons.accessibility_new,
+            color: Colors.white,
           ),
         ),
       ),

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../../../../common/resources/colors.dart';
 import '../../../../common/resources/dimensions.dart';
 import '../../../../common/widgets/custom_app_bar.dart';
+import '../accessibility_setting.dart';
 import '../program_list_item.dart';
+
 
 class ProgramListPage extends StatelessWidget {
   final String title;
@@ -18,6 +20,9 @@ class ProgramListPage extends StatelessWidget {
     required this.programs,
   });
 
+void _showAccessibilitySettings(BuildContext context) {
+  AccessibilitySettingsDialog.show(context);
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,9 +61,19 @@ class ProgramListPage extends StatelessWidget {
                     );
                   },
                 ),
+                80.gapH, // Extra space for FAB
               ],
             ),
           ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAccessibilitySettings(context),
+        backgroundColor: AppColors.primary,
+        child: Icon(
+          Icons.accessibility_new,
+          color: AppColors.white,
+          size: D.iconMD,
         ),
       ),
     );

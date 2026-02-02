@@ -14,13 +14,27 @@ class SheltersNotifier extends Notifier<DataState<SheltersResponse>> {
     return const DataState.started();
   }
 
-  Future<void> fetchAllShelters() async {
+  Future<void> fetchAllShelters({bool forceRefresh = false}) async {
+    // Don't reload if we already have data (unless force refresh)
+    if (!forceRefresh) {
+      state.whenOrNull(
+        success: (_) => null, // Already has data, return early
+      );
+      // ignore: unnecessary_type_check
+      if (state is! DataState<SheltersResponse> || 
+          state.toString().contains('success')) {
+        return;
+      }
+    }
+
     state = const DataState.loading();
     final repository = ref.read(shelterRepositoryProvider);
     final result = await repository.getAllShelters();
-
-    // Update state - no need to check mounted in Notifier
     state = result;
+  }
+
+  Future<void> refresh() async {
+    await fetchAllShelters(forceRefresh: true);
   }
 
   void reset() {
