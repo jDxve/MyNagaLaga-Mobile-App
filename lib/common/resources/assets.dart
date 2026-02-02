@@ -56,8 +56,11 @@ class Assets {
 
   static const String reqServiceIcon = 'assets/icons/req_service_icon.svg';
   static const String complaintIcon = 'assets/icons/complaints_icon.svg';
-  
-  static const String avalableShelter =  'assets/icons/available_shelter.png';
+
+  static const String avalableShelter = 'assets/icons/available_shelter.png';
   static const String limitedShelter = 'assets/icons/limited_shelter.png';
   static const String fullShelter = 'assets/icons/full_shelter.png';
+
+  static const String currentLoc = 'assets/icons/current_loc.png';
+
 }

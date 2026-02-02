@@ -1,60 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../common/models/dio/data_state.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/widgets/search_input.dart';
 import '../../home/components/circular_notif.dart';
 import '../compnents/shelter_map.dart';
 import '../compnents/shelters_list.dart';
-import '../models/shelter_data_model.dart';
+import '../notifier/shelter_notifier.dart';
 
-class DisasterResilienceScreen extends StatefulWidget {
+class DisasterResilienceScreen extends ConsumerStatefulWidget {
   static const String routeName = '/disaster-resilience';
   const DisasterResilienceScreen({super.key});
 
   @override
-  State<DisasterResilienceScreen> createState() =>
+  ConsumerState<DisasterResilienceScreen> createState() =>
       _DisasterResilienceScreenState();
 }
 
-class _DisasterResilienceScreenState extends State<DisasterResilienceScreen> {
+class _DisasterResilienceScreenState
+    extends ConsumerState<DisasterResilienceScreen> {
   final TextEditingController _searchController = TextEditingController();
 
-  // Sample shelter data
-  final List<ShelterData> _shelters = [
-    ShelterData(
-      name: 'Cabasan Elementary School',
-      address: 'Barangay Cabasan, Bacacay, Albay',
-      capacity: '45/200',
-      status: ShelterStatus.available,
-      latitude: 13.3250,
-      longitude: 123.8794,
-      seniors: 12,
-      infants: 5,
-      pwd: 3,
-    ),
-    ShelterData(
-      name: 'Bacacay National High School',
-      address: 'Poblacion, Bacacay, Albay',
-      capacity: '180/200',
-      status: ShelterStatus.limited,
-      latitude: 13.3280,
-      longitude: 123.8820,
-      seniors: 12,
-      infants: 5,
-      pwd: 3,
-    ),
-    ShelterData(
-      name: 'Bacacay Covered Court',
-      address: 'Centro, Bacacay, Albay',
-      capacity: '200/200',
-      status: ShelterStatus.full,
-      latitude: 13.3220,
-      longitude: 123.8760,
-      seniors: 15,
-      infants: 8,
-      pwd: 5,
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    // Fetch shelters when screen loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(sheltersNotifierProvider.notifier).fetchAllShelters();
+    });
+  }
 
   @override
   void dispose() {
@@ -65,6 +40,8 @@ class _DisasterResilienceScreenState extends State<DisasterResilienceScreen> {
   @override
   Widget build(BuildContext context) {
     D.init(context);
+    final sheltersState = ref.watch(sheltersNotifierProvider);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -106,11 +83,98 @@ class _DisasterResilienceScreenState extends State<DisasterResilienceScreen> {
               ),
             ),
 
-            // Map Section
-            ShelterMap(shelters: _shelters),
+            // Content based on state
+            Expanded(
+              child: sheltersState.when(
+                started: () => const Center(
+                  child: Text('Loading evacuation centers...'),
+                ),
+                loading: () => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                success: (data) {
+                  if (data.shelters.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.home_work_outlined,
+                            size: 64,
+                            color: AppColors.grey,
+                          ),
+                          16.gapH,
+                          Text(
+                            'No evacuation centers available',
+                            style: TextStyle(
+                              fontSize: D.textBase,
+                              color: AppColors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
 
-            // Shelters List
-            SheltersList(shelters: _shelters),
+                  return Column(
+                    children: [
+                      // Map Section
+                      ShelterMap(shelters: data.shelters),
+
+                      // Shelters List
+                      SheltersList(shelters: data.shelters),
+                    ],
+                  );
+                },
+                error: (error) => Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(24.w),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          size: 64,
+                          color: Colors.red,
+                        ),
+                        16.gapH,
+                        Text(
+                          'Failed to load evacuation centers',
+                          style: TextStyle(
+                            fontSize: D.textBase,
+                            fontWeight: D.semiBold,
+                            color: AppColors.black,
+                          ),
+                        ),
+                        8.gapH,
+                        Text(
+                          error ?? 'Unknown error occurred',
+                          style: TextStyle(
+                            fontSize: D.textSM,
+                            color: AppColors.grey,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        24.gapH,
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            ref
+                                .read(sheltersNotifierProvider.notifier)
+                                .fetchAllShelters();
+                          },
+                          icon: const Icon(Icons.refresh),
+                          label: const Text('Retry'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),

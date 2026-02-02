@@ -54,9 +54,11 @@ class _ShelterMapState extends State<ShelterMap> with OSMMixinObserver {
     if (!mounted || _markersAdded) return;
     if (isReady) {
       _markersAdded = true;
-      await Future.delayed(const Duration(milliseconds: 500));
-      await _startLocationTracking();
-      await _addShelterMarkers();
+      await Future.delayed(const Duration(milliseconds: 1500));
+      if (mounted) {
+        await _startLocationTracking();
+        await _addShelterMarkers();
+      }
     }
   }
 
@@ -65,16 +67,24 @@ class _ShelterMapState extends State<ShelterMap> with OSMMixinObserver {
       await _mapController.enableTracking();
       await _updateUserLocation();
 
-      _locationTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
-        if (mounted) {
-          await _updateUserLocation();
-        } else {
-          timer.cancel();
-        }
-      });
+      _locationTimer = Timer.periodic(
+        const Duration(seconds: 5),
+        (timer) async {
+          if (mounted) {
+            await _updateUserLocation();
+          } else {
+            timer.cancel();
+          }
+        },
+      );
     } catch (e) {
-      debugPrint('Error enabling tracking: $e');
-      _userLocation = Constant.nagaCityCenter;
+      debugPrint('❌ Error enabling tracking: $e');
+      if (mounted) {
+        setState(() {
+          _userLocation = Constant.nagaCityCenter;
+        });
+        await _updateCurrentLocationMarker();
+      }
     }
   }
 
@@ -86,73 +96,98 @@ class _ShelterMapState extends State<ShelterMap> with OSMMixinObserver {
         longitude: position.longitude,
       );
 
-      if (_userLocation == null ||
-          _calculateDistance(
-            _userLocation!.latitude,
-            _userLocation!.longitude,
-            newLocation.latitude,
-            newLocation.longitude,
-          ) > 0.0001) {
-        setState(() {
-          _userLocation = newLocation;
-        });
+      if (_userLocation == null || _hasLocationChanged(_userLocation!, newLocation)) {
+        if (mounted) {
+          setState(() {
+            _userLocation = newLocation;
+          });
+        }
 
-        debugPrint('User location updated: ${_userLocation?.latitude}, ${_userLocation?.longitude}');
+        debugPrint('📍 User location: ${_userLocation?.latitude}, ${_userLocation?.longitude}');
+        
+        await Future.delayed(const Duration(milliseconds: 500));
+        
+        await _updateCurrentLocationMarker();
         await _drawRouteToNearestShelter();
       }
     } catch (e) {
-      debugPrint('Error getting user location: $e');
+      debugPrint('❌ Error getting location: $e');
     }
   }
 
+  Future<void> _updateCurrentLocationMarker() async {
+    if (_userLocation == null || !mounted) return;
+
+    try {
+      await _mapController.removeMarker(_userLocation!);
+    } catch (e) {
+      debugPrint('No existing current location marker to remove');
+    }
+
+    await Future.delayed(const Duration(milliseconds: 200));
+
+    try {
+      await _mapController.addMarker(
+        _userLocation!,
+        markerIcon: MarkerIcon(
+          assetMarker: AssetMarker(
+            image: AssetImage(Assets.currentLoc),
+            scaleAssetImage: 1.5,
+          ),
+        ),
+      );
+      debugPrint('📍 Current location marker updated');
+    } catch (e) {
+      debugPrint('❌ Error adding current location marker: $e');
+    }
+  }
+
+  bool _hasLocationChanged(GeoPoint oldLocation, GeoPoint newLocation) {
+    final distance = _calculateDistance(
+      oldLocation.latitude,
+      oldLocation.longitude,
+      newLocation.latitude,
+      newLocation.longitude,
+    );
+    return distance > 0.0001;
+  }
+
   Future<void> _addShelterMarkers() async {
+    if (!mounted) return;
+
+    int successCount = 0;
     for (var shelter in widget.shelters) {
+      if (!mounted) return;
+
       try {
         await _mapController.addMarker(
           GeoPoint(latitude: shelter.latitude, longitude: shelter.longitude),
           markerIcon: MarkerIcon(
             assetMarker: AssetMarker(
-              image: AssetImage(_getMarkerPngPath(shelter.status)),
+              image: AssetImage(_getMarkerIcon(shelter.status)),
               scaleAssetImage: 1,
             ),
           ),
         );
-        await Future.delayed(const Duration(milliseconds: 50));
+        successCount++;
+        debugPrint('✅ Added marker $successCount/${widget.shelters.length}: ${shelter.name}');
+
+        await Future.delayed(const Duration(milliseconds: 300));
       } catch (e) {
-        debugPrint('Error adding marker for ${shelter.name}: $e');
+        debugPrint('❌ Error adding marker for ${shelter.name}: $e');
       }
     }
+
+    debugPrint('🎯 Successfully added $successCount/${widget.shelters.length} markers');
   }
 
   Future<void> _drawRouteToNearestShelter() async {
-    if (widget.shelters.isEmpty || _userLocation == null) return;
+    if (widget.shelters.isEmpty || _userLocation == null || !mounted) return;
 
-    if (_currentRoadKey != null) {
-      try {
-        await _mapController.removeRoad(roadKey: _currentRoadKey!);
-      } catch (e) {
-        debugPrint('Error removing old route: $e');
-      }
-    }
+    await _removeCurrentRoute();
 
-    ShelterData? nearestShelter;
-    double minDistance = double.infinity;
-
-    for (var shelter in widget.shelters) {
-      final distance = _calculateDistance(
-        _userLocation!.latitude,
-        _userLocation!.longitude,
-        shelter.latitude,
-        shelter.longitude,
-      );
-
-      if (distance < minDistance) {
-        minDistance = distance;
-        nearestShelter = shelter;
-      }
-    }
-
-    if (nearestShelter == null) return;
+    final nearestShelter = _findNearestShelter();
+    if (nearestShelter == null || !mounted) return;
 
     try {
       final road = await _mapController.drawRoad(
@@ -168,11 +203,46 @@ class _ShelterMapState extends State<ShelterMap> with OSMMixinObserver {
         ),
       );
 
-      _currentRoadKey = road.key;
-      debugPrint('Route updated to ${nearestShelter.name}: ${road.distance} km');
+      if (mounted) {
+        _currentRoadKey = road.key;
+        debugPrint('🛣️ Route to ${nearestShelter.name}: ${road.distance?.toStringAsFixed(2)} km');
+      }
     } catch (e) {
-      debugPrint('Error drawing route: $e');
+      debugPrint('❌ Error drawing route: $e');
     }
+  }
+
+  Future<void> _removeCurrentRoute() async {
+    if (_currentRoadKey != null) {
+      try {
+        await _mapController.removeRoad(roadKey: _currentRoadKey!);
+      } catch (e) {
+        debugPrint('❌ Error removing route: $e');
+      }
+    }
+  }
+
+  ShelterData? _findNearestShelter() {
+    if (_userLocation == null) return null;
+
+    ShelterData? nearest;
+    double minDistance = double.infinity;
+
+    for (var shelter in widget.shelters) {
+      final distance = _calculateDistance(
+        _userLocation!.latitude,
+        _userLocation!.longitude,
+        shelter.latitude,
+        shelter.longitude,
+      );
+
+      if (distance < minDistance) {
+        minDistance = distance;
+        nearest = shelter;
+      }
+    }
+
+    return nearest;
   }
 
   double _calculateDistance(double lat1, double lon1, double lat2, double lon2) {
@@ -181,7 +251,7 @@ class _ShelterMapState extends State<ShelterMap> with OSMMixinObserver {
     return (dLat * dLat + dLon * dLon);
   }
 
-  String _getMarkerPngPath(ShelterStatus status) {
+  String _getMarkerIcon(ShelterStatus status) {
     switch (status) {
       case ShelterStatus.available:
         return Assets.avalableShelter;
@@ -194,66 +264,21 @@ class _ShelterMapState extends State<ShelterMap> with OSMMixinObserver {
 
   @override
   Widget build(BuildContext context) {
-    final Widget mapWidget = OSMFlutter(
+    final mapWidget = OSMFlutter(
       controller: _mapController,
       osmOption: OSMOption(
-        zoomOption: const ZoomOption(initZoom: 14, minZoomLevel: 10),
-        userLocationMarker: UserLocationMaker(
-          personMarker: MarkerIcon(
-            iconWidget: Container(
-              width: 60.w,
-              height: 60.w,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.primary.withOpacity(0.2),
-              ),
-              child: Center(
-                child: Container(
-                  width: 20.w,
-                  height: 20.w,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.primary,
-                    border: Border.all(color: AppColors.white, width: 3),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withOpacity(0.5),
-                        blurRadius: 10.r,
-                        spreadRadius: 2.r,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          directionArrowMarker: MarkerIcon(
-            iconWidget: Container(
-              width: 60.w,
-              height: 60.w,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.primary.withOpacity(0.2),
-              ),
-              child: Center(
-                child: Container(
-                  width: 20.w,
-                  height: 20.w,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.primary,
-                    border: Border.all(color: AppColors.white, width: 3),
-                  ),
-                  child: Icon(
-                    Icons.navigation,
-                    color: AppColors.white,
-                    size: 12.w,
-                  ),
-                ),
-              ),
-            ),
-          ),
+        zoomOption: const ZoomOption(
+          initZoom: 14,
+          minZoomLevel: 12,
+          maxZoomLevel: 18,
         ),
+        userTrackingOption: UserTrackingOption(
+          enableTracking: true,
+          unFollowUser: false,
+        ),
+        showDefaultInfoWindow: false,
+        enableRotationByGesture: false,
+        isPicker: false,
       ),
     );
 

@@ -11,11 +11,10 @@ import '../services/tracking_service.dart';
 // ============================================================================
 // ALL TRACKING NOTIFIER
 // ============================================================================
-
 final allTrackingNotifierProvider =
     NotifierProvider<AllTrackingNotifier, DataState<TrackingResponseModel>>(
-  AllTrackingNotifier.new,
-);
+      AllTrackingNotifier.new,
+    );
 
 class AllTrackingNotifier extends Notifier<DataState<TrackingResponseModel>> {
   late final TrackingRepository _repository;
@@ -34,11 +33,9 @@ class AllTrackingNotifier extends Notifier<DataState<TrackingResponseModel>> {
     final service = TrackingService(dio);
     _repository = TrackingRepositoryImpl(service: service);
 
-    ref.onDispose(() {
-      _pollingService.dispose();
-    });
+    ref.onDispose(() => _pollingService.dispose());
 
-    return state;
+    return const DataState.started();
   }
 
   Future<void> fetchAllTracking({
@@ -51,7 +48,6 @@ class AllTrackingNotifier extends Notifier<DataState<TrackingResponseModel>> {
     bool silent = false,
     bool forceRefresh = false,
   }) async {
-    // Use cached data if available and parameters haven't changed
     if (!forceRefresh &&
         _hasInitialLoad &&
         _currentMobileUserId == mobileUserId &&
@@ -86,35 +82,28 @@ class AllTrackingNotifier extends Notifier<DataState<TrackingResponseModel>> {
 
     if (ref.mounted) {
       state = result;
-      if (result is Success) {
-        _hasInitialLoad = true;
-      }
+      if (result is Success) _hasInitialLoad = true;
     }
   }
 
   void startAutoRefresh({Duration interval = const Duration(seconds: 30)}) {
     if (_currentMobileUserId == null) return;
-
     _pollingService.startPolling(
       interval: interval,
-      onPoll: () async {
-        await fetchAllTracking(
-          mobileUserId: _currentMobileUserId!,
-          page: _currentPage,
-          limit: _currentLimit,
-          module: _currentModule,
-          status: _currentStatus,
-          search: _currentSearch,
-          silent: true,
-          forceRefresh: true,
-        );
-      },
+      onPoll: () async => fetchAllTracking(
+        mobileUserId: _currentMobileUserId!,
+        page: _currentPage,
+        limit: _currentLimit,
+        module: _currentModule,
+        status: _currentStatus,
+        search: _currentSearch,
+        silent: true,
+        forceRefresh: true,
+      ),
     );
   }
 
-  void stopAutoRefresh() {
-    _pollingService.stopPolling();
-  }
+  void stopAutoRefresh() => _pollingService.stopPolling();
 
   void reset() {
     stopAutoRefresh();
@@ -129,9 +118,10 @@ class AllTrackingNotifier extends Notifier<DataState<TrackingResponseModel>> {
 // ============================================================================
 
 final badgeTrackingNotifierProvider =
-    NotifierProvider<BadgeTrackingNotifier, DataState<BadgeRequestsResponseModel>>(
-  BadgeTrackingNotifier.new,
-);
+    NotifierProvider<
+      BadgeTrackingNotifier,
+      DataState<BadgeRequestsResponseModel>
+    >(BadgeTrackingNotifier.new);
 
 class BadgeTrackingNotifier
     extends Notifier<DataState<BadgeRequestsResponseModel>> {
@@ -154,7 +144,8 @@ class BadgeTrackingNotifier
       _pollingService.dispose();
     });
 
-    return state;
+    // ✅ FIXED: Return initial state instead of `state`
+    return const DataState.started();
   }
 
   Future<void> fetchBadgeRequests({
@@ -240,9 +231,10 @@ class BadgeTrackingNotifier
 // ============================================================================
 
 final applicationsTrackingNotifierProvider =
-    NotifierProvider<ApplicationsTrackingNotifier, DataState<ApplicationsResponseModel>>(
-  ApplicationsTrackingNotifier.new,
-);
+    NotifierProvider<
+      ApplicationsTrackingNotifier,
+      DataState<ApplicationsResponseModel>
+    >(ApplicationsTrackingNotifier.new);
 
 class ApplicationsTrackingNotifier
     extends Notifier<DataState<ApplicationsResponseModel>> {
@@ -265,7 +257,8 @@ class ApplicationsTrackingNotifier
       _pollingService.dispose();
     });
 
-    return state;
+    // ✅ FIXED: Return initial state instead of `state`
+    return const DataState.started();
   }
 
   Future<void> fetchApplications({
@@ -351,9 +344,10 @@ class ApplicationsTrackingNotifier
 // ============================================================================
 
 final programsTrackingNotifierProvider =
-    NotifierProvider<ProgramsTrackingNotifier, DataState<ProgramsTrackingResponseModel>>(
-  ProgramsTrackingNotifier.new,
-);
+    NotifierProvider<
+      ProgramsTrackingNotifier,
+      DataState<ProgramsTrackingResponseModel>
+    >(ProgramsTrackingNotifier.new);
 
 class ProgramsTrackingNotifier
     extends Notifier<DataState<ProgramsTrackingResponseModel>> {
@@ -376,7 +370,8 @@ class ProgramsTrackingNotifier
       _pollingService.dispose();
     });
 
-    return state;
+    // ✅ FIXED: Return initial state instead of `state`
+    return const DataState.started();
   }
 
   Future<void> fetchPrograms({
@@ -462,9 +457,10 @@ class ProgramsTrackingNotifier
 // ============================================================================
 
 final servicesTrackingNotifierProvider =
-    NotifierProvider<ServicesTrackingNotifier, DataState<ServicesTrackingResponseModel>>(
-  ServicesTrackingNotifier.new,
-);
+    NotifierProvider<
+      ServicesTrackingNotifier,
+      DataState<ServicesTrackingResponseModel>
+    >(ServicesTrackingNotifier.new);
 
 class ServicesTrackingNotifier
     extends Notifier<DataState<ServicesTrackingResponseModel>> {
@@ -487,7 +483,8 @@ class ServicesTrackingNotifier
       _pollingService.dispose();
     });
 
-    return state;
+    // ✅ FIXED: Return initial state instead of `state`
+    return const DataState.started();
   }
 
   Future<void> fetchServices({
@@ -573,9 +570,10 @@ class ServicesTrackingNotifier
 // ============================================================================
 
 final complaintsTrackingNotifierProvider =
-    NotifierProvider<ComplaintsTrackingNotifier, DataState<ComplaintsResponseModel>>(
-  ComplaintsTrackingNotifier.new,
-);
+    NotifierProvider<
+      ComplaintsTrackingNotifier,
+      DataState<ComplaintsResponseModel>
+    >(ComplaintsTrackingNotifier.new);
 
 class ComplaintsTrackingNotifier
     extends Notifier<DataState<ComplaintsResponseModel>> {
@@ -598,7 +596,8 @@ class ComplaintsTrackingNotifier
       _pollingService.dispose();
     });
 
-    return state;
+    // ✅ FIXED: Return initial state instead of `state`
+    return const DataState.started();
   }
 
   Future<void> fetchComplaints({
