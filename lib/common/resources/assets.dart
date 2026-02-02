@@ -62,5 +62,5 @@ class Assets {
   static const String fullShelter = 'assets/icons/full_shelter.png';
 
   static const String currentLoc = 'assets/icons/current_loc.png';
-
+  static const String familyCard = 'assets/images/family_card.png';
 }

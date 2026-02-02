@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../common/resources/assets.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 
@@ -10,54 +11,13 @@ class FamilyLedgerBanner extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Image Banner
-        Container(
+  
+        Image.asset(
+          Assets.familyCard,
           width: double.infinity,
-          height: 140.h,
-          decoration: BoxDecoration(
-            color: AppColors.lightPrimary,
-            borderRadius: BorderRadius.circular(D.radiusLG),
-          ),
-          padding: EdgeInsets.all(20.w),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Keep your family\ndetails organized\nin one place',
-                      style: TextStyle(
-                        fontSize: D.textBase,
-                        fontWeight: D.bold,
-                        color: AppColors.textlogo,
-                        height: 1.3,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              8.gapW,
-              // Placeholder for illustration
-              Container(
-                width: 100.w,
-                height: 100.w,
-                decoration: BoxDecoration(
-                  color: AppColors.white.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(D.radiusMD),
-                ),
-                child: Icon(
-                  Icons.family_restroom,
-                  size: 60.w,
-                  color: AppColors.primary,
-                ),
-              ),
-            ],
-          ),
+          fit: BoxFit.cover,
         ),
         20.gapH,
-
         // About Section
         Text(
           'About Family Ledger',
@@ -69,7 +29,7 @@ class FamilyLedgerBanner extends StatelessWidget {
         ),
         8.gapH,
         Text(
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
+          'The Family Ledger helps you keep track of your household members, manage family relationships, and maintain an organized record of your family structure. Easily view and update family member information all in one convenient place.',
           style: TextStyle(
             fontSize: D.textSM,
             color: AppColors.grey,

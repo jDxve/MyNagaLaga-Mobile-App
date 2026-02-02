@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../common/models/dio/data_state.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 import '../componets/add_member_dialog.dart';
@@ -6,25 +7,117 @@ import '../componets/delete_member_dialog.dart';
 import '../componets/family_tree_view.dart';
 import '../componets/select_generation_bottom.dart';
 import '../models/family_ledger_model.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../models/household_member_model.dart';
+import '../repository/family_ledger_repository_impl.dart';
 
-class FamilyTreePage extends StatefulWidget {
+
+class FamilyTreePage extends ConsumerStatefulWidget {
   static const String routeName = '/family-tree';
+  final String? householdId; // Pass household ID from previous screen
   
-  const FamilyTreePage({super.key});
+  const FamilyTreePage({super.key, this.householdId});
 
   @override
-  State<FamilyTreePage> createState() => _FamilyTreePageState();
+  ConsumerState<FamilyTreePage> createState() => _FamilyTreePageState();
 }
 
-class _FamilyTreePageState extends State<FamilyTreePage> {
+class _FamilyTreePageState extends ConsumerState<FamilyTreePage> {
   List<FamilyMember> generation1 = [];
   List<FamilyMember> generation2 = [];
   List<FamilyMember> generation3 = [];
+  
+  bool isLoading = true;
+  String? errorMessage;
 
   @override
   void initState() {
     super.initState();
-    _initializeDefaultMembers();
+    if (widget.householdId != null) {
+      _loadHouseholdData();
+    } else {
+      _initializeDefaultMembers();
+    }
+  }
+
+  Future<void> _loadHouseholdData() async {
+    if (widget.householdId == null) return;
+    
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+    });
+
+    // Call your repository to get household by ID
+    final repository = ref.read(familyLedgerRepositoryProvider);
+    final result = await repository.getHouseholdById(widget.householdId!);
+
+    result.when(
+      started: () {},
+      loading: () {},
+      success: (household) {
+        _mapHouseholdToGenerations(household.members);
+        setState(() {
+          isLoading = false;
+        });
+      },
+      error: (message) {
+        setState(() {
+          errorMessage = message;
+          isLoading = false;
+        });
+        _initializeDefaultMembers();
+      },
+    );
+  }
+
+  void _mapHouseholdToGenerations(List<HouseholdMemberModel> members) {
+    generation1.clear();
+    generation2.clear();
+    generation3.clear();
+
+    for (var member in members) {
+      final familyMember = FamilyMember(
+        id: member.id,
+        name: member.fullName,
+        role: member.roleLabel,
+        color: _getColorForRole(member.relationshipToHead),
+      );
+
+      // Map based on relationship
+      if (member.relationshipToHead == 'Head' || 
+          member.relationshipToHead == 'Spouse') {
+        generation1.add(familyMember);
+      } else if (member.relationshipToHead == 'Child' || 
+                 member.relationshipToHead == 'Sibling') {
+        generation2.add(familyMember);
+      } else if (member.relationshipToHead == 'Grandchild' || 
+                 member.relationshipToHead == 'Grandparent') {
+        generation3.add(familyMember);
+      } else {
+        // Default to generation 2 for other relationships
+        generation2.add(familyMember);
+      }
+    }
+
+    setState(() {});
+  }
+
+  Color _getColorForRole(String role) {
+    switch (role) {
+      case 'Head':
+        return AppColors.lightBlue;
+      case 'Spouse':
+        return AppColors.lightPurple;
+      case 'Child':
+      case 'Sibling':
+        return AppColors.lightGrey;
+      case 'Grandchild':
+      case 'Grandparent':
+        return AppColors.lightYellow;
+      default:
+        return AppColors.lightPink;
+    }
   }
 
   void _initializeDefaultMembers() {
@@ -56,34 +149,11 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
         role: 'Son',
         color: AppColors.lightGrey,
       ),
-      FamilyMember(
-        id: '5',
-        name: 'Pedro',
-        role: 'Son',
-        color: AppColors.lightGrey,
-      ),
     ];
     
-    generation3 = [
-      FamilyMember(
-        id: '6',
-        name: 'Prince',
-        role: 'Grandson',
-        color: AppColors.lightYellow,
-      ),
-      FamilyMember(
-        id: '7',
-        name: 'Mary',
-        role: 'Granddaughter',
-        color: AppColors.lightYellow,
-      ),
-      FamilyMember(
-        id: '8',
-        name: 'Jay',
-        role: 'Grandson',
-        color: AppColors.lightYellow,
-      ),
-    ];
+    generation3 = [];
+    
+    setState(() {});
   }
 
   void _showSelectGenerationSheet() {
@@ -177,51 +247,67 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
             fontFamily: 'Segoe UI',
           ),
         ),
+        actions: [
+          if (widget.householdId != null)
+            IconButton(
+              icon: Icon(Icons.refresh, color: AppColors.primary),
+              onPressed: _loadHouseholdData,
+            ),
+        ],
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-          child: Column(
-            children: [
-              // Title Section
-              Text(
-                'Family Registry',
-                style: TextStyle(
-                  fontSize: D.textLG,
-                  fontWeight: D.bold,
-                  color: AppColors.textlogo,
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : errorMessage != null
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(errorMessage!),
+                      16.gapH,
+                      ElevatedButton(
+                        onPressed: _loadHouseholdData,
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                )
+              : SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Family Registry',
+                          style: TextStyle(
+                            fontSize: D.textLG,
+                            fontWeight: D.bold,
+                            color: AppColors.textlogo,
+                          ),
+                        ),
+                        8.gapH,
+                        Text(
+                          'Easily manage your family tree. Add users, track ages, and define roles within your family structure.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: D.textSM,
+                            color: AppColors.grey,
+                            height: 1.4,
+                          ),
+                        ),
+                        32.gapH,
+                        FamilyTreeView(
+                          generation1: generation1,
+                          generation2: generation2,
+                          generation3: generation3,
+                          onMemberLongPress: _showDeleteDialog,
+                        ),
+                        40.gapH,
+                        _buildAddButton(),
+                        24.gapH,
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-              8.gapH,
-              Text(
-                'Easily manage your family tree. Add users, track ages, and define roles within your family structure.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: D.textSM,
-                  color: AppColors.grey,
-                  height: 1.4,
-                ),
-              ),
-              32.gapH,
-
-              // Family Tree
-              FamilyTreeView(
-                generation1: generation1,
-                generation2: generation2,
-                generation3: generation3,
-                onMemberLongPress: _showDeleteDialog,
-              ),
-
-              40.gapH,
-
-              // Add Member Button
-              _buildAddButton(),
-              
-              24.gapH,
-            ],
-          ),
-        ),
-      ),
     );
   }
 
@@ -234,7 +320,6 @@ class _FamilyTreePageState extends State<FamilyTreePage> {
         border: Border.all(
           color: AppColors.primary,
           width: 2,
-          style: BorderStyle.solid,
         ),
       ),
       child: Material(
