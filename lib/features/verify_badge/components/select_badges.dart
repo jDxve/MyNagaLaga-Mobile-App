@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../../common/models/dio/data_state.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/resources/assets.dart';
@@ -9,138 +7,111 @@ import '../../../common/resources/strings.dart';
 import '../../../common/widgets/secondary_button.dart';
 import '../../../common/widgets/error_modal.dart';
 import '../models/badge_type_model.dart';
-import '../notifier/badge_types_notifier.dart';
 
 Widget badgeSelectionCards({
   required BuildContext context,
+  required List<BadgeType> badgeTypes,
   required Function(BadgeType) onBadgeSelected,
   BadgeType? selectedBadge,
   required VoidCallback onNext,
 }) {
-  return Consumer(
-    builder: (context, ref, _) {
-      final badgeTypesState = ref.watch(badgeTypesNotifierProvider);
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      ...badgeTypes.map((apiBadge) {
+        final isSelected = selectedBadge?.id == apiBadge.id;
+        final localMetadata = _getBadgeLocalMetadata(apiBadge.badgeKey);
 
-      return badgeTypesState.when(
-        started: () => const Center(child: CircularProgressIndicator()),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        success: (badgeTypes) {
-          if (badgeTypes.isEmpty) {
-            return const Center(child: Text('No badge types available'));
-          }
-
-          return Column(
-            children: [
-              ...badgeTypes.map((badgeType) {
-                final isSelected = selectedBadge?.id == badgeType.id;
-                final badgeInfo = _getBadgeInfo(badgeType.badgeKey);
-                
-                return Padding(
-                  padding: EdgeInsets.only(bottom: 12.h),
-                  child: _BadgeCard(
-                    badgeType: badgeType,
-                    title: badgeInfo['title'],
-                    description: badgeInfo['description'],
-                    icon: badgeInfo['icon'],
-                    lightColor: badgeInfo['lightColor'],
-                    darkColor: badgeInfo['darkColor'],
-                    isSelected: isSelected,
-                    onTap: () => onBadgeSelected(badgeType),
-                  ),
-                );
-              }),
-              16.gapH,
-              _InfoCard(),
-              16.gapH,
-              SecondaryButton(
-                text: AppString.next,
-                isFilled: true,
-                isDisabled: selectedBadge == null,
-                onPressed: selectedBadge != null
-                    ? onNext
-                    : () {
-                        showErrorModal(
-                          context: context,
-                          title: AppString.noBadgeSelectedTitle,
-                          description: AppString.noBadgeSelectedDescription,
-                          icon: Icons.warning_amber_outlined,
-                          iconColor: Colors.orange,
-                          buttonText: AppString.gotIt,
-                        );
-                      },
-              ),
-            ],
-          );
-        },
-        error: (error) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 48, color: Colors.red),
-              16.gapH,
-              Text('Error: $error'),
-              16.gapH,
-              ElevatedButton(
-                onPressed: () => ref
-                    .read(badgeTypesNotifierProvider.notifier)
-                    .fetchBadgeTypes(),
-                child: const Text('Retry'),
-              ),
-            ],
+        return Padding(
+          padding: EdgeInsets.only(bottom: 12.h),
+          child: _BadgeCard(
+            title: apiBadge.name,
+            description: localMetadata['description'],
+            styleInfo: localMetadata,
+            isSelected: isSelected,
+            onTap: () => onBadgeSelected(apiBadge),
           ),
-        ),
-      );
-    },
+        );
+      }),
+      16.gapH,
+      const _InfoCard(),
+      16.gapH,
+      SecondaryButton(
+        text: AppString.next,
+        isFilled: true,
+        isDisabled: selectedBadge == null,
+        onPressed: selectedBadge != null
+            ? onNext
+            : () {
+                showErrorModal(
+                  context: context,
+                  title: AppString.noBadgeSelectedTitle,
+                  description: AppString.noBadgeSelectedDescription,
+                  icon: Icons.warning_amber_outlined,
+                  iconColor: Colors.orange,
+                  buttonText: AppString.gotIt,
+                );
+              },
+      ),
+    ],
   );
 }
 
-Map<String, dynamic> _getBadgeInfo(String badgeKey) {
+Map<String, dynamic> _getBadgeLocalMetadata(String badgeKey) {
   switch (badgeKey) {
     case 'senior_citizen':
       return {
-        'title': AppString.seniorCitizenTitle,
         'description': AppString.seniorCitizenDescription,
         'icon': Assets.seniorCitizenIcon,
+        'useIconData': false,
         'lightColor': AppColors.lightYellow,
         'darkColor': AppColors.darkYellow,
       };
     case 'pwd':
       return {
-        'title': AppString.pwdTitle,
         'description': AppString.pwdDescription,
         'icon': Assets.pwdIcon,
+        'useIconData': false,
         'lightColor': AppColors.lightPink,
         'darkColor': AppColors.darkPink,
       };
     case 'solo_parent':
       return {
-        'title': AppString.soloParentTitle,
         'description': AppString.soloParentDescription,
         'icon': Assets.soloParentIcon,
+        'useIconData': false,
         'lightColor': AppColors.lightPurple,
         'darkColor': AppColors.darkPurple,
       };
     case 'indigent':
       return {
-        'title': AppString.indigentTitle,
         'description': AppString.indigentDescription,
         'icon': Assets.indigentFamilyIcon,
+        'useIconData': false,
         'lightColor': AppColors.lightPrimary,
         'darkColor': AppColors.darkPrimary,
       };
     case 'student':
       return {
-        'title': AppString.studentTitle,
         'description': AppString.studentDescription,
         'icon': Assets.studentIcon,
+        'useIconData': false,
         'lightColor': AppColors.lightBlue,
         'darkColor': AppColors.darkBlue,
       };
+    case 'citizen':
+      return {
+        'description': 'For all registered citizens and residents of Naga City',
+        'useIconData': true,
+        'iconData': Icons.person_outline,
+        'lightColor': AppColors.lightCitizen,
+        'darkColor': AppColors.darkCitizen,
+      };
     default:
       return {
-        'title': 'Other',
-        'description': 'Other badge type',
+        'description': 'Verification badge for eligible residents',
         'icon': Assets.studentIcon,
+        'useIconData': false,
         'lightColor': AppColors.lightGrey,
         'darkColor': AppColors.grey,
       };
@@ -148,28 +119,25 @@ Map<String, dynamic> _getBadgeInfo(String badgeKey) {
 }
 
 class _BadgeCard extends StatelessWidget {
-  final BadgeType badgeType;
   final String title;
   final String description;
-  final String icon;
-  final Color lightColor;
-  final Color darkColor;
+  final Map<String, dynamic> styleInfo;
   final bool isSelected;
   final VoidCallback onTap;
 
   const _BadgeCard({
-    required this.badgeType,
     required this.title,
     required this.description,
-    required this.icon,
-    required this.lightColor,
-    required this.darkColor,
+    required this.styleInfo,
     required this.isSelected,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final Color lightColor = styleInfo['lightColor'];
+    final Color darkColor = styleInfo['darkColor'];
+
     return GestureDetector(
       onTap: onTap,
       child: Stack(
@@ -194,13 +162,19 @@ class _BadgeCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(D.radiusMD),
                   ),
                   padding: EdgeInsets.all(8.w),
-                  child: SvgPicture.asset(
-                    icon,
-                    colorFilter: ColorFilter.mode(
-                      isSelected ? darkColor : Colors.black,
-                      BlendMode.srcIn,
-                    ),
-                  ),
+                  child: styleInfo['useIconData']
+                      ? Icon(
+                          styleInfo['iconData'],
+                          color: isSelected ? darkColor : Colors.black,
+                          size: 24.w,
+                        )
+                      : SvgPicture.asset(
+                          styleInfo['icon'],
+                          colorFilter: ColorFilter.mode(
+                            isSelected ? darkColor : Colors.black,
+                            BlendMode.srcIn,
+                          ),
+                        ),
                 ),
                 12.gapW,
                 Expanded(
@@ -243,6 +217,7 @@ class _BadgeCard extends StatelessWidget {
 }
 
 class _InfoCard extends StatelessWidget {
+  const _InfoCard();
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -267,9 +242,9 @@ class _InfoCard extends StatelessWidget {
             ),
           ),
           12.gapH,
-          _InfoItem(text: AppString.whyApply1),
-          _InfoItem(text: AppString.whyApply2),
-          _InfoItem(text: AppString.whyApply3),
+          const _InfoItem(text: AppString.whyApply1),
+          const _InfoItem(text: AppString.whyApply2),
+          const _InfoItem(text: AppString.whyApply3),
         ],
       ),
     );
@@ -278,27 +253,18 @@ class _InfoCard extends StatelessWidget {
 
 class _InfoItem extends StatelessWidget {
   final String text;
-
   const _InfoItem({required this.text});
-
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(bottom: 4.h),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Text(
-              text,
-              style: TextStyle(
-                fontSize: D.textSM,
-                color: AppColors.grey,
-                height: 1.4,
-              ),
-            ),
-          ),
-        ],
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: D.textSM,
+          color: AppColors.grey,
+          height: 1.4,
+        ),
       ),
     );
   }

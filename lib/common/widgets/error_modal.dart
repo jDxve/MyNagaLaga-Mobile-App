@@ -36,7 +36,7 @@ void showErrorModal({
               Text(
                 title,
                 style: TextStyle(
-                  fontSize: D.textXL,
+                  fontSize: D.textLG,
                   fontWeight: D.bold,
                   color: Colors.black,
                   fontFamily: 'Segoe UI',

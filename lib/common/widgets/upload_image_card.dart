@@ -15,7 +15,6 @@ class UploadImage extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onRemove;
   final Function(ImageSource source)? onPickImage;
-  final bool showActions;
   final Color iconBackgroundColor;
   final Color iconColor;
   final double? height;
@@ -28,54 +27,99 @@ class UploadImage extends StatelessWidget {
     this.onTap,
     this.onRemove,
     this.onPickImage,
-    this.showActions = false,
-    this.iconBackgroundColor = AppColors.lightYellow, // Updated
-    this.iconColor = AppColors.darkYellow, // Updated
+    this.iconBackgroundColor = AppColors.lightYellow,
+    this.iconColor = AppColors.darkYellow,
     this.height,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        GestureDetector(
-          onTap: image != null ? onTap : null,
-          child: CustomPaint(
-            painter: DashedRectPainter(color: AppColors.grey.withOpacity(0.3)),
-            child: Container(
-              height: height ?? 200.h,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(D.radiusLG),
-              ),
-              child: image != null ? _buildImagePreview() : _buildUploadPlaceholder(),
-            ),
-          ),
-        ),
-        if (showActions) ...[
-          16.gapH,
-          Row(
+  void _showImageSourceBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(D.radiusXL)),
+      ),
+      builder: (BuildContext context) {
+        return Padding(
+          padding: EdgeInsets.fromLTRB(24.w, 12.h, 24.w, 40.h),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Expanded(
-                child: SecondaryButton(
-                  text: AppString.takePhoto,
-                  isFilled: true,
-                  icon: Icons.camera_alt_outlined,
-                  onPressed: () => onPickImage?.call(ImageSource.camera),
+              Container(
+                width: 40.w,
+                height: 4.h,
+                decoration: BoxDecoration(
+                  color: AppColors.grey.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              12.gapW,
-              Expanded(
-                child: SecondaryButton(
-                  text: AppString.upload,
-                  icon: Icons.file_upload_outlined,
-                  onPressed: () => onPickImage?.call(ImageSource.gallery),
+              24.gapH,
+              Text(
+                'Upload Photo',
+                style: TextStyle(
+                  fontSize: D.textLG,
+                  fontWeight: D.bold,
+                  color: AppColors.black,
+                  fontFamily: 'Segoe UI',
                 ),
+              ),
+              8.gapH,
+              Text(
+                'Choose how you want to upload your photo',
+                style: TextStyle(
+                  fontSize: D.textSM,
+                  color: AppColors.grey,
+                  fontFamily: 'Segoe UI',
+                ),
+                textAlign: TextAlign.center,
+              ),
+              24.gapH,
+              SecondaryButton(
+                text: AppString.takePhoto,
+                isFilled: true,
+                icon: Icons.camera_alt_outlined,
+                onPressed: () {
+                  Navigator.pop(context);
+                  onPickImage?.call(ImageSource.camera);
+                },
+              ),
+              12.gapH,
+              SecondaryButton(
+                text: AppString.upload,
+                icon: Icons.file_upload_outlined,
+                onPressed: () {
+                  Navigator.pop(context);
+                  onPickImage?.call(ImageSource.gallery);
+                },
               ),
             ],
           ),
-        ],
-      ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        if (image != null) {
+          onTap?.call();
+        } else {
+          _showImageSourceBottomSheet(context);
+        }
+      },
+      child: CustomPaint(
+        painter: DashedRectPainter(color: AppColors.grey.withOpacity(0.3)),
+        child: Container(
+          height: height ?? 200.h,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(D.radiusLG),
+          ),
+          child: image != null ? _buildImagePreview() : _buildUploadPlaceholder(),
+        ),
+      ),
     );
   }
 
@@ -118,13 +162,13 @@ class UploadImage extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
           child: SvgPicture.asset(
-           Assets.imageUploadIcon,
+            Assets.imageUploadIcon,
             width: 32.w,
             height: 32.w,
             colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
           ),
         ),
-        SizedBox(height: 12.h),
+        12.gapH,
         Text(
           title,
           style: TextStyle(
@@ -134,7 +178,7 @@ class UploadImage extends StatelessWidget {
             fontFamily: 'Segoe UI',
           ),
         ),
-        SizedBox(height: 4.h),
+        4.gapH,
         Text(
           subtitle,
           style: TextStyle(
@@ -150,6 +194,7 @@ class UploadImage extends StatelessWidget {
 
 class DashedRectPainter extends CustomPainter {
   final Color color;
+
   DashedRectPainter({required this.color});
 
   @override
@@ -165,6 +210,7 @@ class DashedRectPainter extends CustomPainter {
       Rect.fromLTWH(0, 0, size.width, size.height),
       Radius.circular(D.radiusLG),
     );
+
     Path path = Path()..addRRect(rrect);
 
     for (var measurePath in path.computeMetrics()) {

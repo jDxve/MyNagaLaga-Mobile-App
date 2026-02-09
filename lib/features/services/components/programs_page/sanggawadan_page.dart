@@ -493,7 +493,7 @@ class _SanggawadanPageState extends ConsumerState<SanggawadanPage> {
               subtitle:
                   isUploaded ? 'Tap to change' : 'Take photo or choose file',
               height: 120.h,
-              showActions: true,
+           //   showActions: true,
               onPickImage: (source) => _pickFile(requirement.id, source),
               onRemove: () =>
                   setState(() => uploadedFiles[requirement.id] = null),

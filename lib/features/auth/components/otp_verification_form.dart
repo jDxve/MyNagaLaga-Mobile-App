@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../common/models/dio/data_state.dart';
 import '../../../common/resources/assets.dart';
 import '../../../common/resources/colors.dart';
@@ -11,6 +12,7 @@ import '../../../common/widgets/error_modal.dart';
 import '../../../common/utils/ui_utils.dart';
 import '../notifier/otp_verification_notifier.dart';
 import '../notifier/auth_notifier.dart';
+import '../notifier/auth_session_notifier.dart';
 import '../../home/screens/home_screen.dart';
 import '../screens/login_screen.dart';
 
@@ -158,16 +160,17 @@ class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
       widget.isSignup
           ? signupOtpVerificationNotifierProvider
           : loginOtpVerificationNotifierProvider,
-      (previous, next) {
+      (previous, next) async {
         next.when(
           started: () {},
           loading: () {},
-          success: (data) {
+          success: (data) async {
             if (widget.isSignup) {
               showErrorModal(
                 context: context,
                 title: 'Signup Successful',
-                description: 'Your account has been created! Please login to continue.',
+                description:
+                    'Your account has been created! Please login to continue.',
                 icon: Icons.check_circle_outline,
                 iconColor: Colors.green,
                 barrierDismissible: false,
@@ -181,22 +184,39 @@ class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
                 },
               );
             } else {
-              showErrorModal(
-                context: context,
-                title: 'Login Successful',
-                description: 'Welcome back!',
-                icon: Icons.check_circle_outline,
-                iconColor: Colors.green,
-                barrierDismissible: false,
-                onButtonPressed: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamedAndRemoveUntil(
-                    context,
-                    HomeScreen.routeName,
-                    (route) => false,
+              // Get "Remember Me" preference
+              final prefs = await SharedPreferences.getInstance();
+              final stayLoggedIn = prefs.getBool('remember_me') ?? false;
+
+              // Save session with "Stay Logged In" preference
+              await ref
+                  .read(authSessionProvider.notifier)
+                  .saveSession(
+                    accessToken: data.session?.accessToken ?? '',
+                    email: data.userEmail ?? widget.email,
+                    userId: data.userId,
+                    fullName: data.mobileUser.fullName,
+                    stayLoggedIn: stayLoggedIn,
                   );
-                },
-              );
+
+              if (mounted) {
+                showErrorModal(
+                  context: context,
+                  title: 'Login Successful',
+                  description: 'Welcome back!',
+                  icon: Icons.check_circle_outline,
+                  iconColor: Colors.green,
+                  barrierDismissible: false,
+                  onButtonPressed: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      HomeScreen.routeName,
+                      (route) => false,
+                    );
+                  },
+                );
+              }
             }
           },
           error: (error) {

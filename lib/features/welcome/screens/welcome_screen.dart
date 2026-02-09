@@ -4,7 +4,6 @@ import '../../../common/resources/colors.dart';
 import '../../../common/resources/assets.dart';
 import '../../../common/resources/strings.dart';
 import '../../../common/resources/dimensions.dart';
-import '../../auth/screens/login_screen.dart';
 import 'onboarding_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -53,45 +52,10 @@ class _WelcomeScreen extends State<WelcomeScreen> {
             text: AppString.letsGetStarted,
             width: 210.w,
             icon: Icons.chevron_right,
-
             iconAtEnd: true,
             onPressed: () {
               Navigator.pushNamed(context, OnboardingScreen.routeName);
             },
-          ),
-          10.gapH,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                AppString.alreadyHaveAccount,
-                style: TextStyle(
-                  color: AppColors.grey,
-                  fontFamily: 'Manrope',
-                  fontSize: D.textXS,
-                  fontWeight: D.medium,
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const LogInScreen(),
-                    ),
-                  );
-                },
-                child: Text(
-                  AppString.signIn,
-                  style: TextStyle(
-                    color: AppColors.secondary,
-                    fontFamily: 'Manrope',
-                    fontSize: D.textXS,
-                    fontWeight: D.medium,
-                  ),
-                ),
-              ),
-            ],
           ),
         ],
       ),

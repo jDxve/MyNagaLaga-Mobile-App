@@ -469,7 +469,7 @@ class _ServiceRequestPageState extends ConsumerState<ServiceRequestPage> {
                 ? () => _removeDocument(0)
                 : null,
             onPickImage: (source) => _pickImage(source, 0),
-            showActions: true,
+        //    showActions: true,
             iconBackgroundColor: AppColors.lightPrimary,
             iconColor: AppColors.primary,
           ),
@@ -521,7 +521,7 @@ class _ServiceRequestPageState extends ConsumerState<ServiceRequestPage> {
                 ? () => _removeDocument(1)
                 : null,
             onPickImage: (source) => _pickImage(source, 1),
-            showActions: true,
+       //     showActions: true,
             iconBackgroundColor: AppColors.lightPrimary,
             iconColor: AppColors.primary,
           ),
@@ -573,7 +573,7 @@ class _ServiceRequestPageState extends ConsumerState<ServiceRequestPage> {
                 ? () => _removeDocument(2)
                 : null,
             onPickImage: (source) => _pickImage(source, 2),
-            showActions: true,
+   //         showActions: true,
             iconBackgroundColor: AppColors.lightPrimary,
             iconColor: AppColors.primary,
           ),

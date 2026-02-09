@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../common/models/dio/data_state.dart';
 import '../../../common/resources/assets.dart';
 import '../../../common/resources/colors.dart';
@@ -20,11 +21,42 @@ class LogInForm extends ConsumerStatefulWidget {
 
 class _LoginFormState extends ConsumerState<LogInForm> {
   final TextEditingController emailController = TextEditingController();
+  bool _rememberMe = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedEmail();
+  }
 
   @override
   void dispose() {
     emailController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadSavedEmail() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedEmail = prefs.getString('saved_email');
+    final rememberMe = prefs.getBool('remember_me') ?? false;
+
+    if (rememberMe && savedEmail != null) {
+      setState(() {
+        emailController.text = savedEmail;
+        _rememberMe = true;
+      });
+    }
+  }
+
+  Future<void> _saveEmailPreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (_rememberMe) {
+      await prefs.setString('saved_email', emailController.text.trim());
+      await prefs.setBool('remember_me', true);
+    } else {
+      await prefs.remove('saved_email');
+      await prefs.setBool('remember_me', false);
+    }
   }
 
   bool _validateForm() {
@@ -44,6 +76,8 @@ class _LoginFormState extends ConsumerState<LogInForm> {
 
   void _handleLogin() async {
     if (!_validateForm()) return;
+
+    await _saveEmailPreference();
 
     final loginNotifier = ref.read(loginNotifierProvider.notifier);
     await loginNotifier.requestLoginOtp(
@@ -148,7 +182,9 @@ class _LoginFormState extends ConsumerState<LogInForm> {
                   ),
                 ),
               ),
-              40.gapH,
+              16.gapH,
+              _buildRememberMeCheckbox(isLoading),
+              24.gapH,
               PrimaryButton(
                 text: isLoading ? 'Sending OTP...' : 'Sign In',
                 onPressed: isLoading ? () {} : _handleLogin,
@@ -186,6 +222,50 @@ class _LoginFormState extends ConsumerState<LogInForm> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildRememberMeCheckbox(bool isLoading) {
+    return GestureDetector(
+      onTap: isLoading
+          ? null
+          : () {
+              setState(() {
+                _rememberMe = !_rememberMe;
+              });
+            },
+      child: Row(
+        children: [
+          Container(
+            width: 15.w,
+            height: 15.w,
+            decoration: BoxDecoration(
+              color: _rememberMe ? AppColors.primary : Colors.white,
+              border: Border.all(
+                color: _rememberMe ? AppColors.primary : AppColors.grey,
+                width: 1.5,
+              ),
+              borderRadius: BorderRadius.circular(4.r),
+            ),
+            child: _rememberMe
+                ? Icon(
+                    Icons.check,
+                    size: 12.w,
+                    color: Colors.white,
+                  )
+                : null,
+          ),
+          8.gapW,
+          Text(
+            'Remember me',
+            style: TextStyle(
+              fontSize: D.textSM,
+              color: isLoading ? AppColors.grey : AppColors.black,
+              fontFamily: 'Segoe UI',
+            ),
+          ),
+        ],
       ),
     );
   }

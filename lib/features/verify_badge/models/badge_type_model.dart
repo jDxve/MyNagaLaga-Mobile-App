@@ -1,27 +1,16 @@
 class BadgeType {
   final String id;
   final String name;
-  final bool requiresExpiry;
-  final int? expiryDays;
-  final bool isActive;
 
   BadgeType({
     required this.id,
     required this.name,
-    required this.requiresExpiry,
-    this.expiryDays,
-    required this.isActive,
   });
 
-  factory BadgeType.fromJson(Map<String, dynamic> json) {
-    return BadgeType(
-      id: json['id'].toString(),
-      name: json['name'] ?? '',
-      requiresExpiry: json['requiresExpiry'] ?? false,
-      expiryDays: json['expiryDays'],
-      isActive: json['isActive'] ?? true,
-    );
-  }
+  factory BadgeType.fromJson(Map<String, dynamic> json) => BadgeType(
+        id: json['id']?.toString() ?? '',
+        name: json['name'] ?? '',
+      );
 
   String get badgeKey {
     final n = name.toLowerCase();
@@ -30,8 +19,26 @@ class BadgeType {
     if (n.contains('solo')) return 'solo_parent';
     if (n.contains('student')) return 'student';
     if (n.contains('indigent')) return 'indigent';
+    if (n.contains('citizen')) return 'citizen';
     return 'other';
   }
+}
 
-  static get student => null;
+class BadgeTypesResponse {
+  final bool success;
+  final List<BadgeType> data;
+
+  BadgeTypesResponse({
+    required this.success,
+    required this.data,
+  });
+
+  factory BadgeTypesResponse.fromJson(Map<String, dynamic> json) =>
+      BadgeTypesResponse(
+        success: json['success'] ?? false,
+        data: (json['data'] as List<dynamic>?)
+                ?.map((item) => BadgeType.fromJson(item as Map<String, dynamic>))
+                .toList() ??
+            [],
+      );
 }

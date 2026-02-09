@@ -46,10 +46,10 @@ class AppString {
       "For single parents raising children\nindependently";
   static const String indigentTitle = "Indigent";
   static const String indigentDescription =
-      "For citizens in need of financial assistance\nprograms";
+      "For citizens in need of financial assistance programs";
   static const String studentTitle = "Student";
   static const String studentDescription =
-      "For fare discounts, educational aid, and city\nlibrary access";
+      "For fare discounts, educational aid, and city library access";
 
   // Info card
   static const String whyApplyTitle = "Why apply for a Digital Badge?";

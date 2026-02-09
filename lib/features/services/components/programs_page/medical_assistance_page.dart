@@ -248,7 +248,7 @@ class _MedicalAssistancePageState extends State<MedicalAssistancePage> {
           title: AppString.uploadYourFile,
           subtitle: AppString.dragOrChoose,
           height: 150.h,
-          showActions: true,
+       //  showActions: true,
           onPickImage: _pickImage,
           onRemove: () => setState(() => uploadedDocument = null),
         ),

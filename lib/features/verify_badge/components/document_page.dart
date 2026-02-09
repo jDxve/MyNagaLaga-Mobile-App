@@ -289,7 +289,7 @@ class _DocumentPageState extends State<DocumentPage> {
           UploadImage(
             image: widget.supportingFile,
             title: "Upload your ID",
-            showActions: true,
+
             onPickImage: (source) => _pickImage(source, isSupporting: true),
             onRemove: () {
               widget.onSupportingFileChanged(null);

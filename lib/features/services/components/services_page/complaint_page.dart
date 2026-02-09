@@ -378,7 +378,7 @@ class _ComplaintPageState extends ConsumerState<ComplaintPage> {
             height: 180.h,
             onRemove: _removeImage,
             onPickImage: _pickImage,
-            showActions: true,
+           // showActions: true,
             iconBackgroundColor: AppColors.lightPrimary,
             iconColor: AppColors.primary,
           ),
