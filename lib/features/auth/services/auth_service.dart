@@ -4,7 +4,6 @@ import 'package:retrofit/retrofit.dart';
 import '../../../common/models/dio/api_client.dart';
 import '../models/auth_models.dart';
 
-
 part 'auth_service.g.dart';
 
 final authServiceProvider = Provider.autoDispose<AuthService>((ref) {

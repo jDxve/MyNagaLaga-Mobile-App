@@ -25,6 +25,7 @@ class PwdForm extends StatefulWidget {
 class _PwdFormState extends State<PwdForm> {
   final TextEditingController _disabilityTypeController = TextEditingController();
   
+  // Display labels (with spaces - user-friendly)
   final List<String> disabilityTypes = [
     'Visual Impairment',
     'Hearing Impairment',
@@ -36,6 +37,11 @@ class _PwdFormState extends State<PwdForm> {
     'Multiple Disabilities',
   ];
 
+  // Map display labels to backend values (with underscores)
+  String _convertToBackendFormat(String displayValue) {
+    return displayValue.replaceAll(' ', '_');
+  }
+
   @override
   void initState() {
     super.initState();
@@ -45,8 +51,14 @@ class _PwdFormState extends State<PwdForm> {
 
   void _validate() {
     final isValid = _disabilityTypeController.text.isNotEmpty;
+    
+    // Convert to backend format before sending
+    final backendValue = _disabilityTypeController.text.isNotEmpty
+        ? _convertToBackendFormat(_disabilityTypeController.text)
+        : '';
+    
     widget.setIsFormValid?.call(isValid, _showError);
-    widget.onDataChanged?.call({'typeOfDisability': _disabilityTypeController.text});
+    widget.onDataChanged?.call({'typeOfDisability': backendValue});
   }
 
   void _showError() {
@@ -83,7 +95,7 @@ class _PwdFormState extends State<PwdForm> {
         Dropdown(
           controller: _disabilityTypeController,
           hintText: AppString.selectDisabilityType,
-          items: disabilityTypes,
+          items: disabilityTypes, // Display with spaces
         ),
         24.gapH,
         BenefitsCard(
@@ -98,4 +110,4 @@ class _PwdFormState extends State<PwdForm> {
       ],
     );
   }
-}
+} 

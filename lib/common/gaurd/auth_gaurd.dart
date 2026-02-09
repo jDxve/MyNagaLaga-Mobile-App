@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mynagalaga_mobile_app/features/auth/screens/login_screen.dart';
-import 'package:mynagalaga_mobile_app/features/auth/notifier/auth_session_notifier.dart';
+import '../../features/auth/screens/login_screen.dart';
+import '../../features/auth/notifier/auth_session_notifier.dart';
 
 class AuthGuard extends ConsumerWidget {
   final Widget child;
+
   const AuthGuard({super.key, required this.child});
 
   @override
@@ -18,7 +19,16 @@ class AuthGuard extends ConsumerWidget {
     }
 
     if (!session.isAuthenticated) {
-      return const LogInScreen();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          LogInScreen.routeName,
+          (route) => false,
+        );
+      });
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
     }
 
     return child;

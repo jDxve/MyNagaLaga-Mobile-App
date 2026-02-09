@@ -34,6 +34,10 @@ class UIUtils {
     if (value.trim().length < 2) {
       return 'Full name must be at least 2 characters';
     }
+    final nameRegex = RegExp(r"^[a-zA-Z\s\-'.]+$");
+    if (!nameRegex.hasMatch(value.trim())) {
+      return 'Full name can only contain letters, spaces, hyphens, and apostrophes';
+    }
     return null;
   }
 
@@ -42,86 +46,88 @@ class UIUtils {
       return 'Address is required';
     }
     if (value.trim().length < 5) {
-      return 'Please enter a complete address';
+      return 'Please enter a complete address (minimum 5 characters)';
+    }
+    if (value.trim().length > 200) {
+      return 'Address is too long (maximum 200 characters)';
     }
     return null;
   }
 
   static String? validatePhoneNumber(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return null; // Optional field
+      return null;
     }
+    
+    final cleaned = value.trim().replaceAll(RegExp(r'[\s\-\(\)]'), '');
     final phoneRegex = RegExp(r'^(09|\+639)\d{9}$');
-    if (!phoneRegex.hasMatch(value.trim().replaceAll(' ', ''))) {
-      return 'Please enter a valid Philippine mobile number';
+    
+    if (!phoneRegex.hasMatch(cleaned)) {
+      return 'Please enter a valid Philippine mobile number (09XXXXXXXXX)';
     }
     return null;
   }
 
   static String? validateOtp(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'OTP is required';
+      return 'OTP code is required';
     }
-    if (value.trim().length != 6) {
-      return 'OTP must be 6 digits';
+    
+    final cleaned = value.trim().replaceAll(RegExp(r'\s'), '');
+    
+    if (cleaned.length != 6) {
+      return 'OTP must be exactly 6 digits';
     }
-    if (!RegExp(r'^\d+$').hasMatch(value.trim())) {
+    
+    if (!RegExp(r'^\d{6}$').hasMatch(cleaned)) {
       return 'OTP must contain only numbers';
     }
+    
     return null;
   }
 
-  /// Converts date from MM/dd/yyyy format to yyyy-MM-dd format (for API)
   static String convertDateToApiFormat(String date) {
     try {
       final parsed = DateFormat('MM/dd/yyyy').parse(date);
       return DateFormat('yyyy-MM-dd').format(parsed);
     } catch (e) {
-      // If parsing fails, try to return as-is or handle error
       return date;
     }
   }
 
-  /// Converts date from yyyy-MM-dd format to MM/dd/yyyy format (for display)
   static String convertDateToDisplayFormat(String date) {
     try {
       final parsed = DateFormat('yyyy-MM-dd').parse(date);
       return DateFormat('MM/dd/yyyy').format(parsed);
     } catch (e) {
-      // If parsing fails, return as-is
       return date;
     }
   }
 
-  /// Formats a DateTime to yyyy-MM-dd format
   static String formatDateForApi(DateTime date) {
     return DateFormat('yyyy-MM-dd').format(date);
   }
 
-  /// Formats a DateTime to MM/dd/yyyy format
   static String formatDateForDisplay(DateTime date) {
     return DateFormat('MM/dd/yyyy').format(date);
   }
 
-  /// Converts gender from lowercase to proper case (for API)
   static String convertGenderToApiFormat(String? gender) {
     if (gender == null) return 'Male';
     if (gender.toLowerCase() == 'male') return 'Male';
     if (gender.toLowerCase() == 'female') return 'Female';
-    return 'Male'; // Default
+    return 'Male';
   }
 
-  /// Converts gender from proper case to lowercase (for display)
   static String convertGenderToDisplayFormat(String? gender) {
     if (gender == null) return 'male';
     if (gender.toLowerCase() == 'male') return 'male';
     if (gender.toLowerCase() == 'female') return 'female';
-    return 'male'; // Default
+    return 'male';
   }
 
-  /// Formats phone number with +63 prefix
   static String formatPhoneWithPrefix(String phone) {
-    final cleaned = phone.trim().replaceAll(' ', '');
+    final cleaned = phone.trim().replaceAll(RegExp(r'[\s\-\(\)]'), '');
     if (cleaned.startsWith('+63')) {
       return cleaned;
     } else if (cleaned.startsWith('09')) {
@@ -132,9 +138,8 @@ class UIUtils {
     return '+63$cleaned';
   }
 
-  /// Removes +63 prefix from phone number
   static String formatPhoneWithoutPrefix(String phone) {
-    final cleaned = phone.trim().replaceAll(' ', '');
+    final cleaned = phone.trim().replaceAll(RegExp(r'[\s\-\(\)]'), '');
     if (cleaned.startsWith('+63')) {
       return '0${cleaned.substring(3)}';
     } else if (cleaned.startsWith('63')) {
@@ -173,11 +178,10 @@ class UIUtils {
     "School ID",
     "Other",
   ];
-  
+
   static String convertIdTypeToApiFormat(String? displayIdType) {
     if (displayIdType == null || displayIdType.isEmpty) return 'OTHER';
 
-    // Map display names to backend enum values
     final idTypeMap = {
       "Driver's License": 'DRIVERS_LICENSE',
       'Drivers License': 'DRIVERS_LICENSE',

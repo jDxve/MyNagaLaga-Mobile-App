@@ -274,11 +274,12 @@ class _ShelterMapState extends State<ShelterMap> with OSMMixinObserver {
         ),
         userTrackingOption: UserTrackingOption(
           enableTracking: true,
-          unFollowUser: false,
+          unFollowUser: true, // ✅ Changed to true - allows free movement
         ),
         showDefaultInfoWindow: false,
         enableRotationByGesture: false,
         isPicker: false,
+        showZoomController: widget.isFullScreen, // ✅ Added zoom controls for fullscreen
       ),
     );
 

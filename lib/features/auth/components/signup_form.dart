@@ -72,16 +72,18 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
       return false;
     }
 
-    final phoneError = UIUtils.validatePhoneNumber(phoneController.text);
-    if (phoneError != null) {
-      showErrorModal(
-        context: context,
-        title: 'Invalid Phone Number',
-        description: phoneError,
-        icon: Icons.phone_outlined,
-        iconColor: Colors.orange,
-      );
-      return false;
+    if (phoneController.text.trim().isNotEmpty) {
+      final phoneError = UIUtils.validatePhoneNumber(phoneController.text);
+      if (phoneError != null) {
+        showErrorModal(
+          context: context,
+          title: 'Invalid Phone Number',
+          description: phoneError,
+          icon: Icons.phone_outlined,
+          iconColor: Colors.orange,
+        );
+        return false;
+      }
     }
 
     if (selectedSex == null) {
@@ -102,7 +104,6 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
     if (!_validateForm()) return;
 
     final signupNotifier = ref.read(signupNotifierProvider.notifier);
-
     await signupNotifier.requestSignupOtp(
       email: emailController.text.trim(),
       fullName: fullNameController.text.trim(),
@@ -164,19 +165,18 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
         ),
       ),
       child: SafeArea(
-        child: SingleChildScrollView(
+        child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              70.gapH,
               Image.asset(
                 Assets.logo,
-                width: 120.w,
-                height: 85.h,
+                width: 100.w,
+                height: 65.h,
                 fit: BoxFit.contain,
               ),
-              20.gapH,
+              2.gapH,
               Text(
                 'Welcome to MyNaga',
                 style: TextStyle(
@@ -186,104 +186,139 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                   fontFamily: 'Segoe UI',
                 ),
               ),
-              4.gapH,
+              2.gapH,
               Text(
                 'Create your account',
                 style: TextStyle(
-                  fontSize: D.textBase,
+                  fontSize: D.textSM,
                   fontWeight: D.semiBold,
                   color: AppColors.grey,
                   fontFamily: 'Segoe UI',
                 ),
               ),
-              30.gapH,
-              _buildLabel('Email Address'),
-              8.gapH,
-              AbsorbPointer(
-                absorbing: isLoading,
-                child: Opacity(
-                  opacity: isLoading ? 0.5 : 1.0,
-                  child: TextInput(
-                    controller: emailController,
-                    hintText: 'Enter your email address',
-                    prefixIcon: Icon(Icons.email_outlined, color: AppColors.grey),
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                ),
-              ),
-              15.gapH,
-              _buildLabel('Full Name'),
-              8.gapH,
-              AbsorbPointer(
-                absorbing: isLoading,
-                child: Opacity(
-                  opacity: isLoading ? 0.5 : 1.0,
-                  child: TextInput(
-                    controller: fullNameController,
-                    hintText: 'Enter your full name',
-                    prefixIcon: Icon(Icons.person_outline, color: AppColors.grey),
-                  ),
-                ),
-              ),
-              15.gapH,
-              _buildLabel('Complete Address'),
-              8.gapH,
-              AbsorbPointer(
-                absorbing: isLoading,
-                child: Opacity(
-                  opacity: isLoading ? 0.5 : 1.0,
-                  child: TextInput(
-                    controller: addressController,
-                    hintText: 'Enter complete address',
-                    prefixIcon: Icon(
-                      Icons.location_on_outlined,
-                      color: AppColors.grey,
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildLabel('Email Address'),
+                        6.gapH,
+                        AbsorbPointer(
+                          absorbing: isLoading,
+                          child: Opacity(
+                            opacity: isLoading ? 0.5 : 1.0,
+                            child: TextInput(
+                              controller: emailController,
+                              hintText: 'Enter your email address',
+                              prefixIcon: Icon(
+                                Icons.email_outlined,
+                                color: AppColors.grey,
+                              ),
+                              keyboardType: TextInputType.emailAddress,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildLabel('Full Name'),
+                        6.gapH,
+                        AbsorbPointer(
+                          absorbing: isLoading,
+                          child: Opacity(
+                            opacity: isLoading ? 0.5 : 1.0,
+                            child: TextInput(
+                              controller: fullNameController,
+                              hintText: 'Enter your full name',
+                              prefixIcon: Icon(
+                                Icons.person_outline,
+                                color: AppColors.grey,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildLabel('Complete Address'),
+                        6.gapH,
+                        AbsorbPointer(
+                          absorbing: isLoading,
+                          child: Opacity(
+                            opacity: isLoading ? 0.5 : 1.0,
+                            child: TextInput(
+                              controller: addressController,
+                              hintText: 'Enter complete address',
+                              prefixIcon: Icon(
+                                Icons.location_on_outlined,
+                                color: AppColors.grey,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildLabel('Phone Number (Optional)'),
+                        6.gapH,
+                        AbsorbPointer(
+                          absorbing: isLoading,
+                          child: Opacity(
+                            opacity: isLoading ? 0.5 : 1.0,
+                            child: TextInput(
+                              controller: phoneController,
+                              hintText: 'Enter phone number',
+                              prefixIcon: Icon(
+                                Icons.phone_outlined,
+                                color: AppColors.grey,
+                              ),
+                              keyboardType: TextInputType.phone,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildLabel('Sex'),
+                        6.gapH,
+                        AbsorbPointer(
+                          absorbing: isLoading,
+                          child: Opacity(
+                            opacity: isLoading ? 0.5 : 1.0,
+                            child: Toggle(
+                              selectedValue: selectedSex,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedSex = value;
+                                });
+                              },
+                              firstLabel: 'Male',
+                              firstValue: 'Male',
+                              secondLabel: 'Female',
+                              secondValue: 'Female',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              15.gapH,
-              _buildLabel('Phone Number (Optional)'),
-              8.gapH,
-              AbsorbPointer(
-                absorbing: isLoading,
-                child: Opacity(
-                  opacity: isLoading ? 0.5 : 1.0,
-                  child: TextInput(
-                    controller: phoneController,
-                    hintText: 'Enter phone number',
-                    prefixIcon: Icon(Icons.phone_outlined, color: AppColors.grey),
-                    keyboardType: TextInputType.phone,
-                  ),
-                ),
-              ),
-              15.gapH,
-              _buildLabel('Sex'),
-              8.gapH,
-              AbsorbPointer(
-                absorbing: isLoading,
-                child: Opacity(
-                  opacity: isLoading ? 0.5 : 1.0,
-                  child: Toggle(
-                    selectedValue: selectedSex,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedSex = value;
-                      });
-                    },
-                    firstLabel: 'Male',
-                    firstValue: 'Male',
-                    secondLabel: 'Female',
-                    secondValue: 'Female',
-                  ),
-                ),
-              ),
-              40.gapH,
               PrimaryButton(
                 text: isLoading ? 'Sending OTP...' : 'Sign Up',
                 onPressed: isLoading ? () {} : _handleSignup,
               ),
-              20.gapH,
+              12.gapH,
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -320,7 +355,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
     return Text(
       text,
       style: TextStyle(
-        fontSize: D.textBase,
+        fontSize: D.textSM,
         fontWeight: D.medium,
         color: AppColors.black,
         fontFamily: 'Segoe UI',

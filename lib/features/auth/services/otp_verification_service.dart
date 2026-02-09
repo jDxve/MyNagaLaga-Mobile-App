@@ -6,7 +6,8 @@ import '../models/otp_model.dart';
 
 part 'otp_verification_service.g.dart';
 
-final otpVerificationServiceProvider = Provider.autoDispose<OtpVerificationService>((ref) {
+final otpVerificationServiceProvider =
+    Provider.autoDispose<OtpVerificationService>((ref) {
   final apiClient = ApiClient.fromEnv();
   final dio = apiClient.create();
   return OtpVerificationService(dio);
@@ -14,7 +15,8 @@ final otpVerificationServiceProvider = Provider.autoDispose<OtpVerificationServi
 
 @RestApi()
 abstract class OtpVerificationService {
-  factory OtpVerificationService(Dio dio, {String? baseUrl}) = _OtpVerificationService;
+  factory OtpVerificationService(Dio dio, {String? baseUrl}) =
+      _OtpVerificationService;
 
   @POST('/mobile-auth/signup/verify-otp')
   Future<HttpResponse<VerifyOtpResponse>> verifySignupOtp({

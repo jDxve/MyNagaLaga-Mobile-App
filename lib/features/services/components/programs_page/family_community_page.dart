@@ -83,9 +83,9 @@ class _FamilyCommunityPageState extends ConsumerState<FamilyCommunityPage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to pick file: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to pick file: $e')));
       }
     }
   }
@@ -258,15 +258,15 @@ class _FamilyCommunityPageState extends ConsumerState<FamilyCommunityPage> {
           success: (data) => 'Failed to submit request',
           error: (error) => error ?? 'Failed to submit request',
         );
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(errorMessage)));
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     } finally {
       if (mounted) {
         setState(() => _isSubmitting = false);
@@ -340,10 +340,10 @@ class _FamilyCommunityPageState extends ConsumerState<FamilyCommunityPage> {
           controller: familyMemberController,
           hintText: AppString.selectFamilyMember,
           items: const [
-            'Juan Dela Cruz (Father)',
-            'Maria Santos (Mother)',
-            'Jose Rizal (Grandfather)',
-            'Rosa Cruz (Grandmother)',
+            'Kristine A. Mendoza (Spouse)',
+            'Jay Bombales (Son)',
+            'Juan Dela Cruz (Son)',
+            'Jose Santos (Father)',
           ],
         ),
         20.gapH,
@@ -525,8 +525,9 @@ class _FamilyCommunityPageState extends ConsumerState<FamilyCommunityPage> {
               title: isUploaded
                   ? 'Document uploaded'
                   : 'Upload document ${requirement.order}',
-              subtitle:
-                  isUploaded ? 'Tap to change' : 'Take photo or choose file',
+              subtitle: isUploaded
+                  ? 'Tap to change'
+                  : 'Take photo or choose file',
               height: 120.h,
               showActions: true,
               onPickImage: (source) => _pickFile(requirement.id, source),

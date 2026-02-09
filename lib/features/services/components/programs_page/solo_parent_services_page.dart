@@ -32,11 +32,12 @@ class _SoloParentServicesPageState extends State<SoloParentServicesPage> {
   String? selectedRecipient = Constant.forMe;
   final TextEditingController reasonController = TextEditingController();
   final TextEditingController familyMemberController = TextEditingController();
-  final TextEditingController applicationTypeController = TextEditingController();
-  
+  final TextEditingController applicationTypeController =
+      TextEditingController();
+
   // List to store multiple children
   List<TextEditingController> childrenControllers = [TextEditingController()];
-  
+
   File? uploadedDocument;
 
   @override
@@ -114,10 +115,7 @@ class _SoloParentServicesPageState extends State<SoloParentServicesPage> {
                       label: AppString.fullName,
                       value: widget.userName,
                     ),
-                    InfoCardItem(
-                      label: AppString.age,
-                      value: widget.userAge,
-                    ),
+                    InfoCardItem(label: AppString.age, value: widget.userAge),
                   ],
                 ),
                 20.gapH,
@@ -152,9 +150,9 @@ class _SoloParentServicesPageState extends State<SoloParentServicesPage> {
           controller: familyMemberController,
           hintText: AppString.selectFamilyMember,
           items: const [
-            'Maria Santos (Spouse)',
-            'John Santos (Son)',
-            'Jane Santos (Daughter)',
+            'Kristine A. Mendoza (Spouse)',
+            'Jay Bombales (Son)',
+            'Juan Dela Cruz (Son)',
             'Jose Santos (Father)',
           ],
         ),
@@ -164,11 +162,7 @@ class _SoloParentServicesPageState extends State<SoloParentServicesPage> {
         Dropdown(
           controller: applicationTypeController,
           hintText: 'Select type',
-          items: const [
-            'New Application',
-            'Renewal',
-            'Lost ID Replacement',
-          ],
+          items: const ['New Application', 'Renewal', 'Lost ID Replacement'],
         ),
         16.gapH,
         _buildChildrenNamesSection(),

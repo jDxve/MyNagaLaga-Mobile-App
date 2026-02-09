@@ -3,11 +3,7 @@ class LoginRequest {
 
   LoginRequest({required this.email});
 
-  Map<String, dynamic> toJson() {
-    return {
-      'email': email,
-    };
-  }
+  Map<String, dynamic> toJson() => {'email': email};
 }
 
 class SignupRequest {
@@ -25,15 +21,13 @@ class SignupRequest {
     this.phoneNumber,
   });
 
-  Map<String, dynamic> toJson() {
-    return {
-      'email': email,
-      'fullName': fullName,
-      'sex': sex,
-      'address': address,
-      if (phoneNumber != null) 'phoneNumber': phoneNumber,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+        'email': email,
+        'fullName': fullName,
+        'sex': sex,
+        'address': address,
+        if (phoneNumber != null) 'phoneNumber': phoneNumber,
+      };
 }
 
 class OtpResponse {
@@ -42,24 +36,20 @@ class OtpResponse {
   OtpResponse({required this.sent});
 
   factory OtpResponse.fromJson(Map<String, dynamic> json) {
-    // Backend returns { success: true, data: { sent: true } }
     if (json.containsKey('data') && json['data'] is Map<String, dynamic>) {
-      return OtpResponse(
-        sent: json['data']['sent'] ?? false,
-      );
+      return OtpResponse(sent: json['data']['sent'] ?? false);
     }
-    return OtpResponse(
-      sent: json['sent'] ?? false,
-    );
+    return OtpResponse(sent: json['sent'] ?? false);
   }
 }
+
 class AuthSessionState {
   final bool isAuthenticated;
   final bool isLoading;
   final String? userId;
   final String? email;
   final String? fullName;
-  final String? barangayId;  // ← Add this
+  final String? barangayId;
   final String? accessToken;
 
   AuthSessionState({
@@ -68,7 +58,7 @@ class AuthSessionState {
     this.userId,
     this.email,
     this.fullName,
-    this.barangayId,  // ← Add this
+    this.barangayId,
     this.accessToken,
   });
 

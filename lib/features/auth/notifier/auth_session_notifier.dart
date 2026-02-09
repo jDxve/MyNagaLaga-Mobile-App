@@ -1,15 +1,15 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../models/auth_models.dart';
 
 class AuthSessionNotifier extends Notifier<AuthSessionState> {
   final _storage = const FlutterSecureStorage();
+
   static const _tokenKey = 'access_token';
   static const _emailKey = 'user_email';
   static const _userIdKey = 'user_id';
   static const _fullNameKey = 'full_name';
-  static const _barangayIdKey = 'barangay_id';  // ✅ ADD THIS
+  static const _barangayIdKey = 'barangay_id';
 
   @override
   AuthSessionState build() {
@@ -18,29 +18,27 @@ class AuthSessionNotifier extends Notifier<AuthSessionState> {
   }
 
   Future<void> _checkSession() async {
-    final token = await _storage.read(key: _tokenKey);
-    final email = await _storage.read(key: _emailKey);
-    final userId = await _storage.read(key: _userIdKey);
-    final fullName = await _storage.read(key: _fullNameKey);
-    final barangayId = await _storage.read(key: _barangayIdKey);  // ✅ ADD THIS
+    try {
+      final token = await _storage.read(key: _tokenKey);
+      final email = await _storage.read(key: _emailKey);
+      final userId = await _storage.read(key: _userIdKey);
+      final fullName = await _storage.read(key: _fullNameKey);
+      final barangayId = await _storage.read(key: _barangayIdKey);
 
-    debugPrint('📖 Reading session from storage:');
-    debugPrint('   Email: $email');
-    debugPrint('   User ID: $userId');
-    debugPrint('   Full Name: $fullName');
-    debugPrint('   Barangay ID: $barangayId');  // ✅ ADD THIS
-
-    if (token != null && token.isNotEmpty) {
-      state = AuthSessionState(
-        isAuthenticated: true,
-        isLoading: false,
-        userId: userId,
-        email: email,
-        fullName: fullName,
-        barangayId: barangayId,  // ✅ ADD THIS
-        accessToken: token,
-      );
-    } else {
+      if (token != null && token.isNotEmpty) {
+        state = AuthSessionState(
+          isAuthenticated: true,
+          isLoading: false,
+          userId: userId,
+          email: email,
+          fullName: fullName,
+          barangayId: barangayId,
+          accessToken: token,
+        );
+      } else {
+        state = AuthSessionState.empty();
+      }
+    } catch (e) {
       state = AuthSessionState.empty();
     }
   }
@@ -50,35 +48,33 @@ class AuthSessionNotifier extends Notifier<AuthSessionState> {
     required String email,
     required String userId,
     String? fullName,
-    String? barangayId,  // ✅ ADD THIS
+    String? barangayId,
   }) async {
-    debugPrint('💾 Saving session:');
-    debugPrint('   Email: $email');
-    debugPrint('   User ID: $userId');
-    debugPrint('   Full Name: $fullName');
-    debugPrint('   Barangay ID: $barangayId');  // ✅ ADD THIS
+    try {
+      await _storage.write(key: _tokenKey, value: accessToken);
+      await _storage.write(key: _emailKey, value: email);
+      await _storage.write(key: _userIdKey, value: userId);
 
-    await _storage.write(key: _tokenKey, value: accessToken);
-    await _storage.write(key: _emailKey, value: email);
-    await _storage.write(key: _userIdKey, value: userId);
-    
-    if (fullName != null) {
-      await _storage.write(key: _fullNameKey, value: fullName);
-    }
-    
-    if (barangayId != null) {
-      await _storage.write(key: _barangayIdKey, value: barangayId);  // ✅ ADD THIS
-    }
+      if (fullName != null) {
+        await _storage.write(key: _fullNameKey, value: fullName);
+      }
 
-    state = AuthSessionState(
-      isAuthenticated: true,
-      isLoading: false,
-      userId: userId,
-      email: email,
-      fullName: fullName,
-      barangayId: barangayId,  // ✅ ADD THIS
-      accessToken: accessToken,
-    );
+      if (barangayId != null) {
+        await _storage.write(key: _barangayIdKey, value: barangayId);
+      }
+
+      state = AuthSessionState(
+        isAuthenticated: true,
+        isLoading: false,
+        userId: userId,
+        email: email,
+        fullName: fullName,
+        barangayId: barangayId,
+        accessToken: accessToken,
+      );
+    } catch (e) {
+      state = AuthSessionState.empty();
+    }
   }
 
   Future<void> logout() async {
@@ -87,6 +83,7 @@ class AuthSessionNotifier extends Notifier<AuthSessionState> {
   }
 }
 
-final authSessionProvider = NotifierProvider<AuthSessionNotifier, AuthSessionState>(
+final authSessionProvider =
+    NotifierProvider<AuthSessionNotifier, AuthSessionState>(
   AuthSessionNotifier.new,
 );

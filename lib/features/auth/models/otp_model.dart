@@ -9,12 +9,10 @@ class OtpVerificationRequest {
     required this.token,
   });
 
-  Map<String, dynamic> toJson() {
-    return {
-      'email': email,
-      'token': token,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+        'email': email,
+        'token': token,
+      };
 }
 
 class SessionData {
@@ -33,12 +31,10 @@ class SessionData {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'access_token': accessToken,
-      'token_type': tokenType,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+        'access_token': accessToken,
+        'token_type': tokenType,
+      };
 }
 
 class VerifyOtpResponse {
@@ -55,12 +51,10 @@ class VerifyOtpResponse {
   });
 
   factory VerifyOtpResponse.fromJson(Map<String, dynamic> json) {
-    // Backend wraps response in { success: true, data: {...} }
     final data = json['data'] ?? json;
-    
     return VerifyOtpResponse(
-      session: data['session'] != null 
-          ? SessionData.fromJson(data['session']) 
+      session: data['session'] != null
+          ? SessionData.fromJson(data['session'])
           : null,
       userId: data['user']?['id']?.toString() ?? '',
       userEmail: data['user']?['email'],

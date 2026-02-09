@@ -46,7 +46,6 @@ class _LoginFormState extends ConsumerState<LogInForm> {
     if (!_validateForm()) return;
 
     final loginNotifier = ref.read(loginNotifierProvider.notifier);
-
     await loginNotifier.requestLoginOtp(
       email: emailController.text.trim(),
     );
@@ -67,6 +66,7 @@ class _LoginFormState extends ConsumerState<LogInForm> {
               MaterialPageRoute(
                 builder: (context) => OtpVerificationForm(
                   email: emailController.text.trim(),
+                  isSignup: false,
                 ),
               ),
             );

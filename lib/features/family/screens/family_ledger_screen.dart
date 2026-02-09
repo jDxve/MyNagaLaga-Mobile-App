@@ -57,7 +57,7 @@ class _FamilyLedgerScreenState extends ConsumerState<FamilyLedgerScreen> {
     
     // Temporary: Set household ID (replace with actual API call)
     setState(() {
-      _householdId = '7'; // Replace with actual household ID from API
+      _householdId = '13'; // Replace with actual household ID from API
       _isLoadingHousehold = false;
     });
 

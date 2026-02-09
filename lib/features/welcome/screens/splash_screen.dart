@@ -1,56 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../home/screens/home_screen.dart';
+import '../../auth/notifier/auth_session_notifier.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/strings.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/resources/assets.dart';
 import 'welcome_screen.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   static const routeName = '/splash';
-  
+
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _checkFirstInstall();
+    _initialize();
   }
 
-Future<void> _checkFirstInstall() async {
+  Future<void> _initialize() async {
     await Future.delayed(const Duration(seconds: 3));
-    
+
+    if (!mounted) return;
+
+    final session = ref.read(authSessionProvider);
     final prefs = await SharedPreferences.getInstance();
     final isFirstInstall = prefs.getBool('isFirstInstall') ?? true;
 
     if (!mounted) return;
 
-    if (isFirstInstall) {
+    if (session.isAuthenticated) {
+      Navigator.pushReplacementNamed(context, HomeScreen.routeName);
+    } else if (isFirstInstall) {
       await prefs.setBool('isFirstInstall', false);
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) => const WelcomeScreen(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
+      Navigator.pushReplacementNamed(context, WelcomeScreen.routeName);
     } else {
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) => const HomeScreen(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
+      Navigator.pushReplacementNamed(context, WelcomeScreen.routeName);
     }
   }
 

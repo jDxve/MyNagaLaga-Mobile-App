@@ -15,9 +15,7 @@ final loginNotifierProvider =
 
 class SignupNotifier extends Notifier<DataState<OtpResponse>> {
   @override
-  DataState<OtpResponse> build() {
-    return const DataState.started();
-  }
+  DataState<OtpResponse> build() => const DataState.started();
 
   Future<void> requestSignupOtp({
     required String email,
@@ -48,13 +46,9 @@ class SignupNotifier extends Notifier<DataState<OtpResponse>> {
 
 class LoginNotifier extends Notifier<DataState<OtpResponse>> {
   @override
-  DataState<OtpResponse> build() {
-    return const DataState.started();
-  }
+  DataState<OtpResponse> build() => const DataState.started();
 
-  Future<void> requestLoginOtp({
-    required String email,
-  }) async {
+  Future<void> requestLoginOtp({required String email}) async {
     state = const DataState.loading();
 
     final repository = ref.read(authRepositoryProvider);

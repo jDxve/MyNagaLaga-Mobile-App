@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../common/models/dio/data_state.dart';
 import '../../../common/models/responses/error_response.dart';
@@ -15,37 +14,19 @@ final authRepositoryProvider = Provider.autoDispose<AuthRepositoryImpl>((ref) {
 class AuthRepositoryImpl implements AuthRepository {
   final AuthService _service;
 
-  AuthRepositoryImpl({
-    required AuthService service,
-  }) : _service = service;
+  AuthRepositoryImpl({required AuthService service}) : _service = service;
 
   @override
   Future<DataState<OtpResponse>> requestSignupOtp({
     required SignupRequest request,
   }) async {
     try {
-      debugPrint('📤 Sending signup OTP request: ${request.toJson()}');
       final response = await _service.requestSignupOtp(request: request);
-      debugPrint('📥 Signup OTP response: ${response.data}');
       return DataState.success(data: response.data);
     } on DioException catch (e) {
-      debugPrint('❌ DioException status: ${e.response?.statusCode}');
-      debugPrint('❌ DioException data: ${e.response?.data}');
-      
-      if (e.response?.data != null) {
-        final errorResponse = ErrorResponse.fromMap(
-          e.response!.data as Map<String, dynamic>,
-        );
-        return DataState.error(
-          error: errorResponse.message ?? 'Failed to send OTP',
-        );
-      }
-      return DataState.error(
-        error: e.message ?? 'Network error occurred',
-      );
+      return _handleDioError(e, 'Failed to send OTP');
     } catch (e) {
-      debugPrint('❌ Unexpected error: $e');
-      return DataState.error(error: 'An unexpected error occurred: $e');
+      return DataState.error(error: 'An unexpected error occurred');
     }
   }
 
@@ -54,28 +35,65 @@ class AuthRepositoryImpl implements AuthRepository {
     required LoginRequest request,
   }) async {
     try {
-      debugPrint('📤 Sending login OTP request: ${request.toJson()}');
       final response = await _service.requestLoginOtp(request: request);
-      debugPrint('📥 Login OTP response: ${response.data}');
       return DataState.success(data: response.data);
     } on DioException catch (e) {
-      debugPrint('❌ DioException status: ${e.response?.statusCode}');
-      debugPrint('❌ DioException data: ${e.response?.data}');
-      
-      if (e.response?.data != null) {
+      return _handleDioError(e, 'Failed to send OTP');
+    } catch (e) {
+      return DataState.error(error: 'An unexpected error occurred');
+    }
+  }
+
+  DataState<OtpResponse> _handleDioError(DioException e, String defaultMessage) {
+    if (e.type == DioExceptionType.connectionTimeout ||
+        e.type == DioExceptionType.sendTimeout ||
+        e.type == DioExceptionType.receiveTimeout) {
+      return DataState.error(
+        error: 'Connection timeout. Please check your internet connection.',
+      );
+    }
+
+    if (e.type == DioExceptionType.connectionError) {
+      return DataState.error(
+        error: 'Cannot connect to server. Please check your internet connection.',
+      );
+    }
+
+    final statusCode = e.response?.statusCode;
+
+    if (statusCode == 404) {
+      return DataState.error(error: 'Service not found. Please contact support.');
+    }
+
+    if (statusCode == 500 || statusCode == 502 || statusCode == 503) {
+      return DataState.error(
+        error: 'Server error. Please try again later.',
+      );
+    }
+
+    if (statusCode == 429) {
+      return DataState.error(
+        error: 'Too many requests. Please wait a moment and try again.',
+      );
+    }
+
+    if (statusCode == 409) {
+      return DataState.error(
+        error: 'Email already registered. Please login instead.',
+      );
+    }
+
+    if (e.response?.data != null) {
+      try {
         final errorResponse = ErrorResponse.fromMap(
           e.response!.data as Map<String, dynamic>,
         );
-        return DataState.error(
-          error: errorResponse.message ?? 'Failed to send OTP',
-        );
+        return DataState.error(error: errorResponse.message ?? defaultMessage);
+      } catch (_) {
+        return DataState.error(error: defaultMessage);
       }
-      return DataState.error(
-        error: e.message ?? 'Network error occurred',
-      );
-    } catch (e) {
-      debugPrint('❌ Unexpected error: $e');
-      return DataState.error(error: 'An unexpected error occurred: $e');
     }
+
+    return DataState.error(error: e.message ?? defaultMessage);
   }
 }

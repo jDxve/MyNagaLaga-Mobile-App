@@ -12,6 +12,7 @@ import '../../../common/utils/ui_utils.dart';
 import '../notifier/otp_verification_notifier.dart';
 import '../notifier/auth_notifier.dart';
 import '../../home/screens/home_screen.dart';
+import '../screens/login_screen.dart';
 
 class OtpVerificationForm extends ConsumerStatefulWidget {
   final String email;
@@ -29,7 +30,7 @@ class OtpVerificationForm extends ConsumerStatefulWidget {
 }
 
 class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
-  int _remainingSeconds = 300;
+  int _remainingSeconds = 120;
   Timer? _timer;
   String _otpCode = '';
 
@@ -60,30 +61,46 @@ class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
 
   void _resendCode() async {
     setState(() {
-      _remainingSeconds = 300;
+      _remainingSeconds = 120;
     });
     _startTimer();
 
     if (widget.isSignup) {
-      // Resend OTP for signup
-      final signupNotifier = ref.read(signupNotifierProvider.notifier);
-      await signupNotifier.requestSignupOtp(
-        email: widget.email,
-        fullName: '', // These will be ignored by backend for resend
-        sex: 'Male',
-        address: '',
-      );
-      
       showErrorModal(
         context: context,
-        title: 'OTP Resent',
-        description: 'A new OTP code has been sent to ${widget.email}',
-        icon: Icons.check_circle_outline,
-        iconColor: Colors.green,
+        title: 'Resend Unavailable',
+        description:
+            'Please go back and submit the signup form again to receive a new OTP.',
+        icon: Icons.info_outline,
+        iconColor: Colors.orange,
       );
     } else {
       final loginNotifier = ref.read(loginNotifierProvider.notifier);
       await loginNotifier.requestLoginOtp(email: widget.email);
+
+      if (mounted) {
+        final loginState = ref.read(loginNotifierProvider);
+        loginState.whenOrNull(
+          success: (data) {
+            showErrorModal(
+              context: context,
+              title: 'OTP Resent',
+              description: 'A new OTP code has been sent to ${widget.email}',
+              icon: Icons.check_circle_outline,
+              iconColor: Colors.green,
+            );
+          },
+          error: (error) {
+            showErrorModal(
+              context: context,
+              title: 'Resend Failed',
+              description: error ?? 'Failed to resend OTP. Please try again.',
+              icon: Icons.error_outline,
+              iconColor: Colors.red,
+            );
+          },
+        );
+      }
     }
   }
 
@@ -146,23 +163,41 @@ class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
           started: () {},
           loading: () {},
           success: (data) {
-            // Session is already saved by the notifier
-            showErrorModal(
-              context: context,
-              title: 'Verification Successful',
-              description: 'Your account has been verified successfully!',
-              icon: Icons.check_circle_outline,
-              iconColor: Colors.green,
-              barrierDismissible: false,
-              onButtonPressed: () {
-                Navigator.pop(context);
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  HomeScreen.routeName,
-                  (route) => false,
-                );
-              },
-            );
+            if (widget.isSignup) {
+              showErrorModal(
+                context: context,
+                title: 'Signup Successful',
+                description: 'Your account has been created! Please login to continue.',
+                icon: Icons.check_circle_outline,
+                iconColor: Colors.green,
+                barrierDismissible: false,
+                onButtonPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    LogInScreen.routeName,
+                    (route) => false,
+                  );
+                },
+              );
+            } else {
+              showErrorModal(
+                context: context,
+                title: 'Login Successful',
+                description: 'Welcome back!',
+                icon: Icons.check_circle_outline,
+                iconColor: Colors.green,
+                barrierDismissible: false,
+                onButtonPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    HomeScreen.routeName,
+                    (route) => false,
+                  );
+                },
+              );
+            }
           },
           error: (error) {
             showErrorModal(
@@ -245,7 +280,7 @@ class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
                       ),
                       4.gapH,
                       Text(
-                        'We sent a 6 digit code to ${widget.email}',
+                        'We sent a 6-digit code to ${widget.email}',
                         style: TextStyle(
                           fontSize: D.textSM,
                           fontWeight: D.semiBold,
@@ -264,7 +299,7 @@ class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
                           ),
                         ),
                       ),
-                      24.gapH,
+                      2.gapH,
                       _remainingSeconds > 0
                           ? Text(
                               'Resend code in ${_formatTime(_remainingSeconds)}',
