@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:retrofit/retrofit.dart';
 import '../../../common/models/dio/api_client.dart';
 
-part 'user_badge_service.g.dart';  // ← Make sure this line exists
+part 'user_badge_service.g.dart';
 
 final badgeServiceProvider = Provider.autoDispose<UserBadgeService>((ref) {
   final dio = ApiClient.fromEnv().create();
@@ -14,8 +14,8 @@ final badgeServiceProvider = Provider.autoDispose<UserBadgeService>((ref) {
 abstract class UserBadgeService {
   factory UserBadgeService(Dio dio, {String? baseUrl}) = _UserBadgeService;
 
-  @GET('/badge-requests/approved/badges')
+  @GET('/badge-requests/mobile-user/{mobileUserId}/badges')
   Future<HttpResponse<dynamic>> getApprovedBadges({
-    @Query("mobileUserId") required String mobileUserId,
+    @Path("mobileUserId") required String mobileUserId,
   });
 }

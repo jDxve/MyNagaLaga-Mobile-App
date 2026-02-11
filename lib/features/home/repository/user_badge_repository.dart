@@ -5,4 +5,6 @@ abstract class BadgeRepository {
   Future<DataState<BadgesResponse>> getApprovedBadges({
     required String mobileUserId,
   });
+
+  void clearCache();
 }

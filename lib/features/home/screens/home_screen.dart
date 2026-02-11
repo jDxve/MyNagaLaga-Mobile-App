@@ -1,4 +1,3 @@
-// lib/features/home/screens/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../common/models/dio/data_state.dart';
@@ -12,7 +11,6 @@ import '../../family/screens/family_ledger_screen.dart';
 import '../../safety/screens/disaster_resilience_screen.dart';
 import '../../services/components/track_case/all_track.dart';
 import '../../services/screens/services_screen.dart';
-
 import '../components/badges.dart';
 import '../components/circular_notif.dart';
 import '../components/home_greetings.dart';
@@ -55,19 +53,39 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _HomeTab extends ConsumerWidget {
+class _HomeTab extends ConsumerStatefulWidget {
   const _HomeTab();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_HomeTab> createState() => _HomeTabState();
+}
+
+class _HomeTabState extends ConsumerState<_HomeTab> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final session = ref.read(authSessionProvider);
+      if (session.isAuthenticated && session.userId != null) {
+        ref.read(badgesNotifierProvider.notifier).fetchBadges(
+              mobileUserId: session.userId!,
+            );
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final session = ref.watch(authSessionProvider);
     final badgesState = ref.watch(badgesNotifierProvider);
 
     ref.listen(authSessionProvider, (previous, next) {
       if (next.isAuthenticated && next.userId != null) {
-        ref.read(badgesNotifierProvider.notifier).fetchBadges(
-              mobileUserId: next.userId!,
-            );
+        if (previous?.userId != next.userId) {
+          ref.read(badgesNotifierProvider.notifier).fetchBadges(
+                mobileUserId: next.userId!,
+              );
+        }
       }
     });
 

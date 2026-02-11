@@ -24,14 +24,14 @@ class _UserBadgeService implements UserBadgeService {
     required String mobileUserId,
   }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'mobileUserId': mobileUserId};
+    final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<HttpResponse<dynamic>>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/badge-requests/approved/badges',
+            '/badge-requests/mobile-user/${mobileUserId}/badges',
             queryParameters: queryParameters,
             data: _data,
           )

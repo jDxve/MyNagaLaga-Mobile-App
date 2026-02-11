@@ -3,12 +3,10 @@ import '../../../common/models/dio/data_state.dart';
 import '../models/user_badge_model.dart';
 import '../repository/user_badge_repository_impl.dart';
 
-// user_badge_notifier.dart - Remove .autoDispose
 final badgesNotifierProvider =
     NotifierProvider<BadgesNotifier, DataState<BadgesResponse>>(
-      // Remove .autoDispose
-      BadgesNotifier.new,
-    );
+  BadgesNotifier.new,
+);
 
 class BadgesNotifier extends Notifier<DataState<BadgesResponse>> {
   @override
@@ -16,7 +14,14 @@ class BadgesNotifier extends Notifier<DataState<BadgesResponse>> {
     return const DataState.started();
   }
 
-  Future<void> fetchBadges({required String mobileUserId}) async {
+  Future<void> fetchBadges({
+    required String mobileUserId,
+    bool forceRefresh = false,
+  }) async {
+    if (forceRefresh) {
+      ref.read(badgeRepositoryProvider).clearCache();
+    }
+
     state = const DataState.loading();
 
     final repository = ref.read(badgeRepositoryProvider);
@@ -24,13 +29,11 @@ class BadgesNotifier extends Notifier<DataState<BadgesResponse>> {
       mobileUserId: mobileUserId,
     );
 
-    // Check if still mounted before updating state
-    if (ref.mounted) {
-      state = result;
-    }
+    state = result;
   }
 
   void reset() {
+    ref.read(badgeRepositoryProvider).clearCache();
     state = const DataState.started();
   }
 }

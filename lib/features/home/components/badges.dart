@@ -59,8 +59,10 @@ class _BadgeDisplayState extends State<BadgeDisplay>
         return Assets.seniorCitizenBadge;
       case BadgeType.pwd:
         return Assets.pwdBadge;
-      case BadgeType.indigentFamily:
+      case BadgeType.indigent:
         return Assets.indigentFamilyBadge;
+      case BadgeType.citizen:
+        return Assets.studentBadge;
       case BadgeType.other:
         return Assets.studentBadge;
     }
@@ -114,9 +116,6 @@ class _BadgeDisplayState extends State<BadgeDisplay>
 
     double containerHeight;
     switch (displayCount) {
-      case 5:
-        containerHeight = 260.h;
-        break;
       case 4:
         containerHeight = 250.h;
         break;
@@ -134,9 +133,10 @@ class _BadgeDisplayState extends State<BadgeDisplay>
       onVerticalDragEnd: (details) {
         if (total <= 1) return;
 
-        if (details.primaryVelocity! < 0) {
+        final velocity = details.primaryVelocity ?? 0;
+        if (velocity < 0) {
           _nextBadge();
-        } else if (details.primaryVelocity! > 0) {
+        } else if (velocity > 0) {
           _previousBadge();
         }
       },

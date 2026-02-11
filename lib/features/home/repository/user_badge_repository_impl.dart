@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../common/models/dio/data_state.dart';
 import '../../../common/models/responses/error_response.dart';
@@ -7,65 +6,66 @@ import '../models/user_badge_model.dart';
 import '../services/user_badge_service.dart';
 import 'user_badge_repository.dart';
 
-final badgeRepositoryProvider = Provider.autoDispose<BadgeRepositoryImpl>((ref) {
-  final service = ref.watch(badgeServiceProvider);
-  return BadgeRepositoryImpl(service: service);
+final badgeRepositoryProvider = Provider<BadgeRepositoryImpl>((ref) {
+  final service = ref.read(badgeServiceProvider);
+  return BadgeRepositoryImpl(service);
 });
 
 class BadgeRepositoryImpl implements BadgeRepository {
   final UserBadgeService _service;
+  BadgesResponse? _cachedBadges;
+  String? _cachedUserId;
 
-  BadgeRepositoryImpl({required UserBadgeService service}) : _service = service;
+  BadgeRepositoryImpl(this._service);
 
   @override
   Future<DataState<BadgesResponse>> getApprovedBadges({
     required String mobileUserId,
   }) async {
+    if (_cachedBadges != null && _cachedUserId == mobileUserId) {
+      return DataState.success(data: _cachedBadges!);
+    }
+
     try {
-      debugPrint("📤 Fetching Approved Badges for user: $mobileUserId");
       final response = await _service.getApprovedBadges(
         mobileUserId: mobileUserId,
       );
 
       final raw = response.data;
 
-      // Handle if response.data is a String (HTML error page)
       if (raw is String) {
-        debugPrint("❌ Received HTML response instead of JSON");
-        return const DataState.error(
-          error: "API endpoint not found. Please check the server configuration.",
-        );
+        return const DataState.error(error: "API endpoint not found");
       }
 
-      // Ensure raw is a Map
       if (raw is! Map<String, dynamic>) {
-        debugPrint("❌ Unexpected response type: ${raw.runtimeType}");
-        return const DataState.error(
-          error: "Unexpected response format from server",
-        );
+        return const DataState.error(error: "Unexpected response format");
       }
 
       if (raw['success'] != true) {
         return DataState.error(
-          error: raw['message'] ?? "Failed to fetch badges",
+          error: raw['error']?.toString() ?? "Failed to fetch badges",
         );
       }
 
-      final badgesResponse = BadgesResponse.fromJson(raw['data']);
-      debugPrint("✅ Loaded ${badgesResponse.totalBadges} badges");
+      final data = raw['data'];
+
+      if (data is! List) {
+        return const DataState.error(error: "Invalid data format");
+      }
+
+      final badgesResponse = BadgesResponse.fromJson(data);
+
+      _cachedBadges = badgesResponse;
+      _cachedUserId = mobileUserId;
+
       return DataState.success(data: badgesResponse);
     } on DioException catch (e) {
-      debugPrint("❌ Dio Error: ${e.response?.statusCode} - ${e.message}");
-      
-      // Handle 404 specifically
       if (e.response?.statusCode == 404) {
-        return const DataState.error(
-          error: "Badge endpoint not found. Please contact support.",
-        );
+        return const DataState.error(error: "Badge endpoint not found");
       }
 
-      // Try to parse error response if it's JSON
-      if (e.response?.data != null && e.response?.data is Map<String, dynamic>) {
+      if (e.response?.data != null &&
+          e.response?.data is Map<String, dynamic>) {
         try {
           final errorResponse = ErrorResponse.fromMap(
             e.response!.data as Map<String, dynamic>,
@@ -73,17 +73,18 @@ class BadgeRepositoryImpl implements BadgeRepository {
           return DataState.error(
             error: errorResponse.message ?? "Failed to fetch badges",
           );
-        } catch (_) {
-          // If parsing fails, fall through to generic error
-        }
+        } catch (_) {}
       }
 
-      return DataState.error(
-        error: e.message ?? "Network error occurred",
-      );
+      return DataState.error(error: e.message ?? "Network error occurred");
     } catch (e) {
-      debugPrint("❌ Unexpected Error: $e");
       return DataState.error(error: "Unexpected error: $e");
     }
+  }
+
+  @override
+  void clearCache() {
+    _cachedBadges = null;
+    _cachedUserId = null;
   }
 }
