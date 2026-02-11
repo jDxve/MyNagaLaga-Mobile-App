@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../common/models/dio/data_state.dart';
 import '../../../common/resources/dimensions.dart';
-import '../../../common/utils/ui_utils.dart';
 import '../../home/screens/home_screen.dart';
 import '../notifier/badge_types_notifier.dart';
 import '../components/application_submitted.dart';
@@ -41,16 +40,14 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
 
   String? _selectedGender;
   String? _selectedIdType;
-  File? _frontIdImage;
-  File? _backIdImage;
-  File? _supportingFile;
+  Map<String, List<File>> _uploadedFiles = {};
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => 
-      ref.read(badgeTypesNotifierProvider.notifier).getBadgeTypes()
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(badgeTypesNotifierProvider.notifier).getBadgeTypes();
+    });
   }
 
   @override
@@ -74,13 +71,17 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
         _submitApplication();
       } else if (_currentStep < _totalSteps) {
         _currentStep++;
+        _isFormValid = false;
       }
     });
   }
 
   void _handlePrevious() {
     setState(() {
-      if (_currentStep > 1) _currentStep--;
+      if (_currentStep > 1) {
+        _currentStep--;
+        _isFormValid = _currentStep == 1 ? (_selectedBadge != null) : false;
+      }
     });
   }
 
@@ -105,9 +106,7 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
       _existingIdController.clear();
       _selectedGender = null;
       _selectedIdType = null;
-      _frontIdImage = null;
-      _backIdImage = null;
-      _supportingFile = null;
+      _uploadedFiles = {};
       _generatedReferenceNumber = null;
     });
   }
@@ -124,20 +123,28 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(error ?? 'An error occurred'),
+                16.gapH,
                 TextButton(
                   onPressed: () => ref.read(badgeTypesNotifierProvider.notifier).getBadgeTypes(),
                   child: const Text('Retry'),
-                )
+                ),
               ],
             ),
           ),
-          success: (badges) => badgeSelectionCards(
-            context: context,
-            badgeTypes: badges,
-            onBadgeSelected: (badgeType) => setState(() => _selectedBadge = badgeType),
-            selectedBadge: _selectedBadge,
-            onNext: _handleNext,
-          ),
+          success: (badges) => badges.isEmpty
+              ? const Center(child: Text('No badges available'))
+              : badgeSelectionCards(
+                  context: context,
+                  badgeTypes: badges,
+                  onBadgeSelected: (badgeType) {
+                    setState(() {
+                      _selectedBadge = badgeType;
+                      _isFormValid = true;
+                    });
+                  },
+                  selectedBadge: _selectedBadge,
+                  onNext: _handleNext,
+                ),
         );
 
       case 2:
@@ -165,7 +172,7 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
           context: context,
           selectedBadge: _selectedBadge?.badgeKey ?? '',
           existingIdController: _existingIdController,
-          onDataChanged: (data) {}, // Handle extra data if needed
+          onDataChanged: (data) {},
           setIsFormValid: (isValid, showError) {
             setState(() {
               _isFormValid = isValid;
@@ -177,14 +184,15 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
       case 4:
         return DocumentPage(
           context: context,
+          badgeTypeId: _selectedBadge?.id ?? '',
           selectedIdType: _selectedIdType,
-          frontImage: _frontIdImage,
-          backImage: _backIdImage,
-          supportingFile: _supportingFile,
+          uploadedFiles: _uploadedFiles,
           onIdTypeChanged: (val) => setState(() => _selectedIdType = val),
-          onFrontImageChanged: (file) => setState(() => _frontIdImage = file),
-          onBackImageChanged: (file) => setState(() => _backIdImage = file),
-          onSupportingFileChanged: (file) => setState(() => _supportingFile = file),
+          onFilesChanged: (key, files) {
+            setState(() {
+              _uploadedFiles[key] = files;
+            });
+          },
           setIsFormValid: (isValid, showError) {
             setState(() {
               _isFormValid = isValid;
@@ -203,9 +211,7 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
           contactNumber: _phoneController.text,
           existingId: _existingIdController.text.isNotEmpty ? _existingIdController.text : null,
           selectedIdType: _selectedIdType,
-          frontIdImage: _frontIdImage,
-          backIdImage: _backIdImage,
-          supportingFile: _supportingFile,
+          uploadedFiles: _uploadedFiles,
           isConsentGiven: _isConsentGiven,
           onConsentChanged: (value) {
             setState(() {

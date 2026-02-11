@@ -1,73 +1,93 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/resources/strings.dart';
-import '../../../common/utils/ui_utils.dart'; // ADD THIS IMPORT
-import '../../../common/widgets/secondary_button.dart';
+import '../../../common/utils/ui_utils.dart';
 import '../../../common/widgets/text_input.dart';
 import '../../../common/widgets/error_modal.dart';
 import '../../../common/widgets/upload_image_card.dart';
+import '../../../common/models/dio/data_state.dart';
+import '../notifier/badge_requirements_notifier.dart';
+import '../models/badge_requirement_model.dart';
 
-class DocumentPage extends StatefulWidget {
+class DocumentPage extends ConsumerStatefulWidget {
   final BuildContext context;
+  final String badgeTypeId;
   final String? selectedIdType;
-  final File? frontImage;
-  final File? backImage;
-  final File? supportingFile;
+  final Map<String, List<File>> uploadedFiles;
   final Function(String?) onIdTypeChanged;
-  final Function(File?) onFrontImageChanged;
-  final Function(File?) onBackImageChanged;
-  final Function(File?) onSupportingFileChanged;
+  final Function(String key, List<File> files) onFilesChanged;
   final Function(bool isValid, VoidCallback showError)? setIsFormValid;
 
   const DocumentPage({
     super.key,
     required this.context,
+    required this.badgeTypeId,
     required this.selectedIdType,
-    this.frontImage,
-    this.backImage,
-    this.supportingFile,
+    required this.uploadedFiles,
     required this.onIdTypeChanged,
-    required this.onFrontImageChanged,
-    required this.onBackImageChanged,
-    required this.onSupportingFileChanged,
+    required this.onFilesChanged,
     this.setIsFormValid,
   });
 
   @override
-  State<DocumentPage> createState() => _DocumentPageState();
+  ConsumerState<DocumentPage> createState() => _DocumentPageState();
 }
 
-class _DocumentPageState extends State<DocumentPage> {
+class _DocumentPageState extends ConsumerState<DocumentPage> {
   final ImagePicker _picker = ImagePicker();
-  final PageController _pageController = PageController();
   final TextEditingController _idTypeController = TextEditingController();
   final LayerLink _layerLink = LayerLink();
 
   bool _isDropdownOpen = false;
   OverlayEntry? _overlayEntry;
-  int _currentPage = 0;
   String? _selectedIdType;
-
-  // REMOVED: local idTypes list - now using UIUtils.idTypes
 
   @override
   void initState() {
     super.initState();
     _selectedIdType = widget.selectedIdType;
     _idTypeController.text = widget.selectedIdType ?? '';
-    WidgetsBinding.instance.addPostFrameCallback((_) => _validateForm());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.badgeTypeId.isNotEmpty) {
+        ref.read(badgeRequirementsNotifierProvider.notifier).fetch(widget.badgeTypeId);
+      }
+      _validateForm();
+    });
+  }
+
+  @override
+  void didUpdateWidget(DocumentPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.badgeTypeId != widget.badgeTypeId && widget.badgeTypeId.isNotEmpty) {
+      ref.read(badgeRequirementsNotifierProvider.notifier).fetch(widget.badgeTypeId);
+      _validateForm();
+    }
   }
 
   void _validateForm() {
-    bool isValid = _selectedIdType != null &&
-        _selectedIdType!.isNotEmpty &&
-        widget.frontImage != null &&
-        widget.backImage != null &&
-        widget.supportingFile != null;
+    final requirementsState = ref.read(badgeRequirementsNotifierProvider)[widget.badgeTypeId];
+
+    if (requirementsState is! Success<BadgeRequirementsData>) {
+      widget.setIsFormValid?.call(false, _showValidationError);
+      return;
+    }
+
+    final requirements = requirementsState.data.requirements;
+    bool isValid = _selectedIdType != null && _selectedIdType!.isNotEmpty;
+
+    for (var req in requirements) {
+      final files = widget.uploadedFiles[req.key] ?? [];
+      if (req.isRequired && files.isEmpty) {
+        isValid = false;
+        break;
+      }
+    }
+
     widget.setIsFormValid?.call(isValid, _showValidationError);
   }
 
@@ -83,10 +103,19 @@ class _DocumentPageState extends State<DocumentPage> {
       );
       return;
     }
+
+    final requirementsState = ref.read(badgeRequirementsNotifierProvider)[widget.badgeTypeId];
+    if (requirementsState is! Success<BadgeRequirementsData>) return;
+
+    final requirements = requirementsState.data.requirements;
     List<String> missingItems = [];
-    if (widget.frontImage == null) missingItems.add(AppString.frontOfId);
-    if (widget.backImage == null) missingItems.add(AppString.backOfId);
-    if (widget.supportingFile == null) missingItems.add("Supporting File");
+
+    for (var req in requirements) {
+      final files = widget.uploadedFiles[req.key] ?? [];
+      if (req.isRequired && files.isEmpty) {
+        missingItems.add(req.label);
+      }
+    }
 
     if (missingItems.isNotEmpty) {
       showErrorModal(
@@ -100,8 +129,21 @@ class _DocumentPageState extends State<DocumentPage> {
     }
   }
 
-  Future<void> _pickImage(ImageSource source, {required bool isSupporting}) async {
+  Future<void> _pickImage(ImageSource source, String requirementKey, int maxFiles) async {
     try {
+      final currentFiles = widget.uploadedFiles[requirementKey] ?? [];
+      if (currentFiles.length >= maxFiles) {
+        showErrorModal(
+          context: widget.context,
+          title: 'Maximum Files Reached',
+          description: 'You can only upload up to $maxFiles file(s) for this requirement.',
+          icon: Icons.warning_outlined,
+          iconColor: Colors.orange,
+          buttonText: AppString.ok,
+        );
+        return;
+      }
+
       final XFile? pickedFile = await _picker.pickImage(source: source);
       if (pickedFile != null) {
         final croppedFile = await ImageCropper().cropImage(
@@ -110,7 +152,7 @@ class _DocumentPageState extends State<DocumentPage> {
           compressQuality: 90,
           uiSettings: [
             AndroidUiSettings(
-              toolbarTitle: isSupporting ? "Crop Supporting File" : AppString.cropIdCard,
+              toolbarTitle: AppString.cropIdCard,
               toolbarColor: AppColors.primary,
               toolbarWidgetColor: Colors.white,
               initAspectRatio: CropAspectRatioPreset.ratio3x2,
@@ -120,15 +162,9 @@ class _DocumentPageState extends State<DocumentPage> {
         );
 
         if (croppedFile != null) {
-          if (isSupporting) {
-            widget.onSupportingFileChanged(File(croppedFile.path));
-          } else {
-            if (_currentPage == 0) {
-              widget.onFrontImageChanged(File(croppedFile.path));
-            } else {
-              widget.onBackImageChanged(File(croppedFile.path));
-            }
-          }
+          final updatedFiles = List<File>.from(currentFiles);
+          updatedFiles.add(File(croppedFile.path));
+          widget.onFilesChanged(requirementKey, updatedFiles);
           _validateForm();
           setState(() {});
         }
@@ -136,6 +172,14 @@ class _DocumentPageState extends State<DocumentPage> {
     } catch (e) {
       debugPrint('Error: $e');
     }
+  }
+
+  void _removeFile(String requirementKey, int index) {
+    final currentFiles = List<File>.from(widget.uploadedFiles[requirementKey] ?? []);
+    currentFiles.removeAt(index);
+    widget.onFilesChanged(requirementKey, currentFiles);
+    _validateForm();
+    setState(() {});
   }
 
   void _toggleDropdown() {
@@ -182,17 +226,17 @@ class _DocumentPageState extends State<DocumentPage> {
               child: ListView.separated(
                 padding: EdgeInsets.zero,
                 shrinkWrap: true,
-                itemCount: UIUtils.idTypes.length, // CHANGED: Use UIUtils.idTypes
+                itemCount: UIUtils.idTypes.length,
                 separatorBuilder: (context, index) => const Divider(height: 1),
                 itemBuilder: (context, index) {
                   return ListTile(
-                    title: Text(UIUtils.idTypes[index], style: const TextStyle(fontFamily: 'Segoe UI')), // CHANGED
+                    title: Text(UIUtils.idTypes[index], style: const TextStyle(fontFamily: 'Segoe UI')),
                     onTap: () {
                       setState(() {
-                        _idTypeController.text = UIUtils.idTypes[index]; // CHANGED
-                        _selectedIdType = UIUtils.idTypes[index]; // CHANGED
+                        _idTypeController.text = UIUtils.idTypes[index];
+                        _selectedIdType = UIUtils.idTypes[index];
                       });
-                      widget.onIdTypeChanged(UIUtils.idTypes[index]); // CHANGED
+                      widget.onIdTypeChanged(UIUtils.idTypes[index]);
                       _toggleDropdown();
                       _validateForm();
                     },
@@ -208,6 +252,34 @@ class _DocumentPageState extends State<DocumentPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.badgeTypeId.isEmpty) {
+      return const Center(child: Text('Please select a badge type'));
+    }
+
+    final requirementsState = ref.watch(badgeRequirementsNotifierProvider)[widget.badgeTypeId];
+
+    return requirementsState?.when(
+          started: () => const SizedBox.shrink(),
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error) => Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(error ?? 'Failed to load requirements'),
+                16.gapH,
+                TextButton(
+                  onPressed: () => ref.read(badgeRequirementsNotifierProvider.notifier).fetch(widget.badgeTypeId),
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          ),
+          success: (data) => _buildContent(data.requirements),
+        ) ??
+        const SizedBox.shrink();
+  }
+
+  Widget _buildContent(List<BadgeRequirement> requirements) {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -228,77 +300,7 @@ class _DocumentPageState extends State<DocumentPage> {
             ),
           ),
           24.gapH,
-          SizedBox(
-            height: 200.h,
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: (index) => setState(() => _currentPage = index),
-              children: [
-                UploadImage(
-                  image: widget.frontImage,
-                  title: AppString.uploadFrontId,
-                  subtitle: AppString.takePhotoOrUpload,
-                  onTap: () => _showImagePreview(widget.frontImage!),
-                  onRemove: () {
-                    widget.onFrontImageChanged(null);
-                    _validateForm();
-                    setState(() {});
-                  },
-                ),
-                UploadImage(
-                  image: widget.backImage,
-                  title: AppString.uploadBackId,
-                  subtitle: AppString.takePhotoOrUpload,
-                  onTap: () => _showImagePreview(widget.backImage!),
-                  onRemove: () {
-                    widget.onBackImageChanged(null);
-                    _validateForm();
-                    setState(() {});
-                  },
-                ),
-              ],
-            ),
-          ),
-          12.gapH,
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: List.generate(2, (index) => _buildPageIndicator(index))),
-          16.gapH,
-          Row(
-            children: [
-              Expanded(
-                child: SecondaryButton(
-                  text: AppString.takePhoto,
-                  isFilled: true,
-                  icon: Icons.camera_alt_outlined,
-                  onPressed: () => _pickImage(ImageSource.camera, isSupporting: false),
-                ),
-              ),
-              12.gapW,
-              Expanded(
-                child: SecondaryButton(
-                  text: AppString.upload,
-                  icon: Icons.file_upload_outlined,
-                  onPressed: () => _pickImage(ImageSource.gallery, isSupporting: false),
-                ),
-              ),
-            ],
-          ),
-          24.gapH,
-          Text("Upload a supporting file", style: TextStyle(fontSize: D.textBase, fontWeight: D.semiBold, fontFamily: 'Segoe UI', color: AppColors.black)),
-          Text("e.g Birth Certificate, Barangay clearance", style: TextStyle(fontSize: D.textSM, color: AppColors.grey, fontFamily: 'Segoe UI')),
-          12.gapH,
-          UploadImage(
-            image: widget.supportingFile,
-            title: "Upload your ID",
-
-            onPickImage: (source) => _pickImage(source, isSupporting: true),
-            onRemove: () {
-              widget.onSupportingFileChanged(null);
-              _validateForm();
-              setState(() {});
-            },
-            onTap: () => _showImagePreview(widget.supportingFile!),
-          ),
-          24.gapH,
+          ...requirements.map((req) => _buildRequirementSection(req)),
           _buildTipsSection(),
           24.gapH,
         ],
@@ -306,17 +308,64 @@ class _DocumentPageState extends State<DocumentPage> {
     );
   }
 
-  Widget _buildPageIndicator(int index) {
-    final bool isActive = _currentPage == index;
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      margin: EdgeInsets.symmetric(horizontal: 3.w),
-      height: 7.h,
-      width: (isActive ? 30 : 7).w,
-      decoration: BoxDecoration(
-        color: isActive ? AppColors.primary : AppColors.grey.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(12),
-      ),
+  Widget _buildRequirementSection(BadgeRequirement requirement) {
+    final files = widget.uploadedFiles[requirement.key] ?? [];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                requirement.label,
+                style: TextStyle(
+                  fontSize: D.textBase,
+                  fontWeight: D.semiBold,
+                  fontFamily: 'Segoe UI',
+                  color: AppColors.black,
+                ),
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+              decoration: BoxDecoration(
+                color: requirement.isRequired 
+                    ? AppColors.primary.withOpacity(0.1) 
+                    : AppColors.grey.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                requirement.isRequired ? 'Required' : 'Optional',
+                style: TextStyle(
+                  fontSize: D.textXS,
+                  color: requirement.isRequired ? AppColors.primary : AppColors.grey,
+                  fontWeight: D.medium,
+                ),
+              ),
+            ),
+          ],
+        ),
+        12.gapH,
+        ...files.asMap().entries.map((entry) {
+          return Padding(
+            padding: EdgeInsets.only(bottom: 12.h),
+            child: UploadImage(
+              image: entry.value,
+              title: requirement.label,
+              onTap: () => _showImagePreview(entry.value),
+              onRemove: () => _removeFile(requirement.key, entry.key),
+            ),
+          );
+        }),
+        if (files.length < requirement.maxFiles)
+          UploadImage(
+            title: requirement.label,
+            subtitle: AppString.takePhotoOrUpload,
+            onPickImage: (source) => _pickImage(source, requirement.key, requirement.maxFiles),
+          ),
+        24.gapH,
+      ],
     );
   }
 
@@ -376,7 +425,6 @@ class _DocumentPageState extends State<DocumentPage> {
 
   @override
   void dispose() {
-    _pageController.dispose();
     _idTypeController.dispose();
     _removeOverlay(isDisposing: true);
     super.dispose();

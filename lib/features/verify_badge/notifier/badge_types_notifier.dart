@@ -4,7 +4,7 @@ import '../models/badge_type_model.dart';
 import '../repository/badge_type_repository_impl.dart';
 
 final badgeTypesNotifierProvider =
-    NotifierProvider.autoDispose<BadgeTypesNotifier, DataState<List<BadgeType>>>(
+    NotifierProvider<BadgeTypesNotifier, DataState<List<BadgeType>>>(
   BadgeTypesNotifier.new,
 );
 
@@ -13,6 +13,7 @@ class BadgeTypesNotifier extends Notifier<DataState<List<BadgeType>>> {
   DataState<List<BadgeType>> build() => const DataState.started();
 
   Future<void> getBadgeTypes() async {
+    if (state is Success<List<BadgeType>>) return;
     state = const DataState.loading();
 
     final repository = ref.read(badgeTypeRepositoryProvider);

@@ -15,9 +15,7 @@ class ReviewPage extends StatefulWidget {
   final String contactNumber;
   final String? existingId;
   final String? selectedIdType;
-  final File? frontIdImage;
-  final File? backIdImage;
-  final File? supportingFile;
+  final Map<String, List<File>> uploadedFiles;
   final Function(bool) onConsentChanged;
   final bool isConsentGiven;
   final VoidCallback? onValidationError;
@@ -32,9 +30,7 @@ class ReviewPage extends StatefulWidget {
     required this.contactNumber,
     this.existingId,
     this.selectedIdType,
-    this.frontIdImage,
-    this.backIdImage,
-    this.supportingFile,
+    required this.uploadedFiles,
     required this.onConsentChanged,
     required this.isConsentGiven,
     this.onValidationError,
@@ -52,6 +48,7 @@ class _ReviewPageState extends State<ReviewPage> {
       case 'solo_parent': return AppString.soloParentTitle;
       case 'indigent': return AppString.indigentTitle;
       case 'student': return AppString.studentTitle;
+      case 'citizen': return 'Citizen';
       default: return 'Unknown';
     }
   }
@@ -101,35 +98,36 @@ class _ReviewPageState extends State<ReviewPage> {
     );
   }
 
-  Widget _buildImageItem(String label, File image, {bool isFullWidth = false}) {
-    Widget content = GestureDetector(
-      onTap: () => _showImagePreview(image),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: D.textXS,
-              color: AppColors.grey,
-              fontFamily: 'Segoe UI',
+  Widget _buildImageItem(String label, File image) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 12.h),
+      child: GestureDetector(
+        onTap: () => _showImagePreview(image),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: D.textXS,
+                color: AppColors.grey,
+                fontFamily: 'Segoe UI',
+              ),
             ),
-          ),
-          4.gapH,
-          ClipRRect(
-            borderRadius: BorderRadius.circular(D.radiusMD),
-            child: Image.file(
-              image,
-              height: 120.h,
-              width: isFullWidth ? double.infinity : double.infinity,
-              fit: BoxFit.cover,
+            4.gapH,
+            ClipRRect(
+              borderRadius: BorderRadius.circular(D.radiusMD),
+              child: Image.file(
+                image,
+                height: 120.h,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
-
-    return isFullWidth ? content : Expanded(child: content);
   }
 
   void _showConsentError() {
@@ -141,6 +139,13 @@ class _ReviewPageState extends State<ReviewPage> {
       iconColor: Colors.orange,
       buttonText: AppString.ok,
     );
+  }
+
+  String _formatRequirementKey(String key) {
+    return key
+        .split('_')
+        .map((word) => word[0].toUpperCase() + word.substring(1))
+        .join(' ');
   }
 
   @override
@@ -197,33 +202,19 @@ class _ReviewPageState extends State<ReviewPage> {
             InfoCardItem(
               customWidget: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+                children: widget.uploadedFiles.entries.map((entry) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (widget.frontIdImage != null)
-                        _buildImageItem(AppString.frontIdLabel, widget.frontIdImage!),
-                      if (widget.frontIdImage != null && widget.backIdImage != null)
-                        12.gapW,
-                      if (widget.backIdImage != null)
-                        _buildImageItem(AppString.backIdLabel, widget.backIdImage!),
+                      ...entry.value.asMap().entries.map((fileEntry) {
+                        final label = entry.value.length > 1 
+                            ? '${_formatRequirementKey(entry.key)} ${fileEntry.key + 1}'
+                            : _formatRequirementKey(entry.key);
+                        return _buildImageItem(label, fileEntry.value);
+                      }),
                     ],
-                  ),
-                  if (widget.supportingFile != null) ...[
-                    16.gapH,
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: _buildImageItem(
-                            "Supporting Document", 
-                            widget.supportingFile!, 
-                            isFullWidth: true,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ],
+                  );
+                }).toList(),
               ),
             ),
           ],
