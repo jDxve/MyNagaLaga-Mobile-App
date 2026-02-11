@@ -3,8 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../common/models/dio/data_state.dart';
 import '../../../common/resources/dimensions.dart';
+import '../../../common/widgets/error_modal.dart';
+import '../../../common/resources/strings.dart';
+import '../../../common/utils/ui_utils.dart';
 import '../../home/screens/home_screen.dart';
 import '../notifier/badge_types_notifier.dart';
+import '../notifier/badge_request_notifier.dart';
 import '../components/application_submitted.dart';
 import '../components/basic_info_page.dart';
 import '../components/document_page.dart';
@@ -26,21 +30,31 @@ class VerifyBadgeScreen extends ConsumerStatefulWidget {
 class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
   BadgeType? _selectedBadge;
   int _currentStep = 1;
-  final int _totalSteps = 6;
   bool _isFormValid = false;
   bool _isConsentGiven = false;
   VoidCallback? _validationCallback;
   String? _generatedReferenceNumber;
+  bool _isSubmitting = false;
 
-  final TextEditingController _fullNameController = TextEditingController();
-  final TextEditingController _dateOfBirthController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _existingIdController = TextEditingController();
+  final _fullNameController = TextEditingController();
+  final _dateOfBirthController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _existingIdController = TextEditingController();
+  final _typeOfDisabilityController = TextEditingController();
+  final _numberOfDependentsController = TextEditingController();
+  final _monthlyIncomeController = TextEditingController();
+  final _schoolNameController = TextEditingController();
+  final _educationLevelController = TextEditingController();
+  final _yearGradeController = TextEditingController();
+  final _schoolIdController = TextEditingController();
 
   String? _selectedGender;
   String? _selectedIdType;
   Map<String, List<File>> _uploadedFiles = {};
+
+  bool get _isCitizen => _selectedBadge?.badgeKey == 'citizen';
+  int get _totalSteps => _isCitizen ? 4 : 6;
 
   @override
   void initState() {
@@ -57,19 +71,26 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
     _phoneController.dispose();
     _addressController.dispose();
     _existingIdController.dispose();
+    _typeOfDisabilityController.dispose();
+    _numberOfDependentsController.dispose();
+    _monthlyIncomeController.dispose();
+    _schoolNameController.dispose();
+    _educationLevelController.dispose();
+    _yearGradeController.dispose();
+    _schoolIdController.dispose();
     super.dispose();
   }
 
   void _handleNext() {
-    if (_currentStep >= 2 && _currentStep <= 5 && !_isFormValid) {
+    if (_currentStep >= 2 && !_isFormValid) {
       _validationCallback?.call();
       return;
     }
 
     setState(() {
-      if (_currentStep == 5) {
+      if ((_isCitizen && _currentStep == 3) || (!_isCitizen && _currentStep == 5)) {
         _submitApplication();
-      } else if (_currentStep < _totalSteps) {
+      } else {
         _currentStep++;
         _isFormValid = false;
       }
@@ -85,30 +106,69 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
     });
   }
 
-  void _submitApplication() {
-    final referenceNumber = 'REF-${DateTime.now().millisecondsSinceEpoch}';
-    setState(() {
-      _generatedReferenceNumber = referenceNumber;
-      _currentStep = 6;
-    });
+  void _submitApplication() async {
+    if (_selectedBadge == null || _isSubmitting) return;
+
+    final idTypeError = UIUtils.convertIdTypeToApiFormat(_selectedIdType);
+    if (idTypeError == 'OTHER' && _selectedIdType != 'Other') {
+      showErrorModal(
+        context: context,
+        title: 'ID Type Required',
+        description: 'Please select a valid ID type before submitting.',
+        icon: Icons.badge_outlined,
+        iconColor: Colors.orange,
+        buttonText: AppString.ok,
+      );
+      return;
+    }
+
+    setState(() => _isSubmitting = true);
+
+    await ref.read(badgeRequestNotifierProvider.notifier).submit(
+      badgeTypeId: _selectedBadge!.id,
+      fullName: _fullNameController.text.trim(),
+      birthdate: UIUtils.convertDateToApiFormat(_dateOfBirthController.text),
+      gender: UIUtils.convertGenderToApiFormat(_selectedGender),
+      homeAddress: _addressController.text.trim(),
+      contactNumber: _phoneController.text.trim(),
+      typeOfId: UIUtils.convertIdTypeToApiFormat(_selectedIdType),
+      existingSeniorCitizenId: _existingIdController.text.isEmpty ? null : _existingIdController.text,
+      typeOfDisability: _typeOfDisabilityController.text.isEmpty ? null : _typeOfDisabilityController.text,
+      numberOfDependents: int.tryParse(_numberOfDependentsController.text),
+      estimatedMonthlyHouseholdIncome: _monthlyIncomeController.text.isEmpty ? null : _monthlyIncomeController.text,
+      schoolName: _schoolNameController.text.isEmpty ? null : _schoolNameController.text,
+      educationLevel: _educationLevelController.text.isEmpty ? null : _educationLevelController.text,
+      yearOrGradeLevel: _yearGradeController.text.isEmpty ? null : _yearGradeController.text,
+      schoolIdNumber: _schoolIdController.text.isEmpty ? null : _schoolIdController.text,
+      uploadedFiles: _uploadedFiles,
+    );
   }
 
   void _resetForm() {
+    ref.read(badgeRequestNotifierProvider.notifier).reset();
     setState(() {
       _currentStep = 1;
       _selectedBadge = null;
       _isFormValid = false;
       _isConsentGiven = false;
-      _fullNameController.clear();
-      _dateOfBirthController.clear();
-      _phoneController.clear();
-      _addressController.clear();
-      _existingIdController.clear();
+      _isSubmitting = false;
       _selectedGender = null;
       _selectedIdType = null;
       _uploadedFiles = {};
       _generatedReferenceNumber = null;
     });
+    _fullNameController.clear();
+    _dateOfBirthController.clear();
+    _phoneController.clear();
+    _addressController.clear();
+    _existingIdController.clear();
+    _typeOfDisabilityController.clear();
+    _numberOfDependentsController.clear();
+    _monthlyIncomeController.clear();
+    _schoolNameController.clear();
+    _educationLevelController.clear();
+    _yearGradeController.clear();
+    _schoolIdController.clear();
   }
 
   Widget _buildStepContent() {
@@ -136,12 +196,10 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
               : badgeSelectionCards(
                   context: context,
                   badgeTypes: badges,
-                  onBadgeSelected: (badgeType) {
-                    setState(() {
-                      _selectedBadge = badgeType;
-                      _isFormValid = true;
-                    });
-                  },
+                  onBadgeSelected: (badge) => setState(() {
+                    _selectedBadge = badge;
+                    _isFormValid = true;
+                  }),
                   selectedBadge: _selectedBadge,
                   onNext: _handleNext,
                 ),
@@ -156,49 +214,69 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
           onGenderChanged: (gender) => setState(() => _selectedGender = gender),
           addressController: _addressController,
           phoneController: _phoneController,
-          setIsFormValid: (callback) {
-            setState(() {
-              _isFormValid = _fullNameController.text.isNotEmpty &&
-                  _dateOfBirthController.text.isNotEmpty &&
-                  _addressController.text.isNotEmpty &&
-                  _phoneController.text.length >= 10;
-              _validationCallback = callback;
-            });
-          },
+          setIsFormValid: (callback) => setState(() {
+            _isFormValid = UIUtils.validateFullName(_fullNameController.text) == null &&
+                _dateOfBirthController.text.isNotEmpty &&
+                UIUtils.validateAddress(_addressController.text) == null &&
+                UIUtils.validatePhoneNumber(_phoneController.text) == null;
+            _validationCallback = callback;
+          }),
         );
 
       case 3:
+        if (_isCitizen) {
+          return DocumentPage(
+            context: context,
+            badgeTypeId: _selectedBadge?.id ?? '',
+            selectedIdType: _selectedIdType,
+            uploadedFiles: _uploadedFiles,
+            onIdTypeChanged: (val) => setState(() => _selectedIdType = val),
+            onFilesChanged: (key, files) => setState(() => _uploadedFiles[key] = files),
+            setIsFormValid: (isValid, showError) => setState(() {
+              _isFormValid = isValid;
+              _validationCallback = showError;
+            }),
+          );
+        }
         return EligibilityPage(
           context: context,
           selectedBadge: _selectedBadge?.badgeKey ?? '',
           existingIdController: _existingIdController,
-          onDataChanged: (data) {},
-          setIsFormValid: (isValid, showError) {
-            setState(() {
-              _isFormValid = isValid;
-              _validationCallback = showError;
-            });
+          onDataChanged: (data) {
+            _typeOfDisabilityController.text = data['typeOfDisability'] ?? '';
+            _numberOfDependentsController.text = (data['numberOfDependents'] ?? '').toString();
+            _monthlyIncomeController.text = (data['estimatedMonthlyIncome'] ?? '').toString();
+            _schoolNameController.text = data['schoolName'] ?? '';
+            _educationLevelController.text = data['educationLevel'] ?? '';
+            _yearGradeController.text = data['yearOrGradeLevel'] ?? '';
+            _schoolIdController.text = data['schoolIdNumber'] ?? '';
           },
+          setIsFormValid: (isValid, showError) => setState(() {
+            _isFormValid = isValid;
+            _validationCallback = showError;
+          }),
         );
 
       case 4:
+        if (_isCitizen) {
+          return applicationSubmitted(
+            context: context,
+            referenceNumber: _generatedReferenceNumber,
+            onStartNewApplication: _resetForm,
+            onBackToHome: () => Navigator.of(context).pushNamedAndRemoveUntil(HomeScreen.routeName, (route) => false),
+          );
+        }
         return DocumentPage(
           context: context,
           badgeTypeId: _selectedBadge?.id ?? '',
           selectedIdType: _selectedIdType,
           uploadedFiles: _uploadedFiles,
           onIdTypeChanged: (val) => setState(() => _selectedIdType = val),
-          onFilesChanged: (key, files) {
-            setState(() {
-              _uploadedFiles[key] = files;
-            });
-          },
-          setIsFormValid: (isValid, showError) {
-            setState(() {
-              _isFormValid = isValid;
-              _validationCallback = showError;
-            });
-          },
+          onFilesChanged: (key, files) => setState(() => _uploadedFiles[key] = files),
+          setIsFormValid: (isValid, showError) => setState(() {
+            _isFormValid = isValid;
+            _validationCallback = showError;
+          }),
         );
 
       case 5:
@@ -213,12 +291,10 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
           selectedIdType: _selectedIdType,
           uploadedFiles: _uploadedFiles,
           isConsentGiven: _isConsentGiven,
-          onConsentChanged: (value) {
-            setState(() {
-              _isConsentGiven = value;
-              _isFormValid = value;
-            });
-          },
+          onConsentChanged: (value) => setState(() {
+            _isConsentGiven = value;
+            _isFormValid = value;
+          }),
         );
 
       case 6:
@@ -226,9 +302,7 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
           context: context,
           referenceNumber: _generatedReferenceNumber,
           onStartNewApplication: _resetForm,
-          onBackToHome: () {
-            Navigator.of(context).pushNamedAndRemoveUntil(HomeScreen.routeName, (route) => false);
-          },
+          onBackToHome: () => Navigator.of(context).pushNamedAndRemoveUntil(HomeScreen.routeName, (route) => false),
         );
 
       default:
@@ -239,30 +313,61 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
   @override
   Widget build(BuildContext context) {
     D.init(context);
+
+    ref.listen<DataState>(badgeRequestNotifierProvider, (previous, next) {
+      if (_isSubmitting) {
+        next.when(
+          started: () {},
+          loading: () {},
+          success: (data) => setState(() {
+            _generatedReferenceNumber = data.badgeRequestCode;
+            _currentStep = _totalSteps;
+            _isSubmitting = false;
+          }),
+          error: (error) {
+            setState(() => _isSubmitting = false);
+            showErrorModal(
+              context: context,
+              title: 'Submission Failed',
+              description: error ?? 'Failed to submit badge request.',
+              icon: Icons.error_outline,
+              iconColor: Colors.red,
+              buttonText: AppString.ok,
+            );
+          },
+        );
+      }
+    });
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
-            if (_currentStep < 6)
+            if (_currentStep < _totalSteps)
               topVerify(
                 currentStep: _currentStep,
                 totalSteps: _totalSteps - 1,
               ),
             Expanded(
-              child: _currentStep == 6
+              child: _currentStep == _totalSteps
                   ? _buildStepContent()
                   : SingleChildScrollView(
                       padding: EdgeInsets.all(20.w),
                       child: _buildStepContent(),
                     ),
             ),
-            if (_currentStep > 1 && _currentStep < 6)
-              previousNextButton(
-                onPrevious: _handlePrevious,
-                onNext: _handleNext,
-                isDisabled: !_isFormValid,
-              ),
+            if (_currentStep > 1 && _currentStep < _totalSteps)
+              _isSubmitting
+                  ? const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: CircularProgressIndicator(),
+                    )
+                  : previousNextButton(
+                      onPrevious: _handlePrevious,
+                      onNext: _handleNext,
+                      isDisabled: !_isFormValid,
+                    ),
           ],
         ),
       ),

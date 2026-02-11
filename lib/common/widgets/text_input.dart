@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../resources/colors.dart';
 import '../resources/dimensions.dart';
 
@@ -11,6 +12,8 @@ class TextInput extends StatelessWidget {
   final Widget? prefixIcon;
   final Widget? suffixIcon;
   final String? prefixText;
+  final List<TextInputFormatter>? inputFormatters;
+  final bool readOnly;
 
   const TextInput({
     super.key,
@@ -22,6 +25,8 @@ class TextInput extends StatelessWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.prefixText,
+    this.inputFormatters,
+    this.readOnly = false,
   });
 
   @override
@@ -33,6 +38,8 @@ class TextInput extends StatelessWidget {
         keyboardType: keyboardType,
         maxLines: maxLines,
         obscureText: obscureText,
+        readOnly: readOnly,
+        inputFormatters: inputFormatters,
         style: TextStyle(
           fontSize: D.textBase,
           color: Colors.black,
@@ -63,7 +70,7 @@ class TextInput extends StatelessWidget {
                     )
                   : null),
           prefixIconConstraints: prefixText != null
-              ? BoxConstraints(minWidth: 0, minHeight: 0)
+              ? const BoxConstraints(minWidth: 0, minHeight: 0)
               : null,
           suffixIcon: suffixIcon,
           filled: true,

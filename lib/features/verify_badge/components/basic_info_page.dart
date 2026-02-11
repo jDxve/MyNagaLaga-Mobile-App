@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/resources/strings.dart';
+import '../../../common/utils/ui_utils.dart';
 import '../../../common/widgets/error_modal.dart';
 import '../../../common/widgets/text_input.dart';
 import '../../../common/widgets/toggle.dart';
@@ -37,18 +37,27 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
   @override
   void initState() {
     super.initState();
+    _initDefaults();
+    _attachListeners();
+  }
+
+  void _initDefaults() {
     if (widget.selectedGender == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        widget.onGenderChanged('male');
-      });
+      WidgetsBinding.instance.addPostFrameCallback((_) => widget.onGenderChanged('male'));
     }
-    widget.fullNameController.addListener(_validateForm);
-    widget.dateOfBirthController.addListener(_validateForm);
-    widget.addressController.addListener(_validateForm);
-    widget.phoneController.addListener(_validateForm);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _validateForm();
-    });
+  }
+
+  void _attachListeners() {
+    final controllers = [
+      widget.fullNameController,
+      widget.dateOfBirthController,
+      widget.addressController,
+      widget.phoneController
+    ];
+    for (var c in controllers) {
+      c.addListener(_validateForm);
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) => _validateForm());
   }
 
   @override
@@ -61,84 +70,58 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
   }
 
   void _validateForm() {
-    bool isValid = widget.fullNameController.text.trim().isNotEmpty &&
-        widget.dateOfBirthController.text.trim().isNotEmpty &&
-        widget.addressController.text.trim().isNotEmpty &&
-        widget.phoneController.text.trim().isNotEmpty &&
-        widget.phoneController.text.trim().length >= 10;
+    final isValid = UIUtils.validateFullName(widget.fullNameController.text) == null &&
+        widget.dateOfBirthController.text.length == 10 &&
+        UIUtils.validateAddress(widget.addressController.text) == null &&
+        UIUtils.validatePhoneNumber(widget.phoneController.text) == null;
+
     widget.setIsFormValid(() {
-      if (!isValid) {
-        _showValidationError();
-      }
+      if (!isValid) _showValidationError();
     });
   }
 
   void _showValidationError() {
-    List<String> missingFields = [];
-    if (widget.fullNameController.text.trim().isEmpty) {
-      missingFields.add(AppString.fullName);
-    }
-    if (widget.dateOfBirthController.text.trim().isEmpty) {
-      missingFields.add(AppString.dateOfBirth);
-    }
-    if (widget.addressController.text.trim().isEmpty) {
-      missingFields.add(AppString.homeAddress);
-    }
-    if (widget.phoneController.text.trim().isEmpty) {
-      missingFields.add(AppString.contactNumber);
-    } else if (widget.phoneController.text.trim().length < 10) {
-      showErrorModal(
-        context: widget.context,
-        title: AppString.invalidContactNumberTitle,
-        description: AppString.invalidContactNumberDescription,
-        icon: Icons.phone_outlined,
-        iconColor: Colors.orange,
-        buttonText: AppString.ok,
-      );
-      return;
-    }
-    if (missingFields.isNotEmpty) {
-      String fieldsList = missingFields.join(', ');
-      showErrorModal(
-        context: widget.context,
-        title: AppString.requiredFieldsMissingTitle,
-        description: '${AppString.requiredFieldsMissingDescription}$fieldsList',
-        icon: Icons.error_outline,
-        iconColor: Colors.orange,
-        buttonText: AppString.ok,
-      );
+    final nameErr = UIUtils.validateFullName(widget.fullNameController.text);
+    final addrErr = UIUtils.validateAddress(widget.addressController.text);
+    final phoneErr = UIUtils.validatePhoneNumber(widget.phoneController.text);
+
+    if (nameErr != null) {
+      _triggerError(AppString.requiredFieldsMissingTitle, nameErr);
+    } else if (widget.dateOfBirthController.text.length < 10) {
+      _triggerError(AppString.requiredFieldsMissingTitle, "Please enter a valid date (MM/DD/YYYY)");
+    } else if (addrErr != null) {
+      _triggerError(AppString.requiredFieldsMissingTitle, addrErr);
+    } else if (phoneErr != null) {
+      _triggerError(AppString.invalidContactNumberTitle, phoneErr);
     }
   }
 
-  bool get isFormValid {
-    return widget.fullNameController.text.trim().isNotEmpty &&
-        widget.dateOfBirthController.text.trim().isNotEmpty &&
-        widget.addressController.text.trim().isNotEmpty &&
-        widget.phoneController.text.trim().isNotEmpty &&
-        widget.phoneController.text.trim().length >= 10;
+  void _triggerError(String title, String desc) {
+    showErrorModal(
+      context: widget.context,
+      title: title,
+      description: desc,
+      icon: Icons.error_outline,
+      iconColor: Colors.orange,
+      buttonText: AppString.ok,
+    );
   }
 
   Future<void> _selectDate() async {
-    final DateTime? picked = await showDatePicker(
+    final picked = await showDatePicker(
       context: widget.context,
       initialDate: DateTime.now().subtract(const Duration(days: 365 * 18)),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primary,
-              onPrimary: Colors.white,
-              onSurface: Colors.black,
-            ),
-          ),
-          child: child!,
-        );
-      },
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: ColorScheme.light(primary: AppColors.primary),
+        ),
+        child: child!,
+      ),
     );
     if (picked != null) {
-      widget.dateOfBirthController.text = DateFormat('MM/dd/yyyy').format(picked);
+      widget.dateOfBirthController.text = UIUtils.formatDateForDisplay(picked);
     }
   }
 
@@ -147,50 +130,28 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          AppString.fullName,
-          style: TextStyle(
-            fontSize: D.textBase,
-            fontWeight: D.semiBold,
-            color: Colors.black,
-            fontFamily: 'Segoe UI',
-          ),
-        ),
+        _buildLabel(AppString.fullName),
         8.gapH,
         TextInput(
           controller: widget.fullNameController,
           hintText: AppString.fullNameHint,
+          inputFormatters: [UIUtils.upperCaseWordsFormatter],
         ),
         20.gapH,
-        Text(
-          AppString.dateOfBirth,
-          style: TextStyle(
-            fontSize: D.textBase,
-            fontWeight: D.semiBold,
-            color: Colors.black,
-            fontFamily: 'Segoe UI',
-          ),
-        ),
+        _buildLabel(AppString.dateOfBirth),
         8.gapH,
         TextInput(
           controller: widget.dateOfBirthController,
-          hintText: AppString.dateOfBirthHint,
-          keyboardType: TextInputType.datetime,
+          hintText: "MM/DD/YYYY",
+          keyboardType: TextInputType.number,
+          inputFormatters: [UIUtils.dateTextFormatter],
           suffixIcon: IconButton(
             icon: Icon(Icons.calendar_today, color: AppColors.grey, size: 20.w),
             onPressed: _selectDate,
           ),
         ),
         20.gapH,
-        Text(
-          AppString.sex,
-          style: TextStyle(
-            fontSize: D.textBase,
-            fontWeight: D.semiBold,
-            color: Colors.black,
-            fontFamily: 'Segoe UI',
-          ),
-        ),
+        _buildLabel(AppString.sex),
         8.gapH,
         Toggle(
           selectedValue: widget.selectedGender,
@@ -201,39 +162,41 @@ class _BasicInfoPageState extends State<BasicInfoPage> {
           secondValue: 'female',
         ),
         20.gapH,
-        Text(
-          AppString.homeAddress,
-          style: TextStyle(
-            fontSize: D.textBase,
-            fontWeight: D.semiBold,
-            color: Colors.black,
-            fontFamily: 'Segoe UI',
-          ),
-        ),
+        _buildLabel(AppString.homeAddress),
         8.gapH,
         TextInput(
           controller: widget.addressController,
           hintText: AppString.homeAddressHint,
           maxLines: 3,
+          inputFormatters: [UIUtils.upperCaseWordsFormatter],
         ),
         20.gapH,
-        Text(
-          AppString.contactNumber,
-          style: TextStyle(
-            fontSize: D.textBase,
-            fontWeight: D.semiBold,
-            color: Colors.black,
-            fontFamily: 'Segoe UI',
-          ),
-        ),
+        _buildLabel(AppString.contactNumber),
         8.gapH,
         TextInput(
           controller: widget.phoneController,
           hintText: AppString.contactNumberHint,
           keyboardType: TextInputType.phone,
           prefixText: AppString.phonePrefix,
+          inputFormatters: [
+            UIUtils.digitsOnly,
+            UIUtils.lengthLimit(10),
+            UIUtils.phoneNumberFormatter,
+          ],
         ),
       ],
+    );
+  }
+
+  Widget _buildLabel(String text) {
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize: D.textBase,
+        fontWeight: D.semiBold,
+        color: Colors.black,
+        fontFamily: 'Segoe UI',
+      ),
     );
   }
 }
