@@ -102,14 +102,7 @@ class BadgeRequestRepositoryImpl implements BadgeRequestRepository {
         }
       }
 
-      print('🚀 Submitting badge request...');
-      print('📝 Badge Type ID: $badgeTypeId');
-      print('👤 Full Name: $fullName');
-      print('📸 Files count: ${uploadedFiles.length}');
-      
       final response = await _service.submitBadgeRequest(formData);
-
-      print('✅ Response Status: ${response.response.statusCode}');
 
       if (response.response.statusCode == 201) {
         final Map<String, dynamic> rawData = response.data;
