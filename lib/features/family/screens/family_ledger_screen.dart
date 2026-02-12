@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../common/models/dio/data_state.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
-import '../components/family_tree_view.dart';
 import '../components/household_info_card.dart';
 import '../components/empty_state_widget.dart';
+import '../components/family_registry_section.dart';
+import '../models/household_model.dart';
+import '../notitier/my_household_notifier.dart';
 
 class FamilyLedgerScreen extends ConsumerStatefulWidget {
   static const String routeName = '/family-ledger';
@@ -12,185 +15,132 @@ class FamilyLedgerScreen extends ConsumerStatefulWidget {
   const FamilyLedgerScreen({super.key});
 
   @override
-  ConsumerState<FamilyLedgerScreen> createState() => _FamilyLedgerScreenState();
+  ConsumerState<FamilyLedgerScreen> createState() =>
+      _FamilyLedgerScreenState();
 }
 
 class _FamilyLedgerScreenState extends ConsumerState<FamilyLedgerScreen> {
-  bool _isLoading = true;
-  bool _hasHousehold = false;
-  Map<String, dynamic>? _householdData;
-
   @override
   void initState() {
     super.initState();
-    _loadUserHousehold();
-  }
-
-  Future<void> _loadUserHousehold() async {
-    setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 1));
-
-    setState(() {
-      _hasHousehold = true;
-      _householdData = _getMockData();
-      _isLoading = false;
-    });
-  }
-
-  Map<String, dynamic> _getMockData() {
-    return {
-      'id': '1',
-      'household_code': 'HH-001',
-      'barangay': {'id': '1', 'name': 'Cabasan'},
-      'household_members': [
-        _createMember('1', 'John', 'Dela Cruz', 'Head', true, 'Active'),
-        _createMember('2', 'Maria', 'Dela Cruz', 'Spouse', false, 'Active'),
-        _createMember('3', 'Alice', 'Dela Cruz', 'Child', false, 'Active'),
-        _createMember('4', 'Bob', 'Dela Cruz', 'Child', false, 'Active'),
-        _createMember('5', 'Charlie', 'Dela Cruz', 'Child', false, 'Active'),
-        _createMember('6', 'Pedro', 'Dela Cruz', 'Child', false, 'Active'),
-        _createMember('7', 'Prince', 'Dela Cruz', 'Grandchild', false, 'Active'),
-        _createMember('8', 'Mary', 'Dela Cruz', 'Grandchild', false, 'Active'),
-        _createMember('9', 'Jay', 'Dela Cruz', 'Grandchild', false, 'Active'),
-      ],
-    };
-  }
-
-  Map<String, dynamic> _createMember(
-    String id,
-    String firstName,
-    String lastName,
-    String relationship,
-    bool isHead,
-    String status,
-  ) {
-    return {
-      'id': id,
-      'is_head': isHead,
-      'relationship_to_head': relationship,
-      'status': status,
-      'residents': {
-        'id': id,
-        'first_name': firstName,
-        'last_name': lastName,
-        'birthdate': '2000-01-01',
-      },
-    };
+    Future.microtask(
+      () => ref.read(myHouseholdNotifierProvider.notifier).getMyHousehold(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     D.init(context);
 
-    if (_isLoading) {
-      return Scaffold(
-        backgroundColor: AppColors.background,
-        body: const Center(child: CircularProgressIndicator()),
-      );
-    }
+    final householdState = ref.watch(myHouseholdNotifierProvider);
 
-    return _hasHousehold ? _buildHouseholdView() : _buildNoHouseholdView();
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: householdState.when(
+          started: () => const Center(child: Text('Initializing...')),
+          loading: () => const Center(child: CircularProgressIndicator()),
+          success: (household) {
+            if (household == null) {
+              return _buildNoHousehold();
+            }
+            return _buildHouseholdContent(household);
+          },
+          error: (error) => Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Error: $error'),
+                16.gapH,
+                ElevatedButton(
+                  onPressed: () => ref
+                      .read(myHouseholdNotifierProvider.notifier)
+                      .getMyHousehold(forceRefresh: true),
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
-  Widget _buildHouseholdView() {
-    return Container(
-      color: AppColors.background,
-      child: SafeArea(
-        child: Column(
-          children: [
-            _buildHeader(),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    20.gapH,
-                    HouseholdInfoCard(
-                      householdCode: _householdData!['household_code'],
-                      barangay: _householdData!['barangay']['name'],
-                      memberCount: _householdData!['household_members'].length,
-                    ),
-                    32.gapH,
-                    _buildFamilyRegistry(),
-                  ],
-                ),
+  Widget _buildNoHousehold() {
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
+          child: Column(children: [16.gapH, _buildHeader()]),
+        ),
+        const Expanded(
+          child: EmptyStateWidget(
+            icon: Icons.family_restroom,
+            title: 'No Household Found',
+            message: 'You are not currently part of any household.',
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHouseholdContent(Household household) {
+    return RefreshIndicator(
+      onRefresh: () => ref
+          .read(myHouseholdNotifierProvider.notifier)
+          .getMyHousehold(forceRefresh: true),
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              16.gapH,
+              _buildHeader(),
+              20.gapH,
+              HouseholdInfoCard(
+                householdCode: household.householdCode,
+                barangay: household.barangays.name,
+                memberCount: household.memberCount,
               ),
-            ),
-          ],
+              32.gapH,
+              FamilyRegistrySection(
+                members: household.householdMembers,
+                currentUserMemberId: household.myMemberId,
+              ),
+              24.gapH,
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildHeader() {
-    return Container(
-      color: AppColors.white,
-      padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 16.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Family Ledger',
-            style: TextStyle(
-              fontSize: D.textXL,
-              fontWeight: D.bold,
-              color: AppColors.textlogo,
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Family Ledger',
+          style: TextStyle(
+            fontSize: 24.f,
+            fontWeight: FontWeight.w700,
+            fontFamily: 'Segoe UI',
+            color: AppColors.textlogo,
           ),
-          4.gapH,
-          Text(
-            'View and manage your household members',
-            style: TextStyle(fontSize: D.textSM, color: AppColors.grey),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFamilyRegistry() {
-    return Container(
-      color: AppColors.white,
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: 24.h),
-      child: Column(
-        children: [
-          Text(
-            'Family Registry',
-            style: TextStyle(
-              fontSize: D.textXL,
-              fontWeight: D.bold,
-              color: AppColors.textlogo,
-            ),
-          ),
-          8.gapH,
-          Text(
-            'Your household members',
-            style: TextStyle(fontSize: D.textSM, color: AppColors.grey),
-          ),
-          32.gapH,
-          FamilyTreeView(members: _householdData!['household_members']),
-          40.gapH,
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNoHouseholdView() {
-    return Container(
-      color: AppColors.background,
-      child: SafeArea(
-        child: Column(
-          children: [
-            _buildHeader(),
-            Expanded(
-              child: EmptyStateWidget(
-                icon: Icons.family_restroom,
-                title: 'No Household Found',
-                message: 'You are not currently part of any household.',
-              ),
-            ),
-          ],
         ),
-      ),
+        4.gapH,
+        Text(
+          'View and manage your household members',
+          style: TextStyle(
+            fontSize: 14.f,
+            fontWeight: FontWeight.w400,
+            fontFamily: 'Segoe UI',
+            color: AppColors.grey,
+          ),
+        ),
+      ],
     );
   }
 }

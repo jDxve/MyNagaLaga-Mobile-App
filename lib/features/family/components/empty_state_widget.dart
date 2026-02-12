@@ -1,4 +1,3 @@
-// lib/features/family_ledger/components/empty_state_widget.dart
 import 'package:flutter/material.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
