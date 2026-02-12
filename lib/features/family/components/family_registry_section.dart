@@ -18,7 +18,8 @@ class FamilyRegistrySection extends StatelessWidget {
   Widget build(BuildContext context) {
     final parents = members
         .where((m) =>
-            m.relationshipToHead == 'Head' || m.relationshipToHead == 'Spouse')
+            m.relationshipToHead == 'Head' ||
+            m.relationshipToHead == 'Spouse')
         .toList();
 
     final children = members
@@ -38,6 +39,36 @@ class FamilyRegistrySection extends StatelessWidget {
             m.relationshipToHead != 'Sibling' &&
             m.relationshipToHead != 'Grandchild')
         .toList();
+
+    Widget verticalConnector() {
+      return Container(
+        width: 2,
+        height: 30.h,
+        margin: EdgeInsets.symmetric(vertical: 10.h),
+        color: AppColors.grey.withOpacity(0.3),
+      );
+    }
+
+    Widget memberRow(List<HouseholdMember> list) {
+      return Wrap(
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 20.w,
+        runSpacing: 20.h,
+        children: list.map((member) {
+          final isCurrentUser =
+              currentUserMemberId != null && member.id == currentUserMemberId;
+
+          return TreeMemberNode(
+            name: member.fullName,
+            role: member.relationshipToHead,
+            isHead: member.isHead,
+            status: member.status,
+            isCurrentUser: isCurrentUser,
+          );
+        }).toList(),
+      );
+    }
 
     return Container(
       color: AppColors.white,
@@ -72,49 +103,18 @@ class FamilyRegistrySection extends StatelessWidget {
             ),
           ),
           32.gapH,
-          if (parents.isNotEmpty) _buildWrappedRow(parents),
-          if (parents.isNotEmpty && children.isNotEmpty)
-            _buildVerticalConnector(),
-          if (children.isNotEmpty) _buildWrappedRow(children),
+          if (parents.isNotEmpty) memberRow(parents),
+          if (parents.isNotEmpty && children.isNotEmpty) verticalConnector(),
+          if (children.isNotEmpty) memberRow(children),
           if (children.isNotEmpty && grandchildren.isNotEmpty)
-            _buildVerticalConnector(),
-          if (grandchildren.isNotEmpty) _buildWrappedRow(grandchildren),
+            verticalConnector(),
+          if (grandchildren.isNotEmpty) memberRow(grandchildren),
           if (others.isNotEmpty) ...[
-            _buildVerticalConnector(),
-            _buildWrappedRow(others),
+            verticalConnector(),
+            memberRow(others),
           ],
         ],
       ),
-    );
-  }
-
-  Widget _buildWrappedRow(List<HouseholdMember> groupMembers) {
-    return Wrap(
-      alignment: WrapAlignment.center,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      spacing: 20.w,
-      runSpacing: 20.h,
-      children: groupMembers.map((member) {
-        final isCurrentUser =
-            currentUserMemberId != null && member.id == currentUserMemberId;
-
-        return TreeMemberNode(
-          name: member.fullName,
-          role: member.relationshipToHead,
-          isHead: member.isHead,
-          status: member.status,
-          isCurrentUser: isCurrentUser,
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildVerticalConnector() {
-    return Container(
-      width: 2,
-      height: 30.h,
-      margin: EdgeInsets.symmetric(vertical: 10.h),
-      color: AppColors.grey.withOpacity(0.3),
     );
   }
 }

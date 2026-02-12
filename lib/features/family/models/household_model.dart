@@ -104,7 +104,7 @@ class Household {
   final String myRelationship;
   final String myStatus;
   final bool isHouseholdHead;
-  final String? myMemberId; // ⭐ Add this field
+  final String? myMemberId; 
 
   Household({
     required this.id,
@@ -118,7 +118,7 @@ class Household {
     required this.myRelationship,
     required this.myStatus,
     required this.isHouseholdHead,
-    this.myMemberId, // ⭐ Add this
+    this.myMemberId, 
   });
 
   factory Household.fromJson(Map<String, dynamic> json) => Household(
