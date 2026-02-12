@@ -2,15 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
-import '../../../common/widgets/primary_button.dart';
-
-import '../../auth/notifier/auth_session_notifier.dart';
-import '../componets/family_ledger_banner.dart';
-import '../componets/family_tree_page.dart';
+import '../components/family_tree_view.dart';
+import '../components/household_info_card.dart';
+import '../components/empty_state_widget.dart';
 
 class FamilyLedgerScreen extends ConsumerStatefulWidget {
   static const String routeName = '/family-ledger';
-  
+
   const FamilyLedgerScreen({super.key});
 
   @override
@@ -18,184 +16,179 @@ class FamilyLedgerScreen extends ConsumerStatefulWidget {
 }
 
 class _FamilyLedgerScreenState extends ConsumerState<FamilyLedgerScreen> {
-  String? _householdId;
-  bool _isLoadingHousehold = true;
+  bool _isLoading = true;
+  bool _hasHousehold = false;
+  Map<String, dynamic>? _householdData;
 
   @override
   void initState() {
     super.initState();
-    // Load household after widget is built
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadUserHousehold();
-    });
+    _loadUserHousehold();
   }
 
   Future<void> _loadUserHousehold() async {
+    setState(() => _isLoading = true);
+    await Future.delayed(const Duration(seconds: 1));
+
     setState(() {
-      _isLoadingHousehold = true;
+      _hasHousehold = true;
+      _householdData = _getMockData();
+      _isLoading = false;
     });
-
-    // Get authenticated user ID from session
-    final authSession = ref.read(authSessionProvider);
-    final userId = authSession.userId;
-
-    if (userId == null) {
-      debugPrint('❌ No authenticated user');
-      setState(() {
-        _isLoadingHousehold = false;
-      });
-      return;
-    }
-
-    debugPrint('📤 Fetching household for user: $userId');
-
-    // TODO: Call your repository to get user's household
-    // For now, you can hardcode or make an API call
-    // Example:
-    // final repository = ref.read(familyLedgerRepositoryProvider);
-    // final result = await repository.getMyHousehold();
-    
-    // Temporary: Set household ID (replace with actual API call)
-    setState(() {
-      _householdId = '13'; // Replace with actual household ID from API
-      _isLoadingHousehold = false;
-    });
-
-    debugPrint('✅ User household ID: $_householdId');
   }
 
-  void _navigateToFamilyTree() {
-    final authSession = ref.read(authSessionProvider);
-    
-    if (!authSession.isAuthenticated) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please login first'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
+  Map<String, dynamic> _getMockData() {
+    return {
+      'id': '1',
+      'household_code': 'HH-001',
+      'barangay': {'id': '1', 'name': 'Cabasan'},
+      'household_members': [
+        _createMember('1', 'John', 'Dela Cruz', 'Head', true, 'Active'),
+        _createMember('2', 'Maria', 'Dela Cruz', 'Spouse', false, 'Active'),
+        _createMember('3', 'Alice', 'Dela Cruz', 'Child', false, 'Active'),
+        _createMember('4', 'Bob', 'Dela Cruz', 'Child', false, 'Active'),
+        _createMember('5', 'Charlie', 'Dela Cruz', 'Child', false, 'Active'),
+        _createMember('6', 'Pedro', 'Dela Cruz', 'Child', false, 'Active'),
+        _createMember('7', 'Prince', 'Dela Cruz', 'Grandchild', false, 'Active'),
+        _createMember('8', 'Mary', 'Dela Cruz', 'Grandchild', false, 'Active'),
+        _createMember('9', 'Jay', 'Dela Cruz', 'Grandchild', false, 'Active'),
+      ],
+    };
+  }
 
-    if (_householdId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('You are not part of any household yet'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => FamilyTreePage(
-          householdId: _householdId,
-        ),
-      ),
-    );
+  Map<String, dynamic> _createMember(
+    String id,
+    String firstName,
+    String lastName,
+    String relationship,
+    bool isHead,
+    String status,
+  ) {
+    return {
+      'id': id,
+      'is_head': isHead,
+      'relationship_to_head': relationship,
+      'status': status,
+      'residents': {
+        'id': id,
+        'first_name': firstName,
+        'last_name': lastName,
+        'birthdate': '2000-01-01',
+      },
+    };
   }
 
   @override
   Widget build(BuildContext context) {
     D.init(context);
 
-    // Watch auth session for changes
-    final authSession = ref.watch(authSessionProvider);
+    if (_isLoading) {
+      return Scaffold(
+        backgroundColor: AppColors.background,
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
 
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-          child: Column(
-            children: [
-              100.gapH,
-              
-              // Family Ledger Title
-              Text(
-                'Family Ledger',
-                style: TextStyle(
-                  fontSize: D.textLG,
-                  fontWeight: D.bold,
-                  color: AppColors.textlogo,
+    return _hasHousehold ? _buildHouseholdView() : _buildNoHouseholdView();
+  }
+
+  Widget _buildHouseholdView() {
+    return Container(
+      color: AppColors.background,
+      child: SafeArea(
+        child: Column(
+          children: [
+            _buildHeader(),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    20.gapH,
+                    HouseholdInfoCard(
+                      householdCode: _householdData!['household_code'],
+                      barangay: _householdData!['barangay']['name'],
+                      memberCount: _householdData!['household_members'].length,
+                    ),
+                    32.gapH,
+                    _buildFamilyRegistry(),
+                  ],
                 ),
               ),
-              16.gapH,
-              
-              const FamilyLedgerBanner(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-              // Show user info
-              if (authSession.isAuthenticated) ...[
-                16.gapH,
-                Container(
-                  padding: EdgeInsets.all(16.w),
-                  decoration: BoxDecoration(
-                    color: AppColors.lightPrimary,
-                    borderRadius: BorderRadius.circular(D.radiusMD),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Logged in as:',
-                        style: TextStyle(
-                          fontSize: D.textXS,
-                          color: AppColors.grey,
-                        ),
-                      ),
-                      4.gapH,
-                      Text(
-                        authSession.fullName ?? authSession.email ?? 'User',
-                        style: TextStyle(
-                          fontSize: D.textBase,
-                          fontWeight: D.semiBold,
-                          color: AppColors.textlogo,
-                        ),
-                      ),
-                      if (_householdId != null) ...[
-                        8.gapH,
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.home,
-                              size: 16.w,
-                              color: AppColors.primary,
-                            ),
-                            6.gapW,
-                            Text(
-                              'Household: $_householdId',
-                              style: TextStyle(
-                                fontSize: D.textSM,
-                                color: AppColors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ],
-
-              24.gapH,
-
-              // Button
-              _isLoadingHousehold
-                  ? const CircularProgressIndicator()
-                  : PrimaryButton(
-                      text: _householdId != null 
-                          ? 'View Family Tree' 
-                          : 'No Household Found',
-                      onPressed: _householdId != null 
-                          ? _navigateToFamilyTree 
-                          : () {}, // Empty function instead of null
-                    ),
-              
-              24.gapH,
-            ],
+  Widget _buildHeader() {
+    return Container(
+      color: AppColors.white,
+      padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 16.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Family Ledger',
+            style: TextStyle(
+              fontSize: D.textXL,
+              fontWeight: D.bold,
+              color: AppColors.textlogo,
+            ),
           ),
+          4.gapH,
+          Text(
+            'View and manage your household members',
+            style: TextStyle(fontSize: D.textSM, color: AppColors.grey),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFamilyRegistry() {
+    return Container(
+      color: AppColors.white,
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(vertical: 24.h),
+      child: Column(
+        children: [
+          Text(
+            'Family Registry',
+            style: TextStyle(
+              fontSize: D.textXL,
+              fontWeight: D.bold,
+              color: AppColors.textlogo,
+            ),
+          ),
+          8.gapH,
+          Text(
+            'Your household members',
+            style: TextStyle(fontSize: D.textSM, color: AppColors.grey),
+          ),
+          32.gapH,
+          FamilyTreeView(members: _householdData!['household_members']),
+          40.gapH,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNoHouseholdView() {
+    return Container(
+      color: AppColors.background,
+      child: SafeArea(
+        child: Column(
+          children: [
+            _buildHeader(),
+            Expanded(
+              child: EmptyStateWidget(
+                icon: Icons.family_restroom,
+                title: 'No Household Found',
+                message: 'You are not currently part of any household.',
+              ),
+            ),
+          ],
         ),
       ),
     );
