@@ -54,7 +54,7 @@ class ProfileHeaderContent extends StatelessWidget {
           phoneNumber,
           style: TextStyle(
             fontFamily: 'Segoe UI',
-            fontSize: D.textBase,
+            fontSize: D.textLG,
             color: AppColors.grey,
           ),
         ),

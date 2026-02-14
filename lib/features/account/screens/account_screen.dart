@@ -1,49 +1,57 @@
-// account/screens/account_screen.dart
 import 'package:flutter/material.dart';
-import '../../../common/resources/dimensions.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../common/widgets/background_gradient.dart';
+import '../../../common/resources/dimensions.dart';
 import '../components/settings_tile.dart';
+import '../../../common/models/dio/data_state.dart';
+import '../notifier/user_info_notifier.dart';
 
-class AccountScreen extends StatelessWidget {
+class AccountScreen extends ConsumerStatefulWidget {
   static const routeName = '/account';
+  const AccountScreen({super.key});
 
-  final String name;
-  final String phoneNumber;
+  @override
+  ConsumerState<AccountScreen> createState() => _AccountScreenState();
+}
 
-  const AccountScreen({
-    super.key,
-    this.name = 'John Dave Banas',
-    this.phoneNumber = '09928463564972',
-  });
+class _AccountScreenState extends ConsumerState<AccountScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(userInfoNotifierProvider.notifier).fetchUserInfo();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final userState = ref.watch(userInfoNotifierProvider);
+
     return gradientBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                46.gapH,
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: 24.w),
-                  padding: EdgeInsets.symmetric(
-                    vertical: 24.h,
-                    horizontal: 24.w,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(D.radiusXL),
-                  ),
-                  child: SettingsTile.buildList(
-                    context,
-                    name: name,
-                    phoneNumber: phoneNumber,
-                  ),
+          child: userState.when(
+            started: () => const Center(child: CircularProgressIndicator()),
+            loading: () => const Center(child: CircularProgressIndicator()),
+            success: (user) => SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Container(
+                padding: EdgeInsets.all(24.w),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(D.radiusXL),
                 ),
-                40.gapH,
-              ],
+                child: SettingsTile.buildList(
+                  context,
+                  name: user.fullName ?? user.email,
+                  phoneNumber: user.phoneNumber ?? 'N/A',
+                ),
+              ),
+            ),
+            error: (err) => const Padding(
+              padding: EdgeInsets.all(24.0),
+              child: Center(child: Text('Error loading profile')),
             ),
           ),
         ),
