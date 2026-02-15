@@ -1,26 +1,36 @@
 import 'package:flutter/material.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
+
 import '../../../common/widgets/secondary_button.dart';
 import '../models/shelter_data_model.dart';
+import '../../../common/utils/distant_caculator.dart';
 
 class ShelterDetailsSheet extends StatelessWidget {
   final ShelterData shelter;
+  final double? distanceInKm;
   final VoidCallback onDirections;
 
   const ShelterDetailsSheet({
     super.key,
     required this.shelter,
+    this.distanceInKm,
     required this.onDirections,
   });
 
-  static void show(BuildContext context, ShelterData shelter, VoidCallback onDirections) {
+  static void show(
+    BuildContext context,
+    ShelterData shelter,
+    double? distanceInKm,
+    VoidCallback onDirections,
+  ) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => ShelterDetailsSheet(
         shelter: shelter,
+        distanceInKm: distanceInKm,
         onDirections: onDirections,
       ),
     );
@@ -96,7 +106,9 @@ class ShelterDetailsSheet extends StatelessWidget {
             const Icon(Icons.near_me, size: 18, color: AppColors.primary),
             const SizedBox(width: 6),
             Text(
-              '0.5 km away',
+              distanceInKm != null
+                  ? DistanceCalculator.formatDistance(distanceInKm!)
+                  : 'Calculating...',
               style: TextStyle(
                 color: AppColors.primary,
                 fontSize: D.textBase,
@@ -105,7 +117,8 @@ class ShelterDetailsSheet extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-            const Icon(Icons.location_on_outlined, size: 16, color: AppColors.grey),
+            const Icon(Icons.location_on_outlined,
+                size: 16, color: AppColors.grey),
             const SizedBox(width: 4),
             Expanded(
               child: Text(
@@ -126,22 +139,46 @@ class ShelterDetailsSheet extends StatelessWidget {
   }
 
   Widget _buildStatusBadge() {
+    final config = _getStatusConfig();
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.1),
+        color: config['bgColor'],
         borderRadius: BorderRadius.circular(8),
       ),
-      child: const Text(
-        'AVAILABLE',
+      child: Text(
+        config['text'],
         style: TextStyle(
-          color: AppColors.primary,
+          color: config['textColor'],
           fontSize: 10,
           fontWeight: FontWeight.w900,
           fontFamily: 'Segoe UI',
         ),
       ),
     );
+  }
+
+  Map<String, dynamic> _getStatusConfig() {
+    switch (shelter.status) {
+      case ShelterStatus.available:
+        return {
+          'text': 'AVAILABLE',
+          'bgColor': AppColors.primary.withOpacity(0.1),
+          'textColor': AppColors.primary,
+        };
+      case ShelterStatus.limited:
+        return {
+          'text': 'LIMITED',
+          'bgColor': AppColors.orange.withOpacity(0.1),
+          'textColor': AppColors.orange,
+        };
+      case ShelterStatus.full:
+        return {
+          'text': 'FULL',
+          'bgColor': AppColors.red.withOpacity(0.1),
+          'textColor': AppColors.red,
+        };
+    }
   }
 
   Widget _buildOccupancySection(String current, String total) {
@@ -217,10 +254,34 @@ class ShelterDetailsSheet extends StatelessWidget {
           mainAxisSpacing: 20,
           crossAxisSpacing: 16,
           children: [
-            _VulnerableTile(icon: Icons.elderly, count: shelter.seniors, label: 'Senior', bgColor: AppColors.lightYellow, iconColor: AppColors.darkYellow),
-            _VulnerableTile(icon: Icons.child_care, count: shelter.infants, label: 'Infant', bgColor: AppColors.lightBlue, iconColor: AppColors.darkBlue),
-            _VulnerableTile(icon: Icons.accessible, count: shelter.pwd, label: 'PWD', bgColor: AppColors.lightPurple, iconColor: AppColors.darkPurple),
-            _VulnerableTile(icon: Icons.pregnant_woman, count: 2, label: 'Pregnant', bgColor: AppColors.lightPink, iconColor: AppColors.darkPink),
+            _VulnerableTile(
+              icon: Icons.elderly,
+              count: shelter.seniors,
+              label: 'Senior',
+              bgColor: AppColors.lightYellow,
+              iconColor: AppColors.darkYellow,
+            ),
+            _VulnerableTile(
+              icon: Icons.child_care,
+              count: shelter.infants,
+              label: 'Infant',
+              bgColor: AppColors.lightBlue,
+              iconColor: AppColors.darkBlue,
+            ),
+            _VulnerableTile(
+              icon: Icons.accessible,
+              count: shelter.pwd,
+              label: 'PWD',
+              bgColor: AppColors.lightPurple,
+              iconColor: AppColors.darkPurple,
+            ),
+            _VulnerableTile(
+              icon: Icons.pregnant_woman,
+              count: 2,
+              label: 'Pregnant',
+              bgColor: AppColors.lightPink,
+              iconColor: AppColors.darkPink,
+            ),
           ],
         ),
       ],
@@ -244,7 +305,9 @@ class ShelterDetailsSheet extends StatelessWidget {
         Wrap(
           spacing: 10,
           runSpacing: 10,
-          children: ['Water', 'Restroom', 'First Aid'].map((e) => _AmenityChip(label: e)).toList(),
+          children: ['Water', 'Restroom', 'First Aid']
+              .map((e) => _AmenityChip(label: e))
+              .toList(),
         ),
       ],
     );
@@ -279,7 +342,13 @@ class _VulnerableTile extends StatelessWidget {
   final Color bgColor;
   final Color iconColor;
 
-  const _VulnerableTile({required this.icon, required this.count, required this.label, required this.bgColor, required this.iconColor});
+  const _VulnerableTile({
+    required this.icon,
+    required this.count,
+    required this.label,
+    required this.bgColor,
+    required this.iconColor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -302,11 +371,22 @@ class _VulnerableTile extends StatelessWidget {
           children: [
             Text(
               '$count',
-              style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 22, color: AppColors.textlogo, fontFamily: 'Segoe UI', height: 1.1),
+              style: const TextStyle(
+                fontWeight: FontWeight.w900,
+                fontSize: 22,
+                color: AppColors.textlogo,
+                fontFamily: 'Segoe UI',
+                height: 1.1,
+              ),
             ),
             Text(
               label,
-              style: const TextStyle(color: AppColors.grey, fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'Segoe UI'),
+              style: const TextStyle(
+                color: AppColors.grey,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Segoe UI',
+              ),
             ),
           ],
         ),
@@ -317,6 +397,7 @@ class _VulnerableTile extends StatelessWidget {
 
 class _AmenityChip extends StatelessWidget {
   final String label;
+
   const _AmenityChip({required this.label});
 
   @override
@@ -330,7 +411,12 @@ class _AmenityChip extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: const TextStyle(color: AppColors.grey, fontSize: 13, fontWeight: FontWeight.w700, fontFamily: 'Segoe UI'),
+        style: const TextStyle(
+          color: AppColors.grey,
+          fontSize: 13,
+          fontWeight: FontWeight.w700,
+          fontFamily: 'Segoe UI',
+        ),
       ),
     );
   }

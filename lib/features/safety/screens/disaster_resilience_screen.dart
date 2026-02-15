@@ -21,11 +21,12 @@ class DisasterResilienceScreen extends ConsumerStatefulWidget {
 class _DisasterResilienceScreenState
     extends ConsumerState<DisasterResilienceScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final GlobalKey<ShelterMapState> _mapKey = GlobalKey<ShelterMapState>();
+  Map<String, double> _distances = {};
 
   @override
   void initState() {
     super.initState();
-    // Fetch shelters when screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(sheltersNotifierProvider.notifier).fetchAllShelters();
     });
@@ -35,6 +36,14 @@ class _DisasterResilienceScreenState
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _updateDistances(Map<String, double> distances) {
+    if (mounted) {
+      setState(() {
+        _distances = distances;
+      });
+    }
   }
 
   @override
@@ -47,7 +56,6 @@ class _DisasterResilienceScreenState
       body: SafeArea(
         child: Column(
           children: [
-            // Header
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
               child: Row(
@@ -63,27 +71,19 @@ class _DisasterResilienceScreenState
                   ),
                   circularNotif(
                     notificationCount: 3,
-                    onTap: () {
-                      // Handle notification tap
-                    },
+                    onTap: () {},
                   ),
                 ],
               ),
             ),
-
-            // Search Bar
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
               child: searchInput(
                 hintText: 'Search',
                 controller: _searchController,
-                onChanged: (value) {
-                  // Implement search functionality
-                },
+                onChanged: (value) {},
               ),
             ),
-
-            // Content based on state
             Expanded(
               child: sheltersState.when(
                 started: () => const Center(
@@ -118,11 +118,16 @@ class _DisasterResilienceScreenState
 
                   return Column(
                     children: [
-                      // Map Section
-                      ShelterMap(shelters: data.shelters),
-
-                      // Shelters List
-                      SheltersList(shelters: data.shelters),
+                      ShelterMap(
+                        key: _mapKey,
+                        shelters: data.shelters,
+                        onDistancesCalculated: _updateDistances,
+                      ),
+                      SheltersList(
+                        shelters: data.shelters,
+                        distances: _distances,
+                        mapKey: _mapKey,
+                      ),
                     ],
                   );
                 },

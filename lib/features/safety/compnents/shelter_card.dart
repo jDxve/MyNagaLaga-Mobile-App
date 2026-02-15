@@ -2,12 +2,19 @@ import 'package:flutter/material.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 import '../models/shelter_data_model.dart';
+import '../../../common/utils/distant_caculator.dart';
 
 class ShelterCard extends StatelessWidget {
   final ShelterData shelter;
+  final double? distanceInKm;
   final VoidCallback? onTap;
 
-  const ShelterCard({super.key, required this.shelter, this.onTap});
+  const ShelterCard({
+    super.key,
+    required this.shelter,
+    this.distanceInKm,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +96,9 @@ class ShelterCard extends StatelessWidget {
         Icon(Icons.near_me, size: 14, color: AppColors.primary),
         4.gapW,
         Text(
-          '0.5 km away',
+          distanceInKm != null
+              ? DistanceCalculator.formatDistance(distanceInKm!)
+              : 'Calculating...',
           style: TextStyle(
             fontSize: D.textSM,
             fontWeight: D.semiBold,

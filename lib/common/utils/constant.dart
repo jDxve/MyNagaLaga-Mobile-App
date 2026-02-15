@@ -3,7 +3,7 @@ import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 class Constant {
   static const String forMe = 'for_me';
   static const String forFamily = 'for_family';
-
+  
   static const List<String> educationLevels = [
     'Elementary',
     'Junior High School',
@@ -11,7 +11,7 @@ class Constant {
     'College',
     'Graduate School',
   ];
-
+  
   static const Map<String, List<String>> yearLevelMap = {
     'Elementary': [
       'Grade 1',
@@ -26,24 +26,35 @@ class Constant {
     'College': ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'],
     'Graduate School': ['1st Year', '2nd Year', '3rd Year'],
   };
-
+  
   static final nagaCityCenter = GeoPoint(
     latitude: 13.6218,
     longitude: 123.1948,
   );
-
+  
   static final nagaBoundingBox = BoundingBox(
-    east: 123.2770,
-    north: 13.6820,
-    south: 13.5700,
-    west: 123.1400,
+    north: 14.5,
+    south: 12.0,
+    east: 124.5,
+    west: 122.5,
   );
-
+  
   static const List<String> monthsShort = [
-    '', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    '',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
   ];
-
+  
   static String formatDateRange(DateTime start, DateTime end) {
     return '${monthsShort[start.month]} ${start.day} - ${monthsShort[end.month]} ${end.day}, ${end.year}';
   }
