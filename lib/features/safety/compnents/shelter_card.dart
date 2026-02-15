@@ -20,166 +20,178 @@ class ShelterCard extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(D.radiusLG),
           border: Border.all(
-            color: AppColors.grey.withOpacity(0.2),
+            color: AppColors.grey.withOpacity(0.1),
             width: 1,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    shelter.name,
-                    style: TextStyle(
-                      fontSize: D.textBase,
-                      fontWeight: D.bold,
-                      color: AppColors.black,
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
-                  decoration: BoxDecoration(
-                    color: _getStatusBackgroundColor(shelter.status),
-                    borderRadius: BorderRadius.circular(D.radiusSM),
-                  ),
-                  child: Text(
-                    _getStatusText(shelter.status),
-                    style: TextStyle(
-                      fontSize: D.textXS,
-                      fontWeight: D.semiBold,
-                      color: _getStatusTextColor(shelter.status),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            _buildHeader(),
             8.gapH,
-            Text(
-              shelter.address,
-              style: TextStyle(
-                fontSize: D.textSM,
-                color: AppColors.grey,
-              ),
-            ),
-            12.gapH,
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Capacity',
-                  style: TextStyle(
-                    fontSize: D.textSM,
-                    fontWeight: D.medium,
-                    color: AppColors.grey,
-                  ),
-                ),
-                Text(
-                  shelter.capacity,
-                  style: TextStyle(
-                    fontSize: D.textSM,
-                    fontWeight: D.bold,
-                    color: AppColors.black,
-                  ),
-                ),
-              ],
-            ),
-            8.gapH,
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: _getCapacityPercentage(shelter.capacity),
-                backgroundColor: AppColors.grey.withOpacity(0.2),
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  _getStatusTextColor(shelter.status),
-                ),
-                minHeight: 6,
-              ),
-            ),
-            12.gapH,
-            Row(
-              children: [
-                _buildIconInfo(Icons.elderly, shelter.seniors.toString(), 'Seniors'),
-                16.gapW,
-                _buildIconInfo(Icons.child_care, shelter.infants.toString(), 'Infants'),
-                16.gapW,
-                _buildIconInfo(Icons.accessible, shelter.pwd.toString(), 'PWD'),
-              ],
-            ),
+            _buildLocationRow(),
+            16.gapH,
+            _buildCapacitySection(),
           ],
         ),
       ),
     );
   }
 
-  double _getCapacityPercentage(String capacity) {
-    final parts = capacity.split('/');
-    if (parts.length == 2) {
-      final current = int.tryParse(parts[0]) ?? 0;
-      final total = int.tryParse(parts[1]) ?? 1;
-      return current / total;
-    }
-    return 0.0;
-  }
-
-  String _getStatusText(ShelterStatus status) {
-    switch (status) {
-      case ShelterStatus.available:
-        return 'Available';
-      case ShelterStatus.limited:
-        return 'Limited';
-      case ShelterStatus.full:
-        return 'Full';
-    }
-  }
-
-  Color _getStatusBackgroundColor(ShelterStatus status) {
-    switch (status) {
-      case ShelterStatus.available:
-        return AppColors.lightPrimary;
-      case ShelterStatus.limited:
-        return AppColors.lightYellow;
-      case ShelterStatus.full:
-        return Colors.red.withOpacity(0.1);
-    }
-  }
-
-  Color _getStatusTextColor(ShelterStatus status) {
-    switch (status) {
-      case ShelterStatus.available:
-        return AppColors.primary;
-      case ShelterStatus.limited:
-        return AppColors.orange;
-      case ShelterStatus.full:
-        return Colors.red;
-    }
-  }
-
-  Widget _buildIconInfo(IconData icon, String count, String label) {
+  Widget _buildHeader() {
     return Row(
       children: [
-        Icon(icon, size: D.iconSM, color: AppColors.grey),
+        Expanded(
+          child: Text(
+            shelter.name,
+            style: TextStyle(
+              fontSize: D.textBase,
+              fontWeight: D.bold,
+              color: AppColors.black,
+            ),
+          ),
+        ),
+        _buildStatusBadge(),
+      ],
+    );
+  }
+
+  Widget _buildStatusBadge() {
+    final config = _StatusConfig.from(shelter.status);
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+      decoration: BoxDecoration(
+        color: config.backgroundColor,
+        borderRadius: BorderRadius.circular(D.radiusSM),
+      ),
+      child: Text(
+        config.text.toUpperCase(),
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: D.bold,
+          color: config.textColor,
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLocationRow() {
+    return Row(
+      children: [
+        Icon(Icons.near_me, size: 14, color: AppColors.primary),
         4.gapW,
         Text(
-          count,
+          '0.5 km away',
           style: TextStyle(
             fontSize: D.textSM,
             fontWeight: D.semiBold,
-            color: AppColors.black,
+            color: AppColors.primary,
           ),
         ),
+        12.gapW,
+        Icon(Icons.location_on_outlined, size: 14, color: AppColors.grey),
         4.gapW,
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: D.textXS,
-            color: AppColors.grey,
+        Expanded(
+          child: Text(
+            shelter.address,
+            style: TextStyle(fontSize: D.textSM, color: AppColors.grey),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],
     );
+  }
+
+  Widget _buildCapacitySection() {
+    final percentage = _calculateCapacityPercentage();
+    final barColor = _StatusConfig.from(shelter.status).textColor;
+
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Occupancy',
+              style: TextStyle(
+                fontSize: D.textXS,
+                fontWeight: D.semiBold,
+                color: AppColors.grey,
+              ),
+            ),
+            Text(
+              shelter.capacity,
+              style: TextStyle(
+                fontSize: D.textXS,
+                fontWeight: D.bold,
+                color: AppColors.black,
+              ),
+            ),
+          ],
+        ),
+        6.gapH,
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: LinearProgressIndicator(
+            value: percentage,
+            backgroundColor: AppColors.grey.withOpacity(0.1),
+            valueColor: AlwaysStoppedAnimation<Color>(barColor),
+            minHeight: 8,
+          ),
+        ),
+      ],
+    );
+  }
+
+  double _calculateCapacityPercentage() {
+    final parts = shelter.capacity.split('/');
+    if (parts.length != 2) return 0.0;
+    final current = double.tryParse(parts[0]) ?? 0;
+    final total = double.tryParse(parts[1]) ?? 1;
+    return (current / total).clamp(0.0, 1.0);
+  }
+}
+
+class _StatusConfig {
+  final String text;
+  final Color backgroundColor;
+  final Color textColor;
+
+  const _StatusConfig({
+    required this.text,
+    required this.backgroundColor,
+    required this.textColor,
+  });
+
+  factory _StatusConfig.from(ShelterStatus status) {
+    switch (status) {
+      case ShelterStatus.available:
+        return const _StatusConfig(
+          text: 'Available',
+          backgroundColor: AppColors.lightPrimary,
+          textColor: AppColors.primary,
+        );
+      case ShelterStatus.limited:
+        return const _StatusConfig(
+          text: 'Limited',
+          backgroundColor: AppColors.lightYellow,
+          textColor: AppColors.orange,
+        );
+      case ShelterStatus.full:
+        return const _StatusConfig(
+          text: 'Full',
+          backgroundColor: AppColors.lightPink,
+          textColor: AppColors.red,
+        );
+    }
   }
 }

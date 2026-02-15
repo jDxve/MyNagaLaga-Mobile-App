@@ -19,7 +19,7 @@ class ShelterDetailsSheet extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => ShelterDetailsSheet(
+      builder: (_) => ShelterDetailsSheet(
         shelter: shelter,
         onDirections: onDirections,
       ),
@@ -28,432 +28,310 @@ class ShelterDetailsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final capacity = _parseCapacity(shelter.capacity);
-    final percentage = (capacity['current']! / capacity['max']!) * 100;
+    final parts = shelter.capacity.split('/');
+    final current = parts[0];
+    final total = parts.length > 1 ? parts[1] : '0';
 
     return Container(
-      height: MediaQuery.of(context).size.height * 0.85,
+      padding: EdgeInsets.symmetric(horizontal: D.w(24)),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+        color: AppColors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(D.r(32))),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          // Handle bar
-          Container(
-            margin: EdgeInsets.only(top: 12.h),
-            width: 40.w,
-            height: 4.h,
-            decoration: BoxDecoration(
-              color: AppColors.grey.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-
-          // Content
-          Expanded(
+          _buildHandle(),
+          Flexible(
             child: SingleChildScrollView(
-              padding: EdgeInsets.all(24.w),
+              physics: const BouncingScrollPhysics(),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Header
-                  Text(
-                    shelter.name,
-                    style: TextStyle(
-                      fontSize: D.textXL,
-                      fontWeight: D.bold,
-                      color: AppColors.black,
-                    ),
-                  ),
-
-                  16.gapH,
-
-                  // Distance
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.navigation,
-                        size: 20.w,
-                        color: AppColors.grey,
-                      ),
-                      8.gapW,
-                      Text(
-                        '0.5 km away',
-                        style: TextStyle(
-                          fontSize: D.textBase,
-                          color: AppColors.grey,
-                        ),
-                      ),
-                      Spacer(),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                        decoration: BoxDecoration(
-                          color: _getStatusBackgroundColor(shelter.status),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          _getStatusText(shelter.status),
-                          style: TextStyle(
-                            fontSize: D.textSM,
-                            fontWeight: D.semiBold,
-                            color: _getStatusTextColor(shelter.status),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  12.gapH,
-
-                  // Address
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.location_on_outlined,
-                        size: 20.w,
-                        color: AppColors.grey,
-                      ),
-                      8.gapW,
-                      Expanded(
-                        child: Text(
-                          shelter.address,
-                          style: TextStyle(
-                            fontSize: D.textBase,
-                            color: AppColors.grey,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  32.gapH,
-
-                  // Occupancy Details
-                  Text(
-                    'Occupancy Details',
-                    style: TextStyle(
-                      fontSize: D.textLG,
-                      fontWeight: D.bold,
-                      color: AppColors.black,
-                    ),
-                  ),
-
-                  24.gapH,
-
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildOccupancyCard(
-                          'Current',
-                          capacity['current'].toString(),
-                          AppColors.primary.withOpacity(0.1),
-                          AppColors.primary,
-                        ),
-                      ),
-                      16.gapW,
-                      Expanded(
-                        child: _buildOccupancyCard(
-                          'Maximum',
-                          capacity['max'].toString(),
-                          AppColors.grey.withOpacity(0.1),
-                          AppColors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  24.gapH,
-
-                  // Progress bar
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: LinearProgressIndicator(
-                      value: capacity['current']! / capacity['max']!,
-                      backgroundColor: AppColors.grey.withOpacity(0.1),
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        _getStatusTextColor(shelter.status),
-                      ),
-                      minHeight: 8.h,
-                    ),
-                  ),
-
-                  8.gapH,
-
-                  Text(
-                    '${percentage.toStringAsFixed(0)}% occupied',
-                    style: TextStyle(
-                      fontSize: D.textSM,
-                      color: AppColors.grey,
-                    ),
-                  ),
-
-                  32.gapH,
-
-                  // Vulnerable Groups
-                  Container(
-                    padding: EdgeInsets.all(20.w),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: AppColors.primary.withOpacity(0.3),
-                        width: 2,
-                      ),
-                      borderRadius: BorderRadius.circular(D.radiusLG),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Vulnerable Groups',
-                          style: TextStyle(
-                            fontSize: D.textBase,
-                            fontWeight: D.bold,
-                            color: AppColors.black,
-                          ),
-                        ),
-                        20.gapH,
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildVulnerableGroupItem(
-                                Icons.elderly,
-                                shelter.seniors.toString(),
-                                'Senior',
-                                AppColors.orange.withOpacity(0.1),
-                                AppColors.orange,
-                              ),
-                            ),
-                            16.gapW,
-                            Expanded(
-                              child: _buildVulnerableGroupItem(
-                                Icons.child_care,
-                                shelter.infants.toString(),
-                                'Infant',
-                                AppColors.primary.withOpacity(0.1),
-                                AppColors.primary,
-                              ),
-                            ),
-                          ],
-                        ),
-                        16.gapH,
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildVulnerableGroupItem(
-                                Icons.accessible,
-                                shelter.pwd.toString(),
-                                'PWD',
-                                Colors.purple.withOpacity(0.1),
-                                Colors.purple,
-                              ),
-                            ),
-                            16.gapW,
-                            Expanded(
-                              child: _buildVulnerableGroupItem(
-                                Icons.pregnant_woman,
-                                '2',
-                                'Pregnant',
-                                Colors.pink.withOpacity(0.1),
-                                Colors.pink,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  32.gapH,
-
-                  // Amenities
-                  Text(
-                    'Amenities',
-                    style: TextStyle(
-                      fontSize: D.textLG,
-                      fontWeight: D.bold,
-                      color: AppColors.black,
-                    ),
-                  ),
-
-                  16.gapH,
-
-                  Wrap(
-                    spacing: 12.w,
-                    runSpacing: 12.h,
-                    children: [
-                      _buildAmenityChip('Water', AppColors.primary),
-                      _buildAmenityChip('Restroom', AppColors.orange),
-                      _buildAmenityChip('First Aid', Colors.red),
-                      _buildAmenityChip('Kitchen', Colors.green),
-                      _buildAmenityChip('Generator', Colors.purple),
-                    ],
-                  ),
-
-                  24.gapH,
+                  _buildHeader(),
+                  const Divider(height: 32, thickness: 1),
+                  _buildOccupancySection(current, total),
+                  const SizedBox(height: 24),
+                  _buildVulnerableGrid(),
+                  const SizedBox(height: 24),
+                  _buildAmenitiesSection(),
+                  const SizedBox(height: 32),
+                  _buildFooter(context),
+                  const SizedBox(height: 32),
                 ],
               ),
             ),
           ),
-
-          // Directions Button
-          Container(
-            padding: EdgeInsets.all(20.w),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, -2),
-                ),
-              ],
-            ),
-            child: SafeArea(
-              top: false,
-              child: SecondaryButton(
-                text: 'Get Directions',
-                icon: Icons.directions,
-                isFilled: true,
-                onPressed: () {
-                  Navigator.pop(context);
-                  onDirections();
-                },
-              ),
-            ),
-          ),
         ],
       ),
     );
   }
 
-  Widget _buildOccupancyCard(String label, String value, Color bgColor, Color textColor) {
-    return Container(
-      padding: EdgeInsets.all(20.w),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(D.radiusLG),
-      ),
-      child: Column(
-        children: [
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: D.textBase,
-              fontWeight: D.bold,
-              color: textColor,
-            ),
-          ),
-          4.gapH,
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: D.textSM,
-              color: AppColors.grey,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildVulnerableGroupItem(
-    IconData icon,
-    String count,
-    String label,
-    Color bgColor,
-    Color iconColor,
-  ) {
-    return Container(
-      padding: EdgeInsets.all(12.w),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(D.radiusMD),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, size: 24.w, color: iconColor),
-          8.gapW,
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                count,
-                style: TextStyle(
-                  fontSize: D.textBase,
-                  fontWeight: D.bold,
-                  color: AppColors.black,
+  Widget _buildHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Text(
+                shelter.name.toUpperCase(),
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.textlogo,
+                  fontFamily: 'Segoe UI',
+                  letterSpacing: 0.2,
                 ),
               ),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: D.textXS,
+            ),
+            const SizedBox(width: 8),
+            _buildStatusBadge(),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            const Icon(Icons.near_me, size: 18, color: AppColors.primary),
+            const SizedBox(width: 6),
+            Text(
+              '0.5 km away',
+              style: TextStyle(
+                color: AppColors.primary,
+                fontSize: D.textBase,
+                fontWeight: FontWeight.w800,
+                fontFamily: 'Segoe UI',
+              ),
+            ),
+            const SizedBox(width: 16),
+            const Icon(Icons.location_on_outlined, size: 16, color: AppColors.grey),
+            const SizedBox(width: 4),
+            Expanded(
+              child: Text(
+                shelter.address,
+                style: const TextStyle(
                   color: AppColors.grey,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  fontFamily: 'Segoe UI',
                 ),
+                overflow: TextOverflow.ellipsis,
               ),
-            ],
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
-  Widget _buildAmenityChip(String label, Color color) {
+  Widget _buildStatusBadge() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
+        color: AppColors.primary.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
       ),
-      child: Text(
-        label,
+      child: const Text(
+        'AVAILABLE',
         style: TextStyle(
-          fontSize: D.textSM,
-          fontWeight: D.medium,
-          color: color,
+          color: AppColors.primary,
+          fontSize: 10,
+          fontWeight: FontWeight.w900,
+          fontFamily: 'Segoe UI',
         ),
       ),
     );
   }
 
-  Map<String, int> _parseCapacity(String capacity) {
-    final parts = capacity.split('/');
-    return {
-      'current': int.tryParse(parts[0]) ?? 0,
-      'max': int.tryParse(parts.length > 1 ? parts[1] : '0') ?? 1,
-    };
+  Widget _buildOccupancySection(String current, String total) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Occupancy Details',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+            color: AppColors.textlogo,
+            fontFamily: 'Segoe UI',
+          ),
+        ),
+        const SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildStat('Current', current),
+            _buildStat('Maximum', total),
+          ],
+        ),
+      ],
+    );
   }
 
-  String _getStatusText(ShelterStatus status) {
-    switch (status) {
-      case ShelterStatus.available:
-        return 'Available';
-      case ShelterStatus.limited:
-        return 'Limited';
-      case ShelterStatus.full:
-        return 'Full';
-    }
+  Widget _buildStat(String label, String value) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.w900,
+            color: AppColors.textlogo,
+            fontFamily: 'Segoe UI',
+          ),
+        ),
+        Text(
+          label,
+          style: const TextStyle(
+            color: AppColors.grey,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            fontFamily: 'Segoe UI',
+          ),
+        ),
+      ],
+    );
   }
 
-  Color _getStatusBackgroundColor(ShelterStatus status) {
-    switch (status) {
-      case ShelterStatus.available:
-        return AppColors.lightPrimary;
-      case ShelterStatus.limited:
-        return AppColors.lightYellow;
-      case ShelterStatus.full:
-        return Colors.red.withOpacity(0.1);
-    }
+  Widget _buildVulnerableGrid() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Vulnerable Groups',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+            color: AppColors.textlogo,
+            fontFamily: 'Segoe UI',
+          ),
+        ),
+        const SizedBox(height: 20),
+        GridView.count(
+          shrinkWrap: true,
+          padding: EdgeInsets.zero,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: 2,
+          childAspectRatio: 2.2,
+          mainAxisSpacing: 20,
+          crossAxisSpacing: 16,
+          children: [
+            _VulnerableTile(icon: Icons.elderly, count: shelter.seniors, label: 'Senior', bgColor: AppColors.lightYellow, iconColor: AppColors.darkYellow),
+            _VulnerableTile(icon: Icons.child_care, count: shelter.infants, label: 'Infant', bgColor: AppColors.lightBlue, iconColor: AppColors.darkBlue),
+            _VulnerableTile(icon: Icons.accessible, count: shelter.pwd, label: 'PWD', bgColor: AppColors.lightPurple, iconColor: AppColors.darkPurple),
+            _VulnerableTile(icon: Icons.pregnant_woman, count: 2, label: 'Pregnant', bgColor: AppColors.lightPink, iconColor: AppColors.darkPink),
+          ],
+        ),
+      ],
+    );
   }
 
-  Color _getStatusTextColor(ShelterStatus status) {
-    switch (status) {
-      case ShelterStatus.available:
-        return AppColors.primary;
-      case ShelterStatus.limited:
-        return AppColors.orange;
-      case ShelterStatus.full:
-        return Colors.red;
-    }
+  Widget _buildAmenitiesSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Amenities',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+            color: AppColors.textlogo,
+            fontFamily: 'Segoe UI',
+          ),
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: ['Water', 'Restroom', 'First Aid'].map((e) => _AmenityChip(label: e)).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFooter(BuildContext context) {
+    return SecondaryButton(
+      text: 'GET DIRECTIONS',
+      isFilled: true,
+      icon: Icons.directions,
+      onPressed: onDirections,
+    );
+  }
+
+  Widget _buildHandle() {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 16),
+      width: 45,
+      height: 5,
+      decoration: BoxDecoration(
+        color: AppColors.grey.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(10),
+      ),
+    );
+  }
+}
+
+class _VulnerableTile extends StatelessWidget {
+  final IconData icon;
+  final int count;
+  final String label;
+  final Color bgColor;
+  final Color iconColor;
+
+  const _VulnerableTile({required this.icon, required this.count, required this.label, required this.bgColor, required this.iconColor});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: iconColor.withOpacity(0.3), width: 1.5),
+          ),
+          child: Icon(icon, color: iconColor, size: 28),
+        ),
+        const SizedBox(width: 14),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '$count',
+              style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 22, color: AppColors.textlogo, fontFamily: 'Segoe UI', height: 1.1),
+            ),
+            Text(
+              label,
+              style: const TextStyle(color: AppColors.grey, fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'Segoe UI'),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _AmenityChip extends StatelessWidget {
+  final String label;
+  const _AmenityChip({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        border: Border.all(color: AppColors.grey.withOpacity(0.2)),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(color: AppColors.grey, fontSize: 13, fontWeight: FontWeight.w700, fontFamily: 'Segoe UI'),
+      ),
+    );
   }
 }
