@@ -52,7 +52,7 @@ class _DisasterResilienceScreenState
     final sheltersState = ref.watch(sheltersNotifierProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.white,
       body: SafeArea(
         child: Column(
           children: [

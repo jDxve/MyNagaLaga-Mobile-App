@@ -25,27 +25,20 @@ class ShelterCard extends StatelessWidget {
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(D.radiusLG),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: AppColors.grey.withOpacity(0.1),
+            color: AppColors.grey.withOpacity(0.15),
             width: 1,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.02),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeader(),
-            8.gapH,
-            _buildLocationRow(),
-            16.gapH,
-            _buildCapacitySection(),
+            12.gapH,
+            _buildInfoRow(),
+            12.gapH,
+            _buildCapacityBar(),
           ],
         ),
       ),
@@ -59,12 +52,13 @@ class ShelterCard extends StatelessWidget {
           child: Text(
             shelter.name,
             style: TextStyle(
-              fontSize: D.textBase,
-              fontWeight: D.bold,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
               color: AppColors.black,
             ),
           ),
         ),
+        8.gapW,
         _buildStatusBadge(),
       ],
     );
@@ -73,56 +67,58 @@ class ShelterCard extends StatelessWidget {
   Widget _buildStatusBadge() {
     final config = _StatusConfig.from(shelter.status);
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
       decoration: BoxDecoration(
         color: config.backgroundColor,
-        borderRadius: BorderRadius.circular(D.radiusSM),
+        borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
-        config.text.toUpperCase(),
+        config.text,
         style: TextStyle(
-          fontSize: 10,
-          fontWeight: D.bold,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
           color: config.textColor,
-          letterSpacing: 0.5,
         ),
       ),
     );
   }
 
-  Widget _buildLocationRow() {
+  Widget _buildInfoRow() {
     return Row(
       children: [
-        Icon(Icons.near_me, size: 14, color: AppColors.primary),
-        4.gapW,
-        Text(
-          distanceInKm != null
-              ? DistanceCalculator.formatDistance(distanceInKm!)
-              : 'Calculating...',
-          style: TextStyle(
-            fontSize: D.textSM,
-            fontWeight: D.semiBold,
-            color: AppColors.primary,
-          ),
-        ),
-        12.gapW,
-        Icon(Icons.location_on_outlined, size: 14, color: AppColors.grey),
+        Icon(Icons.location_on_outlined, size: 16, color: AppColors.grey),
         4.gapW,
         Expanded(
           child: Text(
             shelter.address,
-            style: TextStyle(fontSize: D.textSM, color: AppColors.grey),
+            style: TextStyle(
+              fontSize: 13,
+              color: AppColors.grey,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
         ),
+        if (distanceInKm != null) ...[
+          12.gapW,
+          Icon(Icons.navigation, size: 16, color: AppColors.primary),
+          4.gapW,
+          Text(
+            DistanceCalculator.formatDistance(distanceInKm!),
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.primary,
+            ),
+          ),
+        ],
       ],
     );
   }
 
-  Widget _buildCapacitySection() {
+  Widget _buildCapacityBar() {
     final percentage = _calculateCapacityPercentage();
-    final barColor = _StatusConfig.from(shelter.status).textColor;
+    final config = _StatusConfig.from(shelter.status);
 
     return Column(
       children: [
@@ -130,31 +126,30 @@ class ShelterCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Occupancy',
+              'Capacity',
               style: TextStyle(
-                fontSize: D.textXS,
-                fontWeight: D.semiBold,
+                fontSize: 12,
                 color: AppColors.grey,
               ),
             ),
             Text(
               shelter.capacity,
               style: TextStyle(
-                fontSize: D.textXS,
-                fontWeight: D.bold,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
                 color: AppColors.black,
               ),
             ),
           ],
         ),
-        6.gapH,
+        8.gapH,
         ClipRRect(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(4),
           child: LinearProgressIndicator(
             value: percentage,
             backgroundColor: AppColors.grey.withOpacity(0.1),
-            valueColor: AlwaysStoppedAnimation<Color>(barColor),
-            minHeight: 8,
+            valueColor: AlwaysStoppedAnimation<Color>(config.textColor),
+            minHeight: 6,
           ),
         ),
       ],

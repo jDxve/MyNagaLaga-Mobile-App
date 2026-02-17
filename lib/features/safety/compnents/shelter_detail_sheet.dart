@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
-
 import '../../../common/widgets/secondary_button.dart';
 import '../models/shelter_data_model.dart';
 import '../../../common/utils/distant_caculator.dart';
@@ -43,10 +42,10 @@ class ShelterDetailsSheet extends StatelessWidget {
     final total = parts.length > 1 ? parts[1] : '0';
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: D.w(24)),
+      padding: EdgeInsets.symmetric(horizontal: 24.w),
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(D.r(32))),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(32.r)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -59,15 +58,16 @@ class ShelterDetailsSheet extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildHeader(),
-                  const Divider(height: 32, thickness: 1),
+                  Divider(thickness: 1),
+                  12.gapH,
                   _buildOccupancySection(current, total),
-                  const SizedBox(height: 24),
+                  24.gapH,
                   _buildVulnerableGrid(),
-                  const SizedBox(height: 24),
+                  24.gapH,
                   _buildAmenitiesSection(),
-                  const SizedBox(height: 32),
+                  32.gapH,
                   _buildFooter(context),
-                  const SizedBox(height: 32),
+                  32.gapH,
                 ],
               ),
             ),
@@ -81,52 +81,59 @@ class ShelterDetailsSheet extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Shelter name + status badge
         Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
               child: Text(
                 shelter.name.toUpperCase(),
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.textlogo,
+                style: TextStyle(
+                  fontSize: D.textLG,
+                  fontWeight: D.bold,
+                  color: AppColors.black,
                   fontFamily: 'Segoe UI',
                   letterSpacing: 0.2,
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            8.gapW,
             _buildStatusBadge(),
           ],
         ),
-        const SizedBox(height: 12),
+        12.gapH,
         Row(
           children: [
-            const Icon(Icons.near_me, size: 18, color: AppColors.primary),
-            const SizedBox(width: 6),
+            Icon(Icons.near_me, size: D.iconSM, color: AppColors.primary),
+            6.gapW,
             Text(
               distanceInKm != null
                   ? DistanceCalculator.formatDistance(distanceInKm!)
                   : 'Calculating...',
               style: TextStyle(
                 color: AppColors.primary,
-                fontSize: D.textBase,
-                fontWeight: FontWeight.w800,
+                fontSize: D.textMD,
+                fontWeight: D.semiBold,
                 fontFamily: 'Segoe UI',
               ),
             ),
-            const SizedBox(width: 16),
-            const Icon(Icons.location_on_outlined,
-                size: 16, color: AppColors.grey),
-            const SizedBox(width: 4),
+          ],
+        ),
+        8.gapH,
+        Row(
+          children: [
+            Icon(
+              Icons.location_on_outlined,
+              size: D.iconXS,
+              color: AppColors.grey,
+            ),
+            4.gapW,
             Expanded(
               child: Text(
                 shelter.address,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.grey,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
+                  fontSize: D.textBase,
+                  fontWeight: D.semiBold,
                   fontFamily: 'Segoe UI',
                 ),
                 overflow: TextOverflow.ellipsis,
@@ -141,17 +148,17 @@ class ShelterDetailsSheet extends StatelessWidget {
   Widget _buildStatusBadge() {
     final config = _getStatusConfig();
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
       decoration: BoxDecoration(
         color: config['bgColor'],
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(8.r),
       ),
       child: Text(
         config['text'],
         style: TextStyle(
           color: config['textColor'],
-          fontSize: 10,
-          fontWeight: FontWeight.w900,
+          fontSize: D.textXS,
+          fontWeight: D.bold,
           fontFamily: 'Segoe UI',
         ),
       ),
@@ -185,16 +192,16 @@ class ShelterDetailsSheet extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Occupancy Details',
           style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w800,
-            color: AppColors.textlogo,
+            fontSize: D.textMD,
+            fontWeight: D.semiBold,
+            color: AppColors.black,
             fontFamily: 'Segoe UI',
           ),
         ),
-        const SizedBox(height: 20),
+        20.gapH,
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -211,19 +218,19 @@ class ShelterDetailsSheet extends StatelessWidget {
       children: [
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.w900,
-            color: AppColors.textlogo,
+          style: TextStyle(
+            fontSize: D.textXXL,
+            fontWeight: D.bold,
+            color: AppColors.black,
             fontFamily: 'Segoe UI',
           ),
         ),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             color: AppColors.grey,
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
+            fontSize: D.textXS,
+            fontWeight: D.medium,
             fontFamily: 'Segoe UI',
           ),
         ),
@@ -235,24 +242,24 @@ class ShelterDetailsSheet extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Vulnerable Groups',
           style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w800,
-            color: AppColors.textlogo,
+            fontSize: D.textMD,
+            fontWeight: D.semiBold,
+            color: AppColors.black,
             fontFamily: 'Segoe UI',
           ),
         ),
-        const SizedBox(height: 20),
+        20.gapH,
         GridView.count(
           shrinkWrap: true,
           padding: EdgeInsets.zero,
           physics: const NeverScrollableScrollPhysics(),
           crossAxisCount: 2,
           childAspectRatio: 2.2,
-          mainAxisSpacing: 20,
-          crossAxisSpacing: 16,
+          mainAxisSpacing: 20.h,
+          crossAxisSpacing: 16.w,
           children: [
             _VulnerableTile(
               icon: Icons.elderly,
@@ -292,22 +299,24 @@ class ShelterDetailsSheet extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Amenities',
           style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w800,
-            color: AppColors.textlogo,
+            fontSize: D.textMD,
+            fontWeight: D.semiBold,
+            color: AppColors.black,
             fontFamily: 'Segoe UI',
           ),
         ),
-        const SizedBox(height: 12),
+        12.gapH,
         Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          children: ['Water', 'Restroom', 'First Aid']
-              .map((e) => _AmenityChip(label: e))
-              .toList(),
+          spacing: 10.w,
+          runSpacing: 10.h,
+          children: [
+            'Water',
+            'Restroom',
+            'First Aid',
+          ].map((e) => _AmenityChip(label: e)).toList(),
         ),
       ],
     );
@@ -324,12 +333,12 @@ class ShelterDetailsSheet extends StatelessWidget {
 
   Widget _buildHandle() {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 16),
-      width: 45,
-      height: 5,
+      margin: EdgeInsets.symmetric(vertical: 16.h),
+      width: 45.w,
+      height: 5.h,
       decoration: BoxDecoration(
         color: AppColors.grey.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(10.r),
       ),
     );
   }
@@ -356,35 +365,34 @@ class _VulnerableTile extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-          padding: const EdgeInsets.all(12),
+          padding: EdgeInsets.all(12.r),
           decoration: BoxDecoration(
             color: bgColor,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(16.r),
             border: Border.all(color: iconColor.withOpacity(0.3), width: 1.5),
           ),
-          child: Icon(icon, color: iconColor, size: 28),
+          child: Icon(icon, color: iconColor, size: D.iconLG),
         ),
-        const SizedBox(width: 14),
+        14.gapW,
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               '$count',
-              style: const TextStyle(
-                fontWeight: FontWeight.w900,
-                fontSize: 22,
-                color: AppColors.textlogo,
+              style: TextStyle(
+                fontWeight: D.bold,
+                fontSize: D.textLG,
+                color: AppColors.black,
                 fontFamily: 'Segoe UI',
-                height: 1.1,
               ),
             ),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.grey,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
+                fontSize: D.textXS,
+                fontWeight: D.semiBold,
                 fontFamily: 'Segoe UI',
               ),
             ),
@@ -403,18 +411,18 @@ class _AmenityChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+      padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 10.h),
       decoration: BoxDecoration(
         color: AppColors.white,
         border: Border.all(color: AppColors.grey.withOpacity(0.2)),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
       ),
       child: Text(
         label,
-        style: const TextStyle(
+        style: TextStyle(
           color: AppColors.grey,
-          fontSize: 13,
-          fontWeight: FontWeight.w700,
+          fontSize: D.textSM,
+          fontWeight: D.semiBold,
           fontFamily: 'Segoe UI',
         ),
       ),
