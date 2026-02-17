@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
+import '../../../../common/resources/colors.dart';
+import '../../../../common/resources/dimensions.dart';
 
 class ProgramListItem extends StatelessWidget {
   final String title;
@@ -41,28 +41,25 @@ class ProgramListItem extends StatelessWidget {
                       fontSize: D.textBase,
                       fontWeight: D.semiBold,
                       color: AppColors.black,
-                      fontFamily: 'Segoe UI',
                     ),
                   ),
-                  4.gapH,
-                  Text(
-                    description,
-                    style: TextStyle(
-                      fontSize: D.textSM,
-                      fontWeight: D.regular,
-                      color: AppColors.grey,
-                      fontFamily: 'Segoe UI',
+                  if (description.isNotEmpty) ...[
+                    4.gapH,
+                    Text(
+                      description,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: D.textSM,
+                        color: AppColors.grey,
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),
             12.gapW,
-            Icon(
-              Icons.chevron_right,
-              color: AppColors.grey,
-              size: 24.w,
-            ),
+            Icon(Icons.chevron_right, color: AppColors.grey, size: 24.w),
           ],
         ),
       ),

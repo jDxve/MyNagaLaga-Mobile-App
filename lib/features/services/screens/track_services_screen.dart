@@ -2,9 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../common/resources/colors.dart';
-import '../../../../common/widgets/custom_app_bar.dart';
-import '../../components/track_case/tracking_widget.dart';
+import '../../../common/resources/colors.dart';
+import '../../../common/widgets/custom_app_bar.dart';
+import '../components/track_case/tracking_widget.dart';
 
 
 class TrackCasesScreen extends ConsumerWidget {

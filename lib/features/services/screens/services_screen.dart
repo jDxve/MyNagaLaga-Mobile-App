@@ -1,18 +1,17 @@
-// lib/features/services/screens/services_screen.dart
-
 import 'package:flutter/material.dart';
 import '../../../common/resources/dimensions.dart';
 import '../components/case_track_button.dart';
 import '../components/services_header.dart';
 import '../components/services_page/complaint_page.dart';
-import '../components/services_page/service_request_page.dart'; // ✅ ADD THIS
+import '../components/services_page/service_request_page.dart';
 import '../components/services_search_section.dart';
 import '../components/featured_program_section.dart';
 import '../components/services_section.dart';
-import 'programs/track_services_screen.dart';
+import 'track_services_screen.dart';
 
 class ServicesScreen extends StatefulWidget {
   static const routeName = '/services';
+
   const ServicesScreen({super.key});
 
   @override
@@ -28,34 +27,30 @@ class _ServicesScreenState extends State<ServicesScreen> {
     super.dispose();
   }
 
-  void _handleNotificationTap() {
-    print('Notification tapped');
-  }
+  void _handleNotificationTap() {}
 
   void _handleSearchChanged(String value) {
-    print('Search: $value');
+    // Parent can use value to filter other sections if needed
+    setState(() {});
   }
 
-  void _handleFilterTap() {
-    print('Filter tapped');
-  }
+  void _handleFilterTap() {}
 
   void _handleTrackCaseTap() {
     Navigator.pushNamed(context, TrackCasesScreen.routeName);
   }
 
   void _handleRequestServicesTap() {
-    // ✅ UPDATE THIS
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const ServiceRequestPage()),
+      MaterialPageRoute(builder: (_) => const ServiceRequestPage()),
     );
   }
 
   void _handleComplaintsTap() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const ComplaintPage()),
+      MaterialPageRoute(builder: (_) => const ComplaintPage()),
     );
   }
 

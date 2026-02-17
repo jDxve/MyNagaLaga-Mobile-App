@@ -20,15 +20,48 @@ class _WelfareProgramsService implements WelfareProgramsService {
   final ParseErrorLogger? errorLogger;
 
   @override
+  Future<HttpResponse<dynamic>> fetchPrograms({
+    bool? isActive,
+    int? page,
+    int? limit,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'isActive': isActive,
+      r'page': page,
+      r'limit': limit,
+    };
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<HttpResponse<dynamic>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/welfare-programs/programs',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch(_options);
+    final _value = _result.data;
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
+  }
+
+  @override
   Future<HttpResponse<dynamic>> fetchPostings({
     String? programId,
+    String? serviceId,
     String? status,
-    int page = 1,
-    int limit = 10,
+    int? page,
+    int? limit,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
       r'programId': programId,
+      r'serviceId': serviceId,
       r'status': status,
       r'page': page,
       r'limit': limit,
@@ -41,6 +74,30 @@ class _WelfareProgramsService implements WelfareProgramsService {
           .compose(
             _dio.options,
             '/welfare-programs/postings',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch(_options);
+    final _value = _result.data;
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<dynamic>> fetchPosting({
+    required String postingId,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<HttpResponse<dynamic>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/welfare-programs/postings/${postingId}',
             queryParameters: queryParameters,
             data: _data,
           )

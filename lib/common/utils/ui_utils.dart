@@ -1,17 +1,28 @@
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import '../resources/assets.dart';
+import '../resources/colors.dart';
+
+class ProgramTheme {
+  final Color accent;
+  final Color surface;
+  final String iconAsset;
+
+  const ProgramTheme({
+    required this.accent,
+    required this.surface,
+    required this.iconAsset,
+  });
+}
 
 class UIUtils {
-  // --- Formatters ---
   static final TextInputFormatter upperCaseWordsFormatter = _UpperCaseWordsFormatter();
   static final TextInputFormatter phoneNumberFormatter = _PhoneNumberFormatter();
   static final TextInputFormatter dateTextFormatter = _DateTextFormatter();
-  
-  // Re-usable standard formatters for convenience
+
   static final TextInputFormatter digitsOnly = FilteringTextInputFormatter.digitsOnly;
   static TextInputFormatter lengthLimit(int length) => LengthLimitingTextInputFormatter(length);
 
-  // --- Currency & Numbers ---
   static String numberFormat(double amount, {String symbol = '₱'}) {
     final formatter = NumberFormat.currency(
       locale: 'en_PH',
@@ -21,7 +32,6 @@ class UIUtils {
     return formatter.format(amount);
   }
 
-  // --- Validation Logic ---
   static bool isValidEmail(String email) {
     final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     return emailRegex.hasMatch(email);
@@ -63,25 +73,30 @@ class UIUtils {
     return null;
   }
 
-  // --- Date Handling ---
   static String convertDateToApiFormat(String date) {
     try {
       final parsed = DateFormat('MM/dd/yyyy').parse(date);
       return DateFormat('yyyy-MM-dd').format(parsed);
-    } catch (e) { return date; }
+    } catch (_) {
+      return date;
+    }
   }
 
   static String convertDateToDisplayFormat(String date) {
     try {
       final parsed = DateFormat('yyyy-MM-dd').parse(date);
       return DateFormat('MM/dd/yyyy').format(parsed);
-    } catch (e) { return date; }
+    } catch (_) {
+      return date;
+    }
   }
 
-  static String formatDateForApi(DateTime date) => DateFormat('yyyy-MM-dd').format(date);
-  static String formatDateForDisplay(DateTime date) => DateFormat('MM/dd/yyyy').format(date);
+  static String formatDateForApi(DateTime date) =>
+      DateFormat('yyyy-MM-dd').format(date);
 
-  // --- Gender & Identity ---
+  static String formatDateForDisplay(DateTime date) =>
+      DateFormat('MM/dd/yyyy').format(date);
+
   static String convertGenderToApiFormat(String? gender) {
     if (gender == null) return 'Male';
     final g = gender.toLowerCase();
@@ -110,12 +125,12 @@ class UIUtils {
   }
 
   static const List<String> idTypes = [
-    "National ID", "Driver's License", "Passport", "Voter's ID", "PhilHealth ID",
-    "SSS ID", "UMID", "Postal ID", "E-Card/UMID", "Employee ID", "PRC ID",
-    "Senior Citizen ID", "COMELEC/Voter ID", "PhilID/ePhilID", "NBI Clearance",
-    "IBP ID", "Firearms License", "AFPSLAI ID", "PVAO ID", "AFP Beneficiary ID",
-    "BIR TIN", "Pag-IBIG ID", "PWD ID", "Solo Parent ID", "Pantawid 4Ps ID",
-    "Barangay ID", "School ID", "Other",
+    "National ID","Driver's License","Passport","Voter's ID","PhilHealth ID",
+    "SSS ID","UMID","Postal ID","E-Card/UMID","Employee ID","PRC ID",
+    "Senior Citizen ID","COMELEC/Voter ID","PhilID/ePhilID","NBI Clearance",
+    "IBP ID","Firearms License","AFPSLAI ID","PVAO ID","AFP Beneficiary ID",
+    "BIR TIN","Pag-IBIG ID","PWD ID","Solo Parent ID","Pantawid 4Ps ID",
+    "Barangay ID","School ID","Other",
   ];
 
   static String convertIdTypeToApiFormat(String? displayIdType) {
@@ -150,15 +165,79 @@ class UIUtils {
     };
     return idTypeMap[displayIdType] ?? 'OTHER';
   }
-}
 
-// --- Private Implementation of Formatters ---
+  static ProgramTheme getProgramTheme(String? programName) {
+    final name = programName?.toLowerCase() ?? '';
+
+    if (name.contains('children') || name.contains('youth')) {
+      return const ProgramTheme(
+        accent: AppColors.blue,
+        surface: AppColors.lightBlue,
+        iconAsset: Assets.childrenYouthIcon,
+      );
+    } else if (name.contains('women')) {
+      return const ProgramTheme(
+        accent: AppColors.purple,
+        surface: AppColors.lightPurple,
+        iconAsset: Assets.womenWelfareIcon,
+      );
+    } else if (name.contains('family') || name.contains('community')) {
+      return const ProgramTheme(
+        accent: AppColors.teal,
+        surface: AppColors.lightPrimary,
+        iconAsset: Assets.familyCommunityIcon,
+      );
+    } else if (name.contains('crisis') || name.contains('intervention')) {
+      return const ProgramTheme(
+        accent: AppColors.orange,
+        surface: AppColors.lightYellow,
+        iconAsset: Assets.crisisInterventionIcon,
+      );
+    } else if (name.contains('disaster') || name.contains('response')) {
+      return const ProgramTheme(
+        accent: AppColors.red,
+        surface: AppColors.lightPink,
+        iconAsset: Assets.disasterResponseIcon,
+      );
+    }
+
+    return const ProgramTheme(
+      accent: AppColors.primary,
+      surface: AppColors.lightPrimary,
+      iconAsset: Assets.otherServicesIcon,
+    );
+  }
+
+  static bool isUrgent(DateTime? endAt) {
+    if (endAt == null) return false;
+    return endAt.difference(DateTime.now()).inDays <= 7;
+  }
+
+  static bool isFull(int? slotsRemaining) {
+    if (slotsRemaining == null) return false;
+    return slotsRemaining <= 0;
+  }
+
+  static String daysLeft(DateTime? endAt) {
+    if (endAt == null) return '';
+    final diff = endAt.difference(DateTime.now()).inDays;
+    if (diff <= 0) return 'Ends today';
+    if (diff == 1) return '1 day left';
+    return '$diff days left';
+  }
+
+  static String slotsText(int? slotsRemaining) {
+    if (slotsRemaining == null) return 'Open';
+    if (slotsRemaining <= 0) return 'Full';
+    return '$slotsRemaining slots left';
+  }
+}
 
 class _UpperCaseWordsFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
     if (newValue.text.isEmpty) return newValue;
-    final String capitalized = newValue.text.split(' ').map((word) {
+    final capitalized = newValue.text.split(' ').map((word) {
       if (word.isEmpty) return word;
       return word[0].toUpperCase() + word.substring(1);
     }).join(' ');
@@ -179,8 +258,8 @@ class _DateTextFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
     if (newValue.selection.baseOffset < oldValue.selection.baseOffset) return newValue;
-    final String text = newValue.text;
-    final StringBuffer buffer = StringBuffer();
+    final text = newValue.text;
+    final buffer = StringBuffer();
     for (int i = 0; i < text.length; i++) {
       if (RegExp(r'[0-9]').hasMatch(text[i])) {
         buffer.write(text[i]);
@@ -190,7 +269,7 @@ class _DateTextFormatter extends TextInputFormatter {
         }
       }
     }
-    final String result = buffer.toString();
+    final result = buffer.toString();
     return TextEditingValue(
       text: result,
       selection: TextSelection.collapsed(offset: result.length),

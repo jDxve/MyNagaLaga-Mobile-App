@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../../common/resources/assets.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
-import '../../../common/resources/assets.dart';
 import '../../../common/resources/strings.dart';
-import '../screens/programs/children_youth_screen.dart';
-import '../screens/programs/women_welfare_screen.dart';
-import '../screens/programs/crisis_intervention_screen.dart';
-import '../screens/programs/family_community_screen.dart';
-import '../screens/programs/disaster_response_screen.dart';
+import '../screens/program_screen.dart';
 import 'featured_program_card.dart';
 
 class FeaturedProgramSection extends StatelessWidget {
@@ -22,52 +18,94 @@ class FeaturedProgramSection extends StatelessWidget {
         title: AppString.childrenYouthTitle,
         subtitle: AppString.childrenYouthSubtitle,
         iconBackgroundColor: AppColors.blue,
-        onTap: () {
-          Navigator.pushNamed(context, ChildrenYouthScreen.routeName);
-        },
+        onTap: () => Navigator.pushNamed(
+          context,
+          ProgramScreen.routeName,
+          arguments: const ProgramScreenArgs(
+            programName: 'Children and Youth Welfare Program',
+            title: 'Children & Youth Welfare',
+            subtitle: 'Programs for children and young adults.',
+          ),
+        ),
       ),
       FeaturedProgramData(
         icon: Assets.womenWelfareIcon,
         title: AppString.womenWelfareTitle,
         subtitle: AppString.womenWelfareSubtitle,
         iconBackgroundColor: AppColors.purple,
-        onTap: () {
-          Navigator.pushNamed(context, WomenWelfareScreen.routeName);
-        },
+        onTap: () => Navigator.pushNamed(
+          context,
+          ProgramScreen.routeName,
+          arguments: const ProgramScreenArgs(
+            programName: 'Women Welfare Program',
+            title: 'Women Welfare',
+            subtitle:
+                'Support for mothers, solo parents, and women in difficult circumstances.',
+          ),
+        ),
       ),
       FeaturedProgramData(
         icon: Assets.familyCommunityIcon,
         title: AppString.familyCommunityTitle,
         subtitle: AppString.familyCommunitySubtitle,
         iconBackgroundColor: AppColors.teal,
-        onTap: () {
-          Navigator.pushNamed(context, FamilyCommunityScreen.routeName);
-        },
+        onTap: () => Navigator.pushNamed(
+          context,
+          ProgramScreen.routeName,
+          arguments: const ProgramScreenArgs(
+            programName: 'Family and Community Welfare Program',
+            title: 'Family & Community Welfare',
+            subtitle:
+                'Strengthening family bonds and supporting vulnerable adults.',
+          ),
+        ),
       ),
       FeaturedProgramData(
         icon: Assets.crisisInterventionIcon,
         title: AppString.crisisInterventionTitle,
         subtitle: AppString.crisisInterventionSubtitle,
         iconBackgroundColor: AppColors.orange,
-        onTap: () {
-          Navigator.pushNamed(context, CrisisInterventionScreen.routeName);
-        },
+        onTap: () => Navigator.pushNamed(
+          context,
+          ProgramScreen.routeName,
+          arguments: const ProgramScreenArgs(
+            programName: 'Crisis Intervention Program',
+            title: 'Crisis Intervention Program (AICS)',
+            subtitle:
+                'Immediate financial or material help for individuals in crisis.',
+          ),
+        ),
       ),
       FeaturedProgramData(
         icon: Assets.disasterResponseIcon,
         title: AppString.disasterResponseTitle,
         subtitle: AppString.disasterResponseSubtitle,
         iconBackgroundColor: AppColors.red,
-        onTap: () {
-          Navigator.pushNamed(context, DisasterResponseScreen.routeName);
-        },
+        onTap: () => Navigator.pushNamed(
+          context,
+          ProgramScreen.routeName,
+          arguments: const ProgramScreenArgs(
+            programName: 'Disaster Response Program',
+            title: 'Disaster Response',
+            subtitle:
+                'Management of safety and relief during typhoons or emergencies.',
+          ),
+        ),
       ),
       FeaturedProgramData(
         icon: Assets.otherServicesIcon,
         title: AppString.otherServicesTitle,
         subtitle: AppString.otherServicesSubtitle,
         iconBackgroundColor: AppColors.lightGrey,
-        onTap: () => print('Other Services tapped'),
+        onTap: () => Navigator.pushNamed(
+          context,
+          ProgramScreen.routeName,
+          arguments: const ProgramScreenArgs(
+            programName: 'Other Services',
+            title: 'Other Services',
+            subtitle: 'Additional welfare services and assistance.',
+          ),
+        ),
       ),
     ];
   }
@@ -84,7 +122,7 @@ class FeaturedProgramSection extends StatelessWidget {
           style: TextStyle(
             fontFamily: 'Segoe UI',
             fontSize: D.textLG,
-            fontWeight: FontWeight.bold,
+            fontWeight: D.bold,
             color: Colors.black,
           ),
         ),
