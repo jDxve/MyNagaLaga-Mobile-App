@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../common/models/dio/data_state.dart';
+import '../../../../common/resources/assets.dart';
 import '../../../../common/resources/colors.dart';
 import '../../../../common/resources/dimensions.dart';
+import '../../../../common/widgets/custom_app_bar.dart';
 import '../../../../common/widgets/secondary_button.dart';
 import '../../../auth/notifier/auth_session_notifier.dart';
 import '../../../home/notifier/user_badge_notifier.dart';
@@ -34,6 +36,16 @@ class _PostingDetailPageState extends ConsumerState<PostingDetailPage> {
             .fetchBadges(mobileUserId: userId);
       }
     });
+  }
+
+  String _getBadgeImage(String badgeName) {
+    final n = badgeName.toLowerCase();
+    if (n.contains('senior')) return Assets.seniorCitizenBadge;
+    if (n.contains('pwd') || n.contains('disab')) return Assets.pwdBadge;
+    if (n.contains('solo') || n.contains('parent')) return Assets.soloParentBadge;
+    if (n.contains('student')) return Assets.studentBadge;
+    if (n.contains('indigent') || n.contains('family')) return Assets.indigentFamilyBadge;
+    return Assets.studentBadge;
   }
 
   @override
@@ -77,23 +89,11 @@ class _PostingDetailPageState extends ConsumerState<PostingDetailPage> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.white,
-        elevation: 0,
-        centerTitle: true,
-        iconTheme: IconThemeData(color: AppColors.black, size: D.iconMD),
-        title: Text(
-          posting.serviceName ?? 'Program Details',
-          style: TextStyle(
-            fontSize: D.textLG,
-            fontWeight: D.bold,
-            fontFamily: 'Segoe UI',
-            color: AppColors.black,
-          ),
-        ),
+      appBar: CustomAppBar(
+        title: posting.serviceName ?? 'Program Details',
       ),
       bottomNavigationBar: Container(
-        padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 22.h),
+        padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 50.h),
         decoration: BoxDecoration(
           color: AppColors.white,
           border: Border(
@@ -106,8 +106,8 @@ class _PostingDetailPageState extends ConsumerState<PostingDetailPage> {
             text: isFull
                 ? 'Slots Full'
                 : !isEligible
-                ? 'Not Eligible'
-                : 'Apply Now',
+                    ? 'Not Eligible'
+                    : 'Apply Now',
             onPressed: canApply ? () {} : () {},
             isDisabled: !canApply,
             isFilled: true,
@@ -119,7 +119,6 @@ class _PostingDetailPageState extends ConsumerState<PostingDetailPage> {
           : ListView(
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
               children: [
-                // TITLE (Primary Hierarchy - Clean)
                 Text(
                   posting.title,
                   style: TextStyle(
@@ -130,10 +129,7 @@ class _PostingDetailPageState extends ConsumerState<PostingDetailPage> {
                     height: 1.2,
                   ),
                 ),
-
                 12.gapH,
-
-                // META CHIPS (Simple & Scannable)
                 Wrap(
                   spacing: 8.w,
                   runSpacing: 8.h,
@@ -142,8 +138,8 @@ class _PostingDetailPageState extends ConsumerState<PostingDetailPage> {
                       isFull
                           ? 'Full'
                           : posting.slotsRemaining != null
-                          ? '${posting.slotsRemaining} slots left'
-                          : 'Open slots',
+                              ? '${posting.slotsRemaining} slots left'
+                              : 'Open slots',
                       isFull ? AppColors.red : AppColors.grey,
                       Icons.people_outline_rounded,
                     ),
@@ -168,11 +164,8 @@ class _PostingDetailPageState extends ConsumerState<PostingDetailPage> {
                   ],
                 ),
                 20.gapH,
-
-                Divider(),
+                const Divider(),
                 5.gapH,
-
-                // DESCRIPTION (Simple Section)
                 if (posting.description != null) ...[
                   Text(
                     'About this posting',
@@ -196,8 +189,6 @@ class _PostingDetailPageState extends ConsumerState<PostingDetailPage> {
                   ),
                   24.gapH,
                 ],
-
-                // BADGE REQUIREMENT (SIMPLIFIED HCI DESIGN)
                 Text(
                   'Badge Requirement',
                   style: TextStyle(
@@ -208,7 +199,6 @@ class _PostingDetailPageState extends ConsumerState<PostingDetailPage> {
                   ),
                 ),
                 16.gapH,
-
                 if (posting.requiredBadges.isEmpty)
                   Text(
                     'No badge required.',
@@ -221,48 +211,54 @@ class _PostingDetailPageState extends ConsumerState<PostingDetailPage> {
                 else
                   Column(
                     children: posting.requiredBadges.map((badge) {
-                      final held = userBadgeIds.contains(badge.id);
+                      final bool held = userBadgeIds.contains(badge.id);
 
                       return Padding(
-                        padding: EdgeInsets.only(bottom: 12.h),
-                        child: Row(
+                        padding: EdgeInsets.only(bottom: 20.h),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(
-                              held
-                                  ? Icons.check_circle_rounded
-                                  : Icons.radio_button_unchecked,
-                              size: D.iconSM,
-                              color: held ? AppColors.primary : AppColors.grey,
-                            ),
-                            10.gapW,
-                            Expanded(
-                              child: Text(
-                                badge.name,
-                                style: TextStyle(
-                                  fontSize: D.textMD,
-                                  fontFamily: 'Segoe UI',
-                                  fontWeight: D.semiBold,
-                                  color: AppColors.black,
+                            Row(
+                              children: [
+                                Icon(
+                                  held
+                                      ? Icons.verified_rounded
+                                      : Icons.lock_outline_rounded,
+                                  size: D.iconSM,
+                                  color: held
+                                      ? AppColors.primary
+                                      : AppColors.grey,
                                 ),
-                              ),
+                                6.gapW,
+                                Text(
+                                  held ? 'Eligible' : 'Not Eligible',
+                                  style: TextStyle(
+                                    fontSize: D.textMD,
+                                    fontFamily: 'Segoe UI',
+                                    fontWeight: D.bold,
+                                    color: held
+                                        ? AppColors.primary
+                                        : AppColors.grey,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              held ? 'Owned' : 'Required',
-                              style: TextStyle(
-                                fontSize: D.textBase,
-                                fontFamily: 'Segoe UI',
-                                color: held
-                                    ? AppColors.primary
-                                    : AppColors.grey,
-                                fontWeight: D.regular,
-                              ),
+                            8.gapH,
+                            Image.asset(
+                              _getBadgeImage(badge.name),
+                              width: double.infinity,
+                              fit: BoxFit.fitWidth,
+                              color: held
+                                  ? null
+                                  : Colors.grey.withOpacity(0.5),
+                              colorBlendMode:
+                                  held ? null : BlendMode.saturation,
                             ),
                           ],
                         ),
                       );
                     }).toList(),
                   ),
-
                 100.gapH,
               ],
             ),

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../common/resources/colors.dart';
-import '../../../../common/resources/dimensions.dart';
-import '../../../common/models/dio/data_state.dart';
-import '../components/programs_page/posting_detailed_page.dart';
-import '../models/welfare_program_model.dart';
-import '../notifier/welfare_program_notifier.dart';
+import '../../../../../common/resources/colors.dart';
+import '../../../../../common/resources/dimensions.dart';
+import '../../../../common/models/dio/data_state.dart';
+import 'posting_detailed_page.dart';
+import '../../models/welfare_program_model.dart';
+import '../../notifier/welfare_program_notifier.dart';
 
 class PostingsListPage extends ConsumerStatefulWidget {
   final String serviceId;

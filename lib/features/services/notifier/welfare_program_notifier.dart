@@ -3,8 +3,6 @@ import '../../../common/models/dio/data_state.dart';
 import '../models/welfare_program_model.dart';
 import '../repository/welfare_program_repository_impl.dart';
 
-// ─── Programs Notifier ──────────────────────────────────────
-
 final welfareProgramsNotifierProvider = NotifierProvider<
     WelfareProgramsNotifier, DataState<List<WelfareProgramModel>>>(
   WelfareProgramsNotifier.new,
@@ -12,6 +10,8 @@ final welfareProgramsNotifierProvider = NotifierProvider<
 
 class WelfareProgramsNotifier
     extends Notifier<DataState<List<WelfareProgramModel>>> {
+  List<WelfareProgramModel>? _cache;
+
   @override
   DataState<List<WelfareProgramModel>> build() {
     ref.keepAlive();
@@ -19,44 +19,45 @@ class WelfareProgramsNotifier
   }
 
   Future<void> fetchPrograms({bool forceRefresh = false}) async {
-    if (!forceRefresh && _hasValidData()) return;
+    if (!forceRefresh && _cache != null && _cache!.isNotEmpty) {
+      state = DataState.success(data: _cache!);
+      return;
+    }
+
     state = const DataState.loading();
-    state = await ref
+
+    final result = await ref
         .read(welfareProgramRepositoryProvider)
         .getPrograms(isActive: true);
+
+    result.whenOrNull(
+      success: (data) {
+        _cache = data;
+      },
+    );
+
+    state = result;
   }
 
   String? findProgramId(String programName) {
-    return state.when(
-      started: () => null,
-      loading: () => null,
-      error: (_) => null,
-      success: (programs) {
-        try {
-          return programs
-              .firstWhere((p) =>
-                  p.name.toLowerCase().contains(programName.toLowerCase()))
-              .id;
-        } catch (_) {
-          return null;
-        }
-      },
-    );
+    final programs = _cache;
+    if (programs == null || programs.isEmpty) return null;
+
+    try {
+      return programs
+          .firstWhere((p) =>
+              p.name.toLowerCase().contains(programName.toLowerCase()))
+          .id;
+    } catch (_) {
+      return null;
+    }
   }
 
-  bool _hasValidData() {
-    return state.when(
-      started: () => false,
-      loading: () => false,
-      success: (data) => data.isNotEmpty,
-      error: (_) => false,
-    );
+  void reset() {
+    _cache = null;
+    state = const DataState.started();
   }
-
-  void reset() => state = const DataState.started();
 }
-
-// ─── All Postings Notifier ──────────────────────────────────
 
 final allPostingsNotifierProvider = NotifierProvider<AllPostingsNotifier,
     DataState<List<WelfarePostingModel>>>(
@@ -65,6 +66,8 @@ final allPostingsNotifierProvider = NotifierProvider<AllPostingsNotifier,
 
 class AllPostingsNotifier
     extends Notifier<DataState<List<WelfarePostingModel>>> {
+  List<WelfarePostingModel>? _cache;
+
   @override
   DataState<List<WelfarePostingModel>> build() {
     ref.keepAlive();
@@ -72,28 +75,33 @@ class AllPostingsNotifier
   }
 
   Future<void> fetchAllPostings({bool forceRefresh = false}) async {
-    if (!forceRefresh && _hasValidData()) return;
+    if (!forceRefresh && _cache != null && _cache!.isNotEmpty) {
+      state = DataState.success(data: _cache!);
+      return;
+    }
+
     state = const DataState.loading();
-    state = await ref.read(welfareProgramRepositoryProvider).getPostings(
+
+    final result = await ref.read(welfareProgramRepositoryProvider).getPostings(
           status: 'Published',
           page: 1,
           limit: 100,
         );
-  }
 
-  bool _hasValidData() {
-    return state.when(
-      started: () => false,
-      loading: () => false,
-      success: (data) => data.isNotEmpty,
-      error: (_) => false,
+    result.whenOrNull(
+      success: (data) {
+        _cache = data;
+      },
     );
+
+    state = result;
   }
 
-  void reset() => state = const DataState.started();
+  void reset() {
+    _cache = null;
+    state = const DataState.started();
+  }
 }
-
-// ─── Postings Notifier ──────────────────────────────────────
 
 final welfarePostingsNotifierProvider = NotifierProvider<
     WelfarePostingsNotifier, DataState<List<WelfarePostingModel>>>(
@@ -102,7 +110,7 @@ final welfarePostingsNotifierProvider = NotifierProvider<
 
 class WelfarePostingsNotifier
     extends Notifier<DataState<List<WelfarePostingModel>>> {
-  String? _cacheKey;
+  final Map<String, List<WelfarePostingModel>> _cache = {};
 
   @override
   DataState<List<WelfarePostingModel>> build() {
@@ -110,26 +118,37 @@ class WelfarePostingsNotifier
     return const DataState.started();
   }
 
-  /// Fetch postings directly by serviceId.
-  /// Used by PostingsListPage after user picks a service.
   Future<void> fetchPostingsByServiceId(
     String serviceId, {
     bool forceRefresh = false,
   }) async {
     final key = 'service:$serviceId';
-    if (!forceRefresh && key == _cacheKey && _hasValidData()) return;
-    _cacheKey = key;
+
+    if (!forceRefresh && _cache.containsKey(key)) {
+      state = DataState.success(data: _cache[key]!);
+      return;
+    }
+
     state = const DataState.loading();
-    state = await ref.read(welfareProgramRepositoryProvider).getPostings(
+
+    final result = await ref
+        .read(welfareProgramRepositoryProvider)
+        .getPostings(
           serviceId: serviceId,
           status: 'Published',
           page: 1,
           limit: 50,
         );
+
+    result.whenOrNull(
+      success: (data) {
+        _cache[key] = data;
+      },
+    );
+
+    state = result;
   }
 
-  /// Fetch postings by resolving programName → programId first.
-  /// Used when navigating from program name rather than serviceId.
   Future<void> fetchPostingsByProgramName(
     String programName, {
     bool forceRefresh = false,
@@ -148,34 +167,37 @@ class WelfarePostingsNotifier
     }
 
     final key = 'program:$programId';
-    if (!forceRefresh && key == _cacheKey && _hasValidData()) return;
-    _cacheKey = key;
+
+    if (!forceRefresh && _cache.containsKey(key)) {
+      state = DataState.success(data: _cache[key]!);
+      return;
+    }
+
     state = const DataState.loading();
-    state = await ref.read(welfareProgramRepositoryProvider).getPostings(
+
+    final result = await ref
+        .read(welfareProgramRepositoryProvider)
+        .getPostings(
           programId: programId,
           status: 'Published',
           page: 1,
           limit: 50,
         );
-  }
 
-  bool _hasValidData() {
-    return state.when(
-      started: () => false,
-      loading: () => false,
-      success: (data) => data.isNotEmpty,
-      error: (_) => false,
+    result.whenOrNull(
+      success: (data) {
+        _cache[key] = data;
+      },
     );
+
+    state = result;
   }
 
   void reset() {
+    _cache.clear();
     state = const DataState.started();
-    _cacheKey = null;
   }
 }
-
-// ─── Posting Detail Notifier ────────────────────────────────
-// Fetches a single posting by ID — includes badge requirements.
 
 final postingDetailNotifierProvider = NotifierProvider<
     PostingDetailNotifier, DataState<WelfarePostingModel>>(
@@ -184,15 +206,40 @@ final postingDetailNotifierProvider = NotifierProvider<
 
 class PostingDetailNotifier
     extends Notifier<DataState<WelfarePostingModel>> {
-  @override
-  DataState<WelfarePostingModel> build() => const DataState.started();
+  final Map<String, WelfarePostingModel> _cache = {};
 
-  Future<void> fetchPosting(String postingId) async {
-    state = const DataState.loading();
-    state = await ref
-        .read(welfareProgramRepositoryProvider)
-        .getPosting(postingId);
+  @override
+  DataState<WelfarePostingModel> build() {
+    ref.keepAlive();
+    return const DataState.started();
   }
 
-  void reset() => state = const DataState.started();
+  Future<void> fetchPosting(
+    String postingId, {
+    bool forceRefresh = false,
+  }) async {
+    if (!forceRefresh && _cache.containsKey(postingId)) {
+      state = DataState.success(data: _cache[postingId]!);
+      return;
+    }
+
+    state = const DataState.loading();
+
+    final result = await ref
+        .read(welfareProgramRepositoryProvider)
+        .getPosting(postingId);
+
+    result.whenOrNull(
+      success: (data) {
+        _cache[postingId] = data;
+      },
+    );
+
+    state = result;
+  }
+
+  void reset() {
+    _cache.clear();
+    state = const DataState.started();
+  }
 }
