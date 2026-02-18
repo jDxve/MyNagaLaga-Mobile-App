@@ -14,6 +14,7 @@ class Assets {
       'assets/badges/indigent_family_badge.png';
   static const String homeBG = 'assets/images/home_bg.png';
   static const String notifIcon = 'assets/icons/notif.svg';
+  static const String citizenBadge = 'assets/badges/citizen_badge.png';
 
   // Quick action icons
   static const String verifyIcon = 'assets/icons/verify.png';

@@ -20,14 +20,14 @@ class _RequestWelfareService implements RequestWelfareService {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<HttpResponse<dynamic>> submitServiceRequest(
-    String postingId,
-    FormData formData,
-  ) async {
+  Future<HttpResponse<dynamic>> submitApplication({
+    required String postingId,
+    required FormData data,
+  }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = formData;
+    final _data = data;
     final _options = _setStreamType<HttpResponse<dynamic>>(
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(

@@ -28,19 +28,15 @@ class _BadgeDisplayState extends State<BadgeDisplay>
       vsync: this,
     );
 
-    _slideAnimation = Tween<Offset>(
-      begin: Offset.zero,
-      end: const Offset(0, -1),
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
-    );
+    _slideAnimation =
+        Tween<Offset>(begin: Offset.zero, end: const Offset(0, -1)).animate(
+          CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
+        );
 
     _fadeAnimation = Tween<double>(
       begin: 1.0,
       end: 0.0,
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -62,9 +58,9 @@ class _BadgeDisplayState extends State<BadgeDisplay>
       case BadgeType.indigent:
         return Assets.indigentFamilyBadge;
       case BadgeType.citizen:
-        return Assets.studentBadge;
+        return Assets.citizenBadge; // <-- now correct
       case BadgeType.other:
-        return Assets.studentBadge;
+        return Assets.studentBadge; // fallback for unknown badges
     }
   }
 
@@ -72,12 +68,10 @@ class _BadgeDisplayState extends State<BadgeDisplay>
     if (_controller.isAnimating) return;
     setState(() {
       _isMovingForward = true;
-      _slideAnimation = Tween<Offset>(
-        begin: Offset.zero,
-        end: const Offset(0, -1),
-      ).animate(
-        CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
-      );
+      _slideAnimation =
+          Tween<Offset>(begin: Offset.zero, end: const Offset(0, -1)).animate(
+            CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
+          );
     });
 
     await _controller.forward();
@@ -91,12 +85,10 @@ class _BadgeDisplayState extends State<BadgeDisplay>
     if (_controller.isAnimating) return;
     setState(() {
       _isMovingForward = false;
-      _slideAnimation = Tween<Offset>(
-        begin: Offset.zero,
-        end: const Offset(0, 1),
-      ).animate(
-        CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
-      );
+      _slideAnimation =
+          Tween<Offset>(begin: Offset.zero, end: const Offset(0, 1)).animate(
+            CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
+          );
     });
 
     await _controller.forward();
@@ -146,7 +138,7 @@ class _BadgeDisplayState extends State<BadgeDisplay>
           alignment: Alignment.topCenter,
           children: List.generate(displayCount, (index) {
             final int reversedIndex = displayCount - 1 - index;
-            
+
             int badgeIndex;
             if (_isMovingForward) {
               badgeIndex = (_currentIndex + reversedIndex) % total;
@@ -170,7 +162,9 @@ class _BadgeDisplayState extends State<BadgeDisplay>
                       child: FadeTransition(
                         opacity: _fadeAnimation,
                         child: Image.asset(
-                          _getBadgeImage(widget.badges[_currentIndex].badgeTypeKey),
+                          _getBadgeImage(
+                            widget.badges[_currentIndex].badgeTypeKey,
+                          ),
                           height: 200.h,
                           fit: BoxFit.contain,
                         ),
@@ -181,7 +175,9 @@ class _BadgeDisplayState extends State<BadgeDisplay>
 
                 final double topOffset = 15.h * position;
                 final double scale = 1.0 - (0.04 * position);
-                final double opacity = position > 3 ? 0.0 : (1.0 - (0.25 * position));
+                final double opacity = position > 3
+                    ? 0.0
+                    : (1.0 - (0.25 * position));
 
                 return Positioned(
                   top: topOffset.clamp(0, 60.h),

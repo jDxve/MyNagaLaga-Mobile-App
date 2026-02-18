@@ -1,4 +1,3 @@
-// request_welfare_service.dart
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:retrofit/retrofit.dart';
@@ -16,8 +15,8 @@ abstract class RequestWelfareService {
   factory RequestWelfareService(Dio dio, {String? baseUrl}) = _RequestWelfareService;
 
   @POST('/welfare-programs/mobile/postings/{postingId}/requests')
-  Future<HttpResponse<dynamic>> submitServiceRequest(
-    @Path('postingId') String postingId,
-    @Body() FormData formData,
-  );
+  Future<HttpResponse<dynamic>> submitApplication({
+    @Path('postingId') required String postingId,
+    @Body() required FormData data,
+  });
 }

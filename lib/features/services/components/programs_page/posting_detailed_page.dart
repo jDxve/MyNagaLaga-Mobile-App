@@ -10,10 +10,10 @@ import '../../../auth/notifier/auth_session_notifier.dart';
 import '../../../home/notifier/user_badge_notifier.dart';
 import '../../models/welfare_program_model.dart';
 import '../../notifier/welfare_program_notifier.dart';
+import 'posting_application_page.dart';
 
 class PostingDetailPage extends ConsumerStatefulWidget {
   final WelfarePostingModel posting;
-
   const PostingDetailPage({super.key, required this.posting});
 
   @override
@@ -28,7 +28,6 @@ class _PostingDetailPageState extends ConsumerState<PostingDetailPage> {
       await ref
           .read(postingDetailNotifierProvider.notifier)
           .fetchPosting(widget.posting.id);
-
       final userId = ref.read(authSessionProvider).userId;
       if (userId != null) {
         ref
@@ -46,6 +45,15 @@ class _PostingDetailPageState extends ConsumerState<PostingDetailPage> {
     if (n.contains('student')) return Assets.studentBadge;
     if (n.contains('indigent') || n.contains('family')) return Assets.indigentFamilyBadge;
     return Assets.studentBadge;
+  }
+
+  void _navigateToApplication(WelfarePostingModel posting) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PostingApplicationPage(posting: posting),
+      ),
+    );
   }
 
   @override
@@ -108,7 +116,9 @@ class _PostingDetailPageState extends ConsumerState<PostingDetailPage> {
                 : !isEligible
                     ? 'Not Eligible'
                     : 'Apply Now',
-            onPressed: canApply ? () {} : () {},
+            onPressed: canApply
+                ? () => _navigateToApplication(posting) // 👈 Navigate here
+                : () {},
             isDisabled: !canApply,
             isFilled: true,
           ),
@@ -212,7 +222,6 @@ class _PostingDetailPageState extends ConsumerState<PostingDetailPage> {
                   Column(
                     children: posting.requiredBadges.map((badge) {
                       final bool held = userBadgeIds.contains(badge.id);
-
                       return Padding(
                         padding: EdgeInsets.only(bottom: 20.h),
                         child: Column(

@@ -10,7 +10,7 @@ import 'secondary_button.dart';
 
 class UploadImage extends StatelessWidget {
   final File? image;
-  final String title;
+  final String? title; 
   final String subtitle;
   final VoidCallback? onTap;
   final VoidCallback? onRemove;
@@ -22,7 +22,7 @@ class UploadImage extends StatelessWidget {
   const UploadImage({
     super.key,
     this.image,
-    required this.title,
+    this.title, 
     this.subtitle = 'Take a photo or upload an image file',
     this.onTap,
     this.onRemove,
@@ -169,16 +169,18 @@ class UploadImage extends StatelessWidget {
           ),
         ),
         12.gapH,
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: D.textBase,
-            fontWeight: D.semiBold,
-            color: AppColors.black,
-            fontFamily: 'Segoe UI',
+        if (title != null) ...[ 
+          Text(
+            title!,
+            style: TextStyle(
+              fontSize: D.textBase,
+              fontWeight: D.semiBold,
+              color: AppColors.black,
+              fontFamily: 'Segoe UI',
+            ),
           ),
-        ),
-        4.gapH,
+          4.gapH,
+        ],
         Text(
           subtitle,
           style: TextStyle(
