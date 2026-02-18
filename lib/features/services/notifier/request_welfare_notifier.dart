@@ -14,6 +14,21 @@ class WelfareServiceNotifier extends Notifier<DataState<WelfareRequestModel>> {
   @override
   DataState<WelfareRequestModel> build() => const DataState.started();
 
+  Future<void> fetchPrefill({
+    required String postingId,
+    required List<String> attachedBadgeTypeIds,
+    required WelfarePostingModel posting,
+  }) async {
+    state = const DataState.loading();
+    final result =
+        await ref.read(welfareServiceRepositoryProvider).fetchPrefill(
+              postingId: postingId,
+              attachedBadgeTypeIds: attachedBadgeTypeIds,
+              posting: posting,
+            );
+    state = result;
+  }
+
   Future<void> submitApplication({
     required String postingId,
     required String mobileUserId,
@@ -21,26 +36,19 @@ class WelfareServiceNotifier extends Notifier<DataState<WelfareRequestModel>> {
     required Map<String, String> textFields,
     required Map<String, File?> files,
     required WelfarePostingModel posting,
+    required List<String> attachedBadgeTypeIds,
   }) async {
-    final repo = ref.read(welfareServiceRepositoryProvider);
-
-    final cached = repo.getCached(postingId);
-    if (cached != null) {
-      state = DataState.success(data: cached);
-      return;
-    }
-
     state = const DataState.loading();
-
-    final result = await repo.submitServiceRequest(
-      postingId: postingId,
-      mobileUserId: mobileUserId,
-      description: description,
-      textFields: textFields,
-      files: files,
-      posting: posting,
-    );
-
+    final result =
+        await ref.read(welfareServiceRepositoryProvider).submitServiceRequest(
+              postingId: postingId,
+              mobileUserId: mobileUserId,
+              description: description,
+              textFields: textFields,
+              files: files,
+              posting: posting,
+              attachedBadgeTypeIds: attachedBadgeTypeIds,
+            );
     state = result;
   }
 

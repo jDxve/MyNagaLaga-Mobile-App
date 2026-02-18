@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "176901515929",
-    "project_id": "mynagalaga",
-    "storage_bucket": "mynagalaga.firebasestorage.app"
+    "project_number": "165350345023",
+    "project_id": "mynagalaga-2fb62",
+    "storage_bucket": "mynagalaga-2fb62.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:176901515929:android:7eb0328c218f885ec3e608",
+        "mobilesdk_app_id": "1:165350345023:android:7d7e5f9f213ccf67526b8a",
         "android_client_info": {
           "package_name": "com.example.mynagalaga_mobile_app"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCo_1RiXPR4WskRmRwIs_sbOTeb3UUq3I0"
+          "current_key": "AIzaSyAM_YeUkQbElQJ5oLJGWDsXi_K0O6TXmVU"
         }
       ],
       "services": {

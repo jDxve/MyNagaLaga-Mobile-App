@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyDICTE2ZvPeEYGFliVn3TSQ1XvM8UpPqb4</string>
+	<string>AIzaSyC2x6RBIeReV4jVop70JEGR-Pp16xa-ovQ</string>
 	<key>GCM_SENDER_ID</key>
-	<string>176901515929</string>
+	<string>165350345023</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.example.mynagalagaMobileApp</string>
 	<key>PROJECT_ID</key>
-	<string>mynagalaga</string>
+	<string>mynagalaga-2fb62</string>
 	<key>STORAGE_BUCKET</key>
-	<string>mynagalaga.firebasestorage.app</string>
+	<string>mynagalaga-2fb62.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:176901515929:ios:4ee60f5273510122c3e608</string>
+	<string>1:165350345023:ios:724930f2fb37aac6526b8a</string>
 </dict>
 </plist>

@@ -41,46 +41,49 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAmYl7jfIfqSECkhNdEL9bTB-8dUkZkXUA',
-    appId: '1:176901515929:web:863c0991469ca77ec3e608',
-    messagingSenderId: '176901515929',
-    projectId: 'mynagalaga',
-    authDomain: 'mynagalaga.firebaseapp.com',
-    storageBucket: 'mynagalaga.firebasestorage.app',
+    apiKey: 'AIzaSyCdVSuWfqoyorAn7p1xYLONNpAIVM-SFVs',
+    appId: '1:165350345023:web:84a24643983bd8b5526b8a',
+    messagingSenderId: '165350345023',
+    projectId: 'mynagalaga-2fb62',
+    authDomain: 'mynagalaga-2fb62.firebaseapp.com',
+    storageBucket: 'mynagalaga-2fb62.firebasestorage.app',
+    measurementId: 'G-P2TM12463E',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCo_1RiXPR4WskRmRwIs_sbOTeb3UUq3I0',
-    appId: '1:176901515929:android:7eb0328c218f885ec3e608',
-    messagingSenderId: '176901515929',
-    projectId: 'mynagalaga',
-    storageBucket: 'mynagalaga.firebasestorage.app',
+    apiKey: 'AIzaSyAM_YeUkQbElQJ5oLJGWDsXi_K0O6TXmVU',
+    appId: '1:165350345023:android:7d7e5f9f213ccf67526b8a',
+    messagingSenderId: '165350345023',
+    projectId: 'mynagalaga-2fb62',
+    storageBucket: 'mynagalaga-2fb62.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDICTE2ZvPeEYGFliVn3TSQ1XvM8UpPqb4',
-    appId: '1:176901515929:ios:4ee60f5273510122c3e608',
-    messagingSenderId: '176901515929',
-    projectId: 'mynagalaga',
-    storageBucket: 'mynagalaga.firebasestorage.app',
+    apiKey: 'AIzaSyC2x6RBIeReV4jVop70JEGR-Pp16xa-ovQ',
+    appId: '1:165350345023:ios:724930f2fb37aac6526b8a',
+    messagingSenderId: '165350345023',
+    projectId: 'mynagalaga-2fb62',
+    storageBucket: 'mynagalaga-2fb62.firebasestorage.app',
     iosBundleId: 'com.example.mynagalagaMobileApp',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyDICTE2ZvPeEYGFliVn3TSQ1XvM8UpPqb4',
-    appId: '1:176901515929:ios:4ee60f5273510122c3e608',
-    messagingSenderId: '176901515929',
-    projectId: 'mynagalaga',
-    storageBucket: 'mynagalaga.firebasestorage.app',
+    apiKey: 'AIzaSyC2x6RBIeReV4jVop70JEGR-Pp16xa-ovQ',
+    appId: '1:165350345023:ios:724930f2fb37aac6526b8a',
+    messagingSenderId: '165350345023',
+    projectId: 'mynagalaga-2fb62',
+    storageBucket: 'mynagalaga-2fb62.firebasestorage.app',
     iosBundleId: 'com.example.mynagalagaMobileApp',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyAmYl7jfIfqSECkhNdEL9bTB-8dUkZkXUA',
-    appId: '1:176901515929:web:f5030ddfca85a78cc3e608',
-    messagingSenderId: '176901515929',
-    projectId: 'mynagalaga',
-    authDomain: 'mynagalaga.firebaseapp.com',
-    storageBucket: 'mynagalaga.firebasestorage.app',
+    apiKey: 'AIzaSyCdVSuWfqoyorAn7p1xYLONNpAIVM-SFVs',
+    appId: '1:165350345023:web:bb7f4122bda62cfe526b8a',
+    messagingSenderId: '165350345023',
+    projectId: 'mynagalaga-2fb62',
+    authDomain: 'mynagalaga-2fb62.firebaseapp.com',
+    storageBucket: 'mynagalaga-2fb62.firebasestorage.app',
+    measurementId: 'G-1TENVS929X',
   );
+
 }

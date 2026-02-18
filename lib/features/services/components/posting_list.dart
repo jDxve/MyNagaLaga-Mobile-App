@@ -29,6 +29,12 @@ class _PostingHorizontalListState
     });
   }
 
+  Future<void> _refresh() async {
+    await ref
+        .read(allPostingsNotifierProvider.notifier)
+        .fetchAllPostings(forceRefresh: true);
+  }
+
   List<WelfarePostingModel> _filtered(List<WelfarePostingModel> all) {
     final q = widget.searchQuery.trim().toLowerCase();
     if (q.isEmpty) return all;
@@ -71,33 +77,43 @@ class _PostingHorizontalListState
         final filtered = _filtered(postings);
 
         if (filtered.isEmpty) {
-          return Padding(
-            padding: EdgeInsets.symmetric(vertical: 16.h),
-            child: Text(
-              widget.searchQuery.isEmpty
-                  ? 'No available postings yet.'
-                  : 'No postings match "${widget.searchQuery}".',
-              style: TextStyle(color: AppColors.grey, fontSize: 14.f),
+          return RefreshIndicator(
+            onRefresh: _refresh,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 16.h),
+                child: Text(
+                  widget.searchQuery.isEmpty
+                      ? 'No available postings yet.'
+                      : 'No postings match "${widget.searchQuery}".',
+                  style: TextStyle(color: AppColors.grey, fontSize: 14.f),
+                ),
+              ),
             ),
           );
         }
 
-        return SizedBox(
-          height: 210.h,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.only(right: 20.w),
-            itemCount: filtered.length,
-            separatorBuilder: (_, __) => SizedBox(width: 16.w),
-            itemBuilder: (context, index) {
-              final post = filtered[index];
-              return _PostingCard(
-                posting: post,
-                theme: UIUtils.getProgramTheme(post.programName),
-                cardWidth: screenWidth * 0.85,
-                onTap: () => _openDetail(post),
-              );
-            },
+        return RefreshIndicator(
+          onRefresh: _refresh,
+          child: SizedBox(
+            height: 210.h,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.only(right: 20.w),
+              itemCount: filtered.length,
+              separatorBuilder: (_, __) => SizedBox(width: 16.w),
+              itemBuilder: (context, index) {
+                final post = filtered[index];
+                return _PostingCard(
+                  posting: post,
+                  theme: UIUtils.getProgramTheme(post.programName),
+                  cardWidth: screenWidth * 0.85,
+                  onTap: () => _openDetail(post),
+                );
+              },
+            ),
           ),
         );
       },
@@ -235,9 +251,7 @@ class _PostingCardState extends State<_PostingCard>
                       Icon(
                         Icons.access_time_rounded,
                         size: 18.w,
-                        color: _isUrgent
-                            ? AppColors.red
-                            : AppColors.grey,
+                        color: _isUrgent ? AppColors.red : AppColors.grey,
                       ),
                       6.gapW,
                       Text(
@@ -245,9 +259,7 @@ class _PostingCardState extends State<_PostingCard>
                         style: TextStyle(
                           fontSize: 13.f,
                           fontWeight: FontWeight.w500,
-                          color: _isUrgent
-                              ? AppColors.red
-                              : AppColors.grey,
+                          color: _isUrgent ? AppColors.red : AppColors.grey,
                         ),
                       ),
                       20.gapW,
@@ -255,8 +267,7 @@ class _PostingCardState extends State<_PostingCard>
                     Icon(
                       Icons.people_outline_rounded,
                       size: 18.w,
-                      color:
-                          _isFull ? AppColors.red : AppColors.grey,
+                      color: _isFull ? AppColors.red : AppColors.grey,
                     ),
                     6.gapW,
                     Text(
@@ -264,9 +275,7 @@ class _PostingCardState extends State<_PostingCard>
                       style: TextStyle(
                         fontSize: 13.f,
                         fontWeight: FontWeight.w500,
-                        color: _isFull
-                            ? AppColors.red
-                            : AppColors.grey,
+                        color: _isFull ? AppColors.red : AppColors.grey,
                       ),
                     ),
                   ],

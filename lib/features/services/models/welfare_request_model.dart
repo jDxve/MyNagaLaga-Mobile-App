@@ -1,3 +1,29 @@
+class WelfarePrefillBadge {
+  final String badgeTypeId;
+  final String badgeTypeName;
+  final Map<String, String> formCommon;
+  final Map<String, String> formExtraNonNull;
+
+  const WelfarePrefillBadge({
+    required this.badgeTypeId,
+    required this.badgeTypeName,
+    required this.formCommon,
+    required this.formExtraNonNull,
+  });
+
+  factory WelfarePrefillBadge.fromMap(Map<String, dynamic> map) {
+    final form = map['form'] as Map<String, dynamic>? ?? {};
+    final common = form['common'] as Map<String, dynamic>? ?? {};
+    final extra = form['extraNonNull'] as Map<String, dynamic>? ?? {};
+    return WelfarePrefillBadge(
+      badgeTypeId: map['badgeTypeId']?.toString() ?? '',
+      badgeTypeName: map['badgeTypeName']?.toString() ?? '',
+      formCommon: common.map((k, v) => MapEntry(k, v?.toString() ?? '')),
+      formExtraNonNull: extra.map((k, v) => MapEntry(k, v?.toString() ?? '')),
+    );
+  }
+}
+
 class WelfareRequestModel {
   final String mobileUserId;
   final String postingId;
@@ -5,6 +31,7 @@ class WelfareRequestModel {
   final List<WelfareAutoAttachedRequirement> autoAttachedRequirements;
   final List<WelfareAutoAttachedCategory> autoAttachedByCategory;
   final List<WelfareAutoFilledCategory> autoFilledTextByCategory;
+  final List<WelfarePrefillBadge> prefillBadges;
 
   const WelfareRequestModel({
     required this.mobileUserId,
@@ -13,9 +40,13 @@ class WelfareRequestModel {
     required this.autoAttachedRequirements,
     required this.autoAttachedByCategory,
     required this.autoFilledTextByCategory,
+    required this.prefillBadges,
   });
 
   factory WelfareRequestModel.fromMap(Map<String, dynamic> map) {
+    final prefill = map['prefill'] as Map<String, dynamic>? ?? {};
+    final rawBadges = prefill['badges'] as List<dynamic>? ?? [];
+
     return WelfareRequestModel(
       mobileUserId: map['mobile_user_id']?.toString() ?? '',
       postingId: map['posting_id']?.toString() ?? '',
@@ -37,6 +68,9 @@ class WelfareRequestModel {
               .map((e) => WelfareAutoFilledCategory.fromMap(
                   e as Map<String, dynamic>))
               .toList(),
+      prefillBadges: rawBadges
+          .map((b) => WelfarePrefillBadge.fromMap(b as Map<String, dynamic>))
+          .toList(),
     );
   }
 }
@@ -123,8 +157,7 @@ class WelfareAutoFilledCategory {
     return WelfareAutoFilledCategory(
       category: map['category'] ?? '',
       items: (map['items'] as List<dynamic>? ?? [])
-          .map((e) =>
-              WelfareAutoFilledItem.fromMap(e as Map<String, dynamic>))
+          .map((e) => WelfareAutoFilledItem.fromMap(e as Map<String, dynamic>))
           .toList(),
     );
   }

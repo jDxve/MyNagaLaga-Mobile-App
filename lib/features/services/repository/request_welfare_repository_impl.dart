@@ -19,20 +19,71 @@ final welfareServiceRepositoryProvider =
 
 class WelfareServiceRepositoryImpl implements WelfareServiceRepository {
   final RequestWelfareService _service;
-  final Map<String, WelfareRequestModel> _cache = {};
+  final Map<String, WelfareRequestModel> _submitCache = {};
 
   WelfareServiceRepositoryImpl({required RequestWelfareService service})
       : _service = service;
 
   @override
-  WelfareRequestModel? getCached(String postingId) => _cache[postingId];
+  WelfareRequestModel? getCached(String postingId) => _submitCache[postingId];
 
   @override
   void clearCache(String postingId) {
-    _cache.remove(postingId);
+    _submitCache.remove(postingId);
     debugPrint('🗑️ Cache cleared for posting $postingId');
   }
 
+  /// First POST — allowMissing: true, no files/text
+  /// Returns prefill.badges[] to pre-fill the form
+  @override
+  Future<DataState<WelfareRequestModel>> fetchPrefill({
+    required String postingId,
+    required List<String> attachedBadgeTypeIds,
+    required WelfarePostingModel posting,
+  }) async {
+    try {
+      final formData = FormData();
+      formData.fields.add(MapEntry('postingId', postingId));
+      formData.fields.add(const MapEntry('allowMissing', 'true'));
+      formData.fields.add(const MapEntry('description', 'prefill'));
+
+      if (attachedBadgeTypeIds.isNotEmpty) {
+        formData.fields.add(MapEntry(
+          'attachedBadgeTypeIds',
+          jsonEncode(attachedBadgeTypeIds),
+        ));
+      }
+
+      final allItems =
+          posting.requirements.expand((g) => g.items).toList();
+      formData.fields.add(MapEntry(
+        'requirementIds',
+        jsonEncode(allItems.map((i) => i.requirementId).toList()),
+      ));
+
+      final response = await _service.submitApplication(
+        postingId: postingId,
+        data: formData,
+      );
+
+      final body = response.data as Map<String, dynamic>;
+      final model = WelfareRequestModel.fromMap(
+          body['data'] as Map<String, dynamic>);
+      return DataState.success(data: model);
+    } on DioException catch (e) {
+      final body = e.response?.data;
+      if (body is Map<String, dynamic>) {
+        final error = ErrorResponse.fromMap(body);
+        return DataState.error(
+            error: error.message ?? 'Failed to load badge data');
+      }
+      return DataState.error(error: e.message ?? 'Network error');
+    } catch (e) {
+      return DataState.error(error: 'Unexpected error: $e');
+    }
+  }
+
+  /// Second POST — allowMissing: false, all filled data
   @override
   Future<DataState<WelfareRequestModel>> submitServiceRequest({
     required String postingId,
@@ -41,41 +92,38 @@ class WelfareServiceRepositoryImpl implements WelfareServiceRepository {
     required Map<String, String> textFields,
     required Map<String, File?> files,
     required WelfarePostingModel posting,
+    required List<String> attachedBadgeTypeIds,
   }) async {
-    final cached = _cache[postingId];
-    if (cached != null) {
-      debugPrint('💾 Returning cached result for posting $postingId');
-      return DataState.success(data: cached);
-    }
+    final cached = _submitCache[postingId];
+    if (cached != null) return DataState.success(data: cached);
 
     try {
       debugPrint('📤 Submitting welfare application for posting $postingId');
 
       final formData = FormData();
-
       formData.fields.add(MapEntry('description', description));
       formData.fields.add(MapEntry('postingId', postingId));
+      formData.fields.add(const MapEntry('allowMissing', 'false'));
 
-      // Flatten all requirement items across groups
-      final allItems = posting.requirements
-          .expand((group) => group.items)
-          .toList();
+      if (attachedBadgeTypeIds.isNotEmpty) {
+        formData.fields.add(MapEntry(
+          'attachedBadgeTypeIds',
+          jsonEncode(attachedBadgeTypeIds),
+        ));
+      }
 
-      // requirementIds — JSON array of DB ids e.g. '["12","13","14"]'
-      final requirementIds =
-          allItems.map((item) => item.requirementId).toList();
-      formData.fields
-          .add(MapEntry('requirementIds', jsonEncode(requirementIds)));
-      debugPrint('📋 requirementIds: $requirementIds');
+      final allItems =
+          posting.requirements.expand((g) => g.items).toList();
+      formData.fields.add(MapEntry(
+        'requirementIds',
+        jsonEncode(allItems.map((i) => i.requirementId).toList()),
+      ));
 
-      // textValues — JSON object keyed by requirementId e.g. '{"12":"John"}'
       final textValueMap = <String, String>{};
       for (final item in allItems) {
         if (item.type == 'text') {
           final value = textFields[item.key] ?? '';
-          if (value.isNotEmpty) {
-            textValueMap[item.requirementId] = value;
-          }
+          if (value.isNotEmpty) textValueMap[item.requirementId] = value;
         }
       }
       if (textValueMap.isNotEmpty) {
@@ -84,7 +132,6 @@ class WelfareServiceRepositoryImpl implements WelfareServiceRepository {
         debugPrint('📝 textValues: $textValueMap');
       }
 
-      // files + fileRequirementIds — aligned arrays
       final fileRequirementIds = <String>[];
       for (final item in allItems) {
         if (item.type != 'text') {
@@ -115,19 +162,15 @@ class WelfareServiceRepositoryImpl implements WelfareServiceRepository {
         data: formData,
       );
 
-      final responseData = response.data as Map<String, dynamic>;
+      final body = response.data as Map<String, dynamic>;
       final model = WelfareRequestModel.fromMap(
-          responseData['data'] as Map<String, dynamic>);
-
-      _cache[postingId] = model;
-      debugPrint('✅ Application submitted. Count: ${model.submittedCount}');
+          body['data'] as Map<String, dynamic>);
+      _submitCache[postingId] = model;
+      debugPrint('✅ Submitted. Count: ${model.submittedCount}');
       return DataState.success(data: model);
     } on DioException catch (e) {
       final body = e.response?.data;
       debugPrint('❌ Dio Error [${e.response?.statusCode}]: $body');
-      if (body is Map<String, dynamic> && body['details'] != null) {
-        debugPrint('❌ Validation details: ${jsonEncode(body['details'])}');
-      }
       if (body is Map<String, dynamic>) {
         final error = ErrorResponse.fromMap(body);
         return DataState.error(
