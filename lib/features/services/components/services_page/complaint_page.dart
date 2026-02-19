@@ -1,5 +1,3 @@
-// lib/features/services/components/services_page/complaint_page.dart
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +7,7 @@ import '../../../../common/resources/colors.dart';
 import '../../../../common/resources/dimensions.dart';
 import '../../../../common/widgets/drop_down.dart';
 import '../../../../common/widgets/primary_button.dart';
+import '../../../../common/widgets/secondary_button.dart';
 import '../../../../common/widgets/text_input.dart';
 import '../../../../common/widgets/upload_image_card.dart';
 import '../../../../common/widgets/custom_app_bar.dart';
@@ -18,6 +17,7 @@ import '../../notifier/complaint_notifier.dart';
 import 'map_location_picker.dart';
 
 class ComplaintPage extends ConsumerStatefulWidget {
+  static const routeName = '/complaint';
   const ComplaintPage({super.key});
 
   @override
@@ -25,26 +25,17 @@ class ComplaintPage extends ConsumerStatefulWidget {
 }
 
 class _ComplaintPageState extends ConsumerState<ComplaintPage> {
-  final TextEditingController _categoryController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
-  final ImagePicker _picker = ImagePicker();
+  final _categoryController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _picker = ImagePicker();
+
   File? _selectedImage;
   double? _latitude;
   double? _longitude;
   bool _isSubmitting = false;
   bool _isAnonymous = false;
-
-  List<ComplaintTypeModel> _complaintTypes = [];
   int? _selectedComplaintTypeId;
-
-  @override
-  void initState() {
-    super.initState();
-    Future.microtask(() {
-      ref.read(complaintTypesNotifierProvider.notifier).fetchComplaintTypes();
-    });
-  }
 
   @override
   void dispose() {
@@ -55,25 +46,18 @@ class _ComplaintPageState extends ConsumerState<ComplaintPage> {
   }
 
   Future<void> _pickImage(ImageSource source) async {
-    final XFile? pickedFile = await _picker.pickImage(source: source);
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
-    }
+    final XFile? picked = await _picker.pickImage(source: source);
+    if (picked == null) return;
+    setState(() => _selectedImage = File(picked.path));
   }
 
-  void _removeImage() {
-    setState(() {
-      _selectedImage = null;
-    });
-  }
+  void _removeImage() => setState(() => _selectedImage = null);
 
   void _openMapPicker() {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MapLocationPicker(
+        builder: (_) => MapLocationPicker(
           onLocationSelected: (address, lat, lng) {
             setState(() {
               _addressController.text = address;
@@ -86,85 +70,82 @@ class _ComplaintPageState extends ConsumerState<ComplaintPage> {
     );
   }
 
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
   void _showSuccessModal(String complaintCode) {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(D.radiusXL),
-          ),
-          child: Padding(
-            padding: EdgeInsets.all(24.w),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 80.w,
-                  height: 80.h,
-                  decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.check_circle,
-                    size: 50,
-                    color: Colors.green,
-                  ),
+      builder: (_) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(D.radiusXL),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(24.w),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 80.w,
+                height: 80.h,
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.1),
+                  shape: BoxShape.circle,
                 ),
-                20.gapH,
-                Text(
-                  'Success!',
+                child: const Icon(Icons.check_circle, size: 50, color: Colors.green),
+              ),
+              20.gapH,
+              Text(
+                'Complaint Submitted!',
+                style: TextStyle(
+                  fontSize: D.textXL,
+                  fontWeight: D.bold,
+                  color: AppColors.black,
+                ),
+              ),
+              12.gapH,
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(D.radiusMD),
+                ),
+                child: Text(
+                  complaintCode,
                   style: TextStyle(
-                    fontSize: D.textXL,
+                    fontSize: D.textLG,
                     fontWeight: D.bold,
-                    color: AppColors.black,
+                    color: AppColors.primary,
+                    fontFamily: 'monospace',
                   ),
                 ),
-                12.gapH,
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(D.radiusMD),
-                  ),
-                  child: Text(
-                    complaintCode,
-                    style: TextStyle(
-                      fontSize: D.textLG,
-                      fontWeight: D.bold,
-                      color: AppColors.primary,
-                      fontFamily: 'monospace',
-                    ),
-                  ),
+              ),
+              12.gapH,
+              Text(
+                'Your complaint has been submitted successfully. Please save your complaint code for tracking.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: D.textSM,
+                  color: AppColors.grey,
+                  height: 1.5,
                 ),
-                12.gapH,
-                Text(
-                  'Your complaint has been submitted successfully. Please save your complaint code for tracking.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: D.textSM,
-                    color: AppColors.grey,
-                    height: 1.5,
-                  ),
-                ),
-                24.gapH,
-                SizedBox(
-                  width: double.infinity,
-                  child: PrimaryButton(
-                    text: 'Done',
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.pop(context);
-                    },
-                  ),
-                ),
-              ],
-            ),
+              ),
+              24.gapH,
+              PrimaryButton(
+                text: 'Done',
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                },
+              ),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -172,23 +153,17 @@ class _ComplaintPageState extends ConsumerState<ComplaintPage> {
     if (_isSubmitting) return;
 
     if (_selectedComplaintTypeId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a complaint category')),
-      );
+      _showSnackBar('Please select a complaint category');
       return;
     }
 
     if (_descriptionController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please describe your problem')),
-      );
+      _showSnackBar('Please describe your problem');
       return;
     }
 
     if (_addressController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a location on map')),
-      );
+      _showSnackBar('Please select a location on map');
       return;
     }
 
@@ -197,17 +172,13 @@ class _ComplaintPageState extends ConsumerState<ComplaintPage> {
     try {
       final authSession = ref.read(authSessionProvider);
       int? complainantMobileUserId;
-      
+
       if (_isAnonymous) {
         complainantMobileUserId = null;
       } else if (authSession.isAuthenticated && authSession.userId != null) {
         complainantMobileUserId = int.tryParse(authSession.userId!);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please log in or submit anonymously'),
-          ),
-        );
+        _showSnackBar('Please log in or submit anonymously');
         setState(() => _isSubmitting = false);
         return;
       }
@@ -231,61 +202,22 @@ class _ComplaintPageState extends ConsumerState<ComplaintPage> {
 
       if (success) {
         final state = ref.read(submitComplaintNotifierProvider);
-        state.when(
-          started: () {},
-          loading: () {},
-          success: (data) {
-            _showSuccessModal(data.complaintCode);
-          },
-          error: (error) {},
-        );
+        state.whenOrNull(success: (data) => _showSuccessModal(data.complaintCode));
       } else {
         final state = ref.read(submitComplaintNotifierProvider);
-        final errorMessage = state.when(
-          started: () => 'Failed to submit complaint',
-          loading: () => 'Failed to submit complaint',
-          success: (data) => 'Failed to submit complaint',
-          error: (error) => error ?? 'Failed to submit complaint',
-        );
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
-        );
+        final error = state.whenOrNull(error: (e) => e) ?? 'Failed to submit complaint';
+        _showSnackBar(error);
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      _showSnackBar('Error: $e');
     } finally {
-      if (mounted) {
-        setState(() => _isSubmitting = false);
-      }
+      if (mounted) setState(() => _isSubmitting = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    ref.listen<DataState<List<ComplaintTypeModel>>>(
-      complaintTypesNotifierProvider,
-      (previous, next) {
-        next.when(
-          started: () {},
-          loading: () {},
-          success: (types) {
-            setState(() {
-              _complaintTypes = types;
-            });
-          },
-          error: (error) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error loading complaint types: $error')),
-            );
-          },
-        );
-      },
-    );
-
     final complaintTypesState = ref.watch(complaintTypesNotifierProvider);
 
     return Scaffold(
@@ -293,36 +225,46 @@ class _ComplaintPageState extends ConsumerState<ComplaintPage> {
       appBar: const CustomAppBar(title: 'File a Complaint'),
       body: SafeArea(
         child: complaintTypesState.when(
-          started: () => const Center(child: Text('Getting started...')),
+          started: () => const Center(child: CircularProgressIndicator()),
           loading: () => const Center(child: CircularProgressIndicator()),
-          success: (types) => _buildForm(),
-          error: (error) => Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                const SizedBox(height: 16),
-                Text('Error: $error'),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    ref
-                        .read(complaintTypesNotifierProvider.notifier)
-                        .fetchComplaintTypes();
-                  },
-                  child: const Text('Retry'),
-                ),
-              ],
-            ),
-          ),
+          success: (types) => _buildForm(types),
+          error: (error) => _buildError(error),
         ),
       ),
     );
   }
 
-  Widget _buildForm() {
+  Widget _buildError(String? error) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(24.w),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error_outline, size: 48, color: Colors.red),
+            16.gapH,
+            Text(
+              error ?? 'Failed to load categories',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: D.textSM, color: AppColors.grey),
+            ),
+            16.gapH,
+            SecondaryButton(
+              text: 'Retry',
+              onPressed: () => ref
+                  .read(complaintTypesNotifierProvider.notifier)
+                  .fetchComplaintTypes(forceRefresh: true),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildForm(List<ComplaintTypeModel> complaintTypes) {
     final authSession = ref.watch(authSessionProvider);
     final isLoggedIn = authSession.isAuthenticated && authSession.userId != null;
+    final items = complaintTypes.map((t) => t.name).toList();
 
     return SingleChildScrollView(
       padding: EdgeInsets.all(20.w),
@@ -334,14 +276,10 @@ class _ComplaintPageState extends ConsumerState<ComplaintPage> {
           Dropdown(
             controller: _categoryController,
             hintText: 'Select Category',
-            items: _complaintTypes.map((type) => type.name).toList(),
+            items: items,
             onChanged: (value) {
-              final selectedType = _complaintTypes.firstWhere(
-                (type) => type.name == value,
-              );
-              setState(() {
-                _selectedComplaintTypeId = selectedType.id;
-              });
+              final selected = complaintTypes.firstWhere((t) => t.name == value);
+              setState(() => _selectedComplaintTypeId = selected.id);
             },
           ),
           20.gapH,
@@ -349,7 +287,7 @@ class _ComplaintPageState extends ConsumerState<ComplaintPage> {
           8.gapH,
           TextInput(
             controller: _descriptionController,
-            hintText: 'Please describe the issue you\'re experiencing in detail...',
+            hintText: 'Please describe the issue in detail...',
             maxLines: 6,
           ),
           20.gapH,
@@ -361,85 +299,116 @@ class _ComplaintPageState extends ConsumerState<ComplaintPage> {
               child: TextInput(
                 controller: _addressController,
                 hintText: 'Tap to select location on map',
-                suffixIcon: const Icon(
-                  Icons.location_on,
+                suffixIcon: Icon(
+                  _latitude != null ? Icons.location_on : Icons.location_on_outlined,
                   color: AppColors.primary,
                 ),
               ),
             ),
           ),
+          if (_latitude != null && _longitude != null) ...[
+            6.gapH,
+            Row(
+              children: [
+                const Icon(Icons.check_circle, size: 14, color: Colors.green),
+                6.gapW,
+                Text(
+                  'Location selected',
+                  style: TextStyle(fontSize: D.textXS, color: Colors.green),
+                ),
+              ],
+            ),
+          ],
           20.gapH,
-          _buildLabel('Upload Image (Optional)'),
+          _buildLabel('Attach Photo (Optional)'),
           8.gapH,
           UploadImage(
             image: _selectedImage,
             title: 'Add Photo',
-            subtitle: 'Tap to take or upload photo',
+            subtitle: 'Take a photo or upload an image file',
             height: 180.h,
-            onRemove: _removeImage,
+            onRemove: _selectedImage != null ? _removeImage : null,
             onPickImage: _pickImage,
-           // showActions: true,
             iconBackgroundColor: AppColors.lightPrimary,
             iconColor: AppColors.primary,
           ),
           20.gapH,
-          
-          if (isLoggedIn) ...[
-            Row(
-              children: [
-                Checkbox(
-                  value: _isAnonymous,
-                  onChanged: (value) {
-                    setState(() {
-                      _isAnonymous = value ?? false;
-                    });
-                  },
-                  activeColor: AppColors.primary,
-                ),
-                Expanded(
-                  child: Text(
-                    'Submit anonymously',
+          if (isLoggedIn) _buildAnonymousToggle() else _buildAnonymousNotice(),
+          32.gapH,
+          PrimaryButton(
+            text: _isSubmitting ? 'Submitting...' : 'Submit Complaint',
+            isLoading: _isSubmitting,
+            onPressed: _isSubmitting ? () {} : _handleSubmit,
+          ),
+          16.gapH,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAnonymousToggle() {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: AppColors.grey.withOpacity(0.2)),
+        borderRadius: BorderRadius.circular(D.radiusMD),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Submit Anonymously',
                     style: TextStyle(
                       fontSize: D.textSM,
+                      fontWeight: D.medium,
                       color: AppColors.black,
                     ),
                   ),
-                ),
-              ],
-            ),
-          ] else ...[
-            Container(
-              padding: EdgeInsets.all(12.w),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(D.radiusMD),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.info_outline,
-                    size: 20,
-                    color: AppColors.primary,
-                  ),
-                  8.gapW,
-                  Expanded(
-                    child: Text(
-                      'Your complaint will be submitted anonymously',
-                      style: TextStyle(
-                        fontSize: D.textXS,
-                        color: AppColors.primary,
-                      ),
-                    ),
+                  4.gapH,
+                  Text(
+                    'Your identity will not be revealed',
+                    style: TextStyle(fontSize: D.textXS, color: AppColors.grey),
                   ),
                 ],
               ),
             ),
-          ],
-          
-          40.gapH,
-          PrimaryButton(
-            text: _isSubmitting ? 'Submitting...' : 'Submit Complaint',
-            onPressed: _isSubmitting ? () {} : _handleSubmit,
+          ),
+          Switch(
+            value: _isAnonymous,
+            onChanged: (value) => setState(() => _isAnonymous = value),
+            activeColor: AppColors.primary,
+          ),
+          12.gapW,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAnonymousNotice() {
+    return Container(
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(D.radiusMD),
+        border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.info_outline, size: 18, color: AppColors.primary),
+          8.gapW,
+          Expanded(
+            child: Text(
+              'You are not logged in. Your complaint will be submitted anonymously.',
+              style: TextStyle(
+                fontSize: D.textXS,
+                color: AppColors.primary,
+                height: 1.4,
+              ),
+            ),
           ),
         ],
       ),

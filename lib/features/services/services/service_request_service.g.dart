@@ -29,7 +29,7 @@ class _ServiceRequestService implements ServiceRequestService {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/welfare-cases/types',
+            '/welfare-cases/mobile/types',
             queryParameters: queryParameters,
             data: _data,
           )

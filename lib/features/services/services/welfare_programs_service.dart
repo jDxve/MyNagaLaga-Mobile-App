@@ -9,6 +9,7 @@ part 'welfare_programs_service.g.dart';
 final welfareProgramsServiceProvider =
     Provider.autoDispose<WelfareProgramsService>((ref) {
   final dio = ApiClient.fromEnv().create();
+  
   return WelfareProgramsService(dio);
 });
 

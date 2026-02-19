@@ -1,5 +1,3 @@
-// lib/features/services/services/service_request_service.dart
-
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:retrofit/retrofit.dart';
@@ -16,13 +14,11 @@ final serviceRequestServiceProvider = Provider.autoDispose<ServiceRequestService
 abstract class ServiceRequestService {
   factory ServiceRequestService(Dio dio, {String? baseUrl}) = _ServiceRequestService;
 
-  @GET('/welfare-cases/types')
+  @GET('/welfare-cases/mobile/types')
   Future<HttpResponse<dynamic>> getCaseTypes();
 
   @POST('/welfare-cases/mobile')
-  Future<HttpResponse<dynamic>> submitServiceRequest(
-    @Body() FormData formData,
-  );
+  Future<HttpResponse<dynamic>> submitServiceRequest(@Body() FormData formData);
 
   @GET('/welfare-cases/mobile')
   Future<HttpResponse<dynamic>> getMyServiceRequests(
@@ -33,7 +29,5 @@ abstract class ServiceRequestService {
   );
 
   @GET('/welfare-cases/mobile/{id}')
-  Future<HttpResponse<dynamic>> getServiceRequestById(
-    @Path('id') String id,
-  );
+  Future<HttpResponse<dynamic>> getServiceRequestById(@Path('id') String id);
 }

@@ -6,8 +6,7 @@ import '../../../common/models/dio/api_client.dart';
 part 'complaint_service.g.dart';
 
 final complaintServiceProvider = Provider.autoDispose<ComplaintService>((ref) {
-  final dio = ApiClient.fromEnv().create();
-  return ComplaintService(dio);
+  return ComplaintService(ApiClient.fromEnv().create());
 });
 
 @RestApi()
@@ -17,8 +16,6 @@ abstract class ComplaintService {
   @GET('/complaints/types')
   Future<HttpResponse<dynamic>> getComplaintTypes();
 
-  @POST('/complaints')
-  Future<HttpResponse<dynamic>> submitComplaint(
-    @Body() FormData formData,
-  );
+  @POST('/complaints/mobile')
+  Future<HttpResponse<dynamic>> submitComplaint(@Body() FormData formData);
 }

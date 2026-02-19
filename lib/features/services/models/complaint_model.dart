@@ -1,5 +1,3 @@
-// lib/features/services/models/complaint_model.dart
-
 class ComplaintModel {
   final int complaintTypeId;
   final int? complainantMobileUserId;
@@ -22,20 +20,6 @@ class ComplaintModel {
     this.longitude,
     this.filePaths,
   });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'complaint_type_id': complaintTypeId,
-      if (complainantMobileUserId != null)
-        'complainant_mobile_user_id': complainantMobileUserId,
-      if (barangayId != null) 'barangay_id': barangayId,
-      'description': description,
-      'is_anonymous': isAnonymous,
-      'is_sensitive': isSensitive,
-      if (latitude != null) 'latitude': latitude,
-      if (longitude != null) 'longitude': longitude,
-    };
-  }
 }
 
 class ComplaintResponseModel {
@@ -53,14 +37,9 @@ class ComplaintResponseModel {
 
   factory ComplaintResponseModel.fromJson(Map<String, dynamic> json) {
     return ComplaintResponseModel(
-      // ✅ FIXED: Safe type conversion
-      id: json['id'] is int 
-          ? json['id'] as int 
-          : int.parse(json['id'].toString()),
-      // ✅ FIXED: Use correct JSON field name
+      id: json['id'] is int ? json['id'] as int : int.parse(json['id'].toString()),
       complaintCode: json['complaint_code'] as String,
       status: json['status'] as String,
-      // ✅ FIXED: Safe DateTime parsing
       submittedAt: json['submitted_at'] is String
           ? DateTime.parse(json['submitted_at'] as String)
           : json['submitted_at'] as DateTime,
@@ -81,9 +60,7 @@ class ComplaintTypeModel {
 
   factory ComplaintTypeModel.fromJson(Map<String, dynamic> json) {
     return ComplaintTypeModel(
-      id: json['id'] is int 
-          ? json['id'] as int 
-          : int.parse(json['id'].toString()),
+      id: json['id'] is int ? json['id'] as int : int.parse(json['id'].toString()),
       name: json['name'] as String,
       description: json['description'] as String?,
     );
