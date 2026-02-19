@@ -51,7 +51,7 @@ class _ComplaintService implements ComplaintService {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/complaints',
+            '/complaints/mobile',
             queryParameters: queryParameters,
             data: _data,
           )

@@ -2,63 +2,42 @@ class BarangayInfo {
   final String id;
   final String? name;
 
-  BarangayInfo({required this.id, this.name});
+  const BarangayInfo({required this.id, this.name});
 
-  factory BarangayInfo.fromJson(Map<String, dynamic> json) {
-    return BarangayInfo(
-      id: json['id'].toString(),
-      name: json['name'] as String?,
-    );
-  }
+  factory BarangayInfo.fromJson(Map<String, dynamic> json) => BarangayInfo(
+        id: json['id'].toString(),
+        name: json['name'] as String?,
+      );
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-    };
-  }
+  Map<String, dynamic> toJson() => {'id': id, 'name': name};
 }
 
 class ProgramInfo {
   final String id;
   final String? name;
 
-  ProgramInfo({required this.id, this.name});
+  const ProgramInfo({required this.id, this.name});
 
-  factory ProgramInfo.fromJson(Map<String, dynamic> json) {
-    return ProgramInfo(
-      id: json['id'].toString(),
-      name: json['name'] as String?,
-    );
-  }
+  factory ProgramInfo.fromJson(Map<String, dynamic> json) => ProgramInfo(
+        id: json['id'].toString(),
+        name: json['name'] as String?,
+      );
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-    };
-  }
+  Map<String, dynamic> toJson() => {'id': id, 'name': name};
 }
 
 class ServiceInfo {
   final String id;
   final String? name;
 
-  ServiceInfo({required this.id, this.name});
+  const ServiceInfo({required this.id, this.name});
 
-  factory ServiceInfo.fromJson(Map<String, dynamic> json) {
-    return ServiceInfo(
-      id: json['id'].toString(),
-      name: json['name'] as String?,
-    );
-  }
+  factory ServiceInfo.fromJson(Map<String, dynamic> json) => ServiceInfo(
+        id: json['id'].toString(),
+        name: json['name'] as String?,
+      );
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-    };
-  }
+  Map<String, dynamic> toJson() => {'id': id, 'name': name};
 }
 
 class PaginationMeta {
@@ -67,31 +46,22 @@ class PaginationMeta {
   final int limit;
   final int totalPages;
 
-  PaginationMeta({
+  const PaginationMeta({
     required this.total,
     required this.page,
     required this.limit,
     required this.totalPages,
   });
 
-  factory PaginationMeta.fromJson(Map<String, dynamic> json) {
-    return PaginationMeta(
-      total: json['total'] as int,
-      page: json['page'] as int,
-      limit: json['limit'] as int,
-      totalPages: json['totalPages'] as int,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'total': total,
-      'page': page,
-      'limit': limit,
-      'totalPages': totalPages,
-    };
-  }
+  factory PaginationMeta.fromJson(Map<String, dynamic> json) => PaginationMeta(
+        total: (json['total'] as num).toInt(),
+        page: (json['page'] as num).toInt(),
+        limit: (json['limit'] as num).toInt(),
+        totalPages: (json['totalPages'] as num).toInt(),
+      );
 }
+
+// ─── Unified Feed ─────────────────────────────────────────────────────────────
 
 class TrackingItemModel {
   final String module;
@@ -104,8 +74,9 @@ class TrackingItemModel {
   final DateTime? updatedAt;
   final BarangayInfo? barangay;
   final Map<String, dynamic>? meta;
+  final bool hasRated;
 
-  TrackingItemModel({
+  const TrackingItemModel({
     required this.module,
     required this.id,
     this.code,
@@ -116,307 +87,46 @@ class TrackingItemModel {
     this.updatedAt,
     this.barangay,
     this.meta,
+    this.hasRated = false,
   });
 
-  factory TrackingItemModel.fromJson(Map<String, dynamic> json) {
-    return TrackingItemModel(
-      module: json['module'] as String,
-      id: json['id'].toString(),
-      code: json['code'] as String?,
-      title: json['title'] as String?,
-      statusRaw: json['status_raw'] as String?,
-      statusLabel: json['status_label'] as String,
-      requestedAt: json['requested_at'] != null
-          ? DateTime.parse(json['requested_at'] as String)
-          : null,
-      updatedAt: json['updated_at'] != null
-          ? DateTime.parse(json['updated_at'] as String)
-          : null,
-      barangay: json['barangay'] != null
-          ? BarangayInfo.fromJson(json['barangay'] as Map<String, dynamic>)
-          : null,
-      meta: json['meta'] as Map<String, dynamic>?,
-    );
-  }
+  factory TrackingItemModel.fromJson(Map<String, dynamic> json) =>
+      TrackingItemModel(
+        module: json['module'] as String,
+        id: json['id'].toString(),
+        code: json['code'] as String?,
+        title: json['title'] as String?,
+        statusRaw: json['status_raw'] as String?,
+        statusLabel: (json['status_label'] as String?) ?? '',
+        requestedAt: json['requested_at'] != null
+            ? DateTime.tryParse(json['requested_at'] as String)
+            : null,
+        updatedAt: json['updated_at'] != null
+            ? DateTime.tryParse(json['updated_at'] as String)
+            : null,
+        barangay: json['barangay'] != null
+            ? BarangayInfo.fromJson(json['barangay'] as Map<String, dynamic>)
+            : null,
+        meta: json['meta'] as Map<String, dynamic>?,
+        hasRated: json['has_rated'] as bool? ?? false,
+      );
 
-  Map<String, dynamic> toJson() {
-    return {
-      'module': module,
-      'id': id,
-      'code': code,
-      'title': title,
-      'status_raw': statusRaw,
-      'status_label': statusLabel,
-      'requested_at': requestedAt?.toIso8601String(),
-      'updated_at': updatedAt?.toIso8601String(),
-      'barangay': barangay?.toJson(),
-      'meta': meta,
-    };
-  }
+  TrackingItemModel copyWith({bool? hasRated}) => TrackingItemModel(
+        module: module,
+        id: id,
+        code: code,
+        title: title,
+        statusRaw: statusRaw,
+        statusLabel: statusLabel,
+        requestedAt: requestedAt,
+        updatedAt: updatedAt,
+        barangay: barangay,
+        meta: meta,
+        hasRated: hasRated ?? this.hasRated,
+      );
 }
 
-class TrackingResponseModel {
-  final List<TrackingItemModel> data;
-  final PaginationMeta meta;
-
-  TrackingResponseModel({required this.data, required this.meta});
-
-  factory TrackingResponseModel.fromJson(Map<String, dynamic> json) {
-    final dataList = (json['data'] as List<dynamic>)
-        .map((item) => TrackingItemModel.fromJson(item as Map<String, dynamic>))
-        .toList();
-
-    return TrackingResponseModel(
-      data: dataList,
-      meta: PaginationMeta.fromJson(json['meta'] as Map<String, dynamic>),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'data': data.map((item) => item.toJson()).toList(),
-      'meta': meta.toJson(),
-    };
-  }
-}
-
-class BadgeRequestModel {
-  final String id;
-  final String? code;
-  final String? type;
-  final String? status;
-  final String statusLabel;
-  final DateTime? dateRequested;
-  final DateTime? reviewedAt;
-  final String? reviewNotes;
-  final DateTime? updatedAt;
-
-  BadgeRequestModel({
-    required this.id,
-    this.code,
-    this.type,
-    this.status,
-    required this.statusLabel,
-    this.dateRequested,
-    this.reviewedAt,
-    this.reviewNotes,
-    this.updatedAt,
-  });
-
-  factory BadgeRequestModel.fromJson(Map<String, dynamic> json) {
-    return BadgeRequestModel(
-      id: json['id'].toString(),
-      code: json['code'] as String?,
-      type: json['type'] as String?,
-      status: json['status'] as String?,
-      statusLabel: json['status_label'] as String,
-      dateRequested: json['date_requested'] != null
-          ? DateTime.parse(json['date_requested'] as String)
-          : null,
-      reviewedAt: json['reviewed_at'] != null
-          ? DateTime.parse(json['reviewed_at'] as String)
-          : null,
-      reviewNotes: json['review_notes'] as String?,
-      updatedAt: json['updated_at'] != null
-          ? DateTime.parse(json['updated_at'] as String)
-          : null,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'code': code,
-      'type': type,
-      'status': status,
-      'status_label': statusLabel,
-      'date_requested': dateRequested?.toIso8601String(),
-      'reviewed_at': reviewedAt?.toIso8601String(),
-      'review_notes': reviewNotes,
-      'updated_at': updatedAt?.toIso8601String(),
-    };
-  }
-}
-
-class BadgeRequestsResponseModel {
-  final List<BadgeRequestModel> data;
-  final PaginationMeta meta;
-
-  BadgeRequestsResponseModel({required this.data, required this.meta});
-
-  factory BadgeRequestsResponseModel.fromJson(Map<String, dynamic> json) {
-    final dataList = (json['data'] as List<dynamic>)
-        .map((item) => BadgeRequestModel.fromJson(item as Map<String, dynamic>))
-        .toList();
-
-    return BadgeRequestsResponseModel(
-      data: dataList,
-      meta: PaginationMeta.fromJson(json['meta'] as Map<String, dynamic>),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'data': data.map((item) => item.toJson()).toList(),
-      'meta': meta.toJson(),
-    };
-  }
-}
-
-class RequirementInfo {
-  final String requestId;
-  final String requirementId;
-  final String status;
-  final DateTime? submittedAt;
-  final DateTime? reviewedAt;
-  final String? reviewNotes;
-
-  RequirementInfo({
-    required this.requestId,
-    required this.requirementId,
-    required this.status,
-    this.submittedAt,
-    this.reviewedAt,
-    this.reviewNotes,
-  });
-
-  factory RequirementInfo.fromJson(Map<String, dynamic> json) {
-    return RequirementInfo(
-      requestId: json['request_id'].toString(),
-      requirementId: json['requirement_id'].toString(),
-      status: json['status'] as String,
-      submittedAt: json['submitted_at'] != null
-          ? DateTime.parse(json['submitted_at'] as String)
-          : null,
-      reviewedAt: json['reviewed_at'] != null
-          ? DateTime.parse(json['reviewed_at'] as String)
-          : null,
-      reviewNotes: json['review_notes'] as String?,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'request_id': requestId,
-      'requirement_id': requirementId,
-      'status': status,
-      'submitted_at': submittedAt?.toIso8601String(),
-      'reviewed_at': reviewedAt?.toIso8601String(),
-      'review_notes': reviewNotes,
-    };
-  }
-}
-
-class ApplicationModel {
-  final String postingId;
-  final String? postingTitle;
-  final String? postingStatus;
-  final ProgramInfo? program;
-  final ServiceInfo? service;
-  final BarangayInfo? barangay;
-  final String overallStatus;
-  final DateTime? requestedAt;
-  final DateTime? lastUpdatedAt;
-  final DateTime? reviewedAt;
-  final String? reviewedByUserProfileId;
-  final String? reviewNotes;
-  final List<RequirementInfo> requirements;
-  final int requirementsCount;
-
-  ApplicationModel({
-    required this.postingId,
-    this.postingTitle,
-    this.postingStatus,
-    this.program,
-    this.service,
-    this.barangay,
-    required this.overallStatus,
-    this.requestedAt,
-    this.lastUpdatedAt,
-    this.reviewedAt,
-    this.reviewedByUserProfileId,
-    this.reviewNotes,
-    required this.requirements,
-    required this.requirementsCount,
-  });
-
-  factory ApplicationModel.fromJson(Map<String, dynamic> json) {
-    return ApplicationModel(
-      postingId: json['posting_id'].toString(),
-      postingTitle: json['posting_title'] as String?,
-      postingStatus: json['posting_status'] as String?,
-      program: json['program'] != null
-          ? ProgramInfo.fromJson(json['program'] as Map<String, dynamic>)
-          : null,
-      service: json['service'] != null
-          ? ServiceInfo.fromJson(json['service'] as Map<String, dynamic>)
-          : null,
-      barangay: json['barangay'] != null
-          ? BarangayInfo.fromJson(json['barangay'] as Map<String, dynamic>)
-          : null,
-      overallStatus: json['overall_status'] as String,
-      requestedAt: json['requested_at'] != null
-          ? DateTime.parse(json['requested_at'] as String)
-          : null,
-      lastUpdatedAt: json['last_updated_at'] != null
-          ? DateTime.parse(json['last_updated_at'] as String)
-          : null,
-      reviewedAt: json['reviewed_at'] != null
-          ? DateTime.parse(json['reviewed_at'] as String)
-          : null,
-      reviewedByUserProfileId: json['reviewed_by_user_profile_id'] as String?,
-      reviewNotes: json['review_notes'] as String?,
-      requirements: (json['requirements'] as List<dynamic>)
-          .map((req) => RequirementInfo.fromJson(req as Map<String, dynamic>))
-          .toList(),
-      requirementsCount: json['requirements_count'] as int,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'posting_id': postingId,
-      'posting_title': postingTitle,
-      'posting_status': postingStatus,
-      'program': program?.toJson(),
-      'service': service?.toJson(),
-      'barangay': barangay?.toJson(),
-      'overall_status': overallStatus,
-      'requested_at': requestedAt?.toIso8601String(),
-      'last_updated_at': lastUpdatedAt?.toIso8601String(),
-      'reviewed_at': reviewedAt?.toIso8601String(),
-      'reviewed_by_user_profile_id': reviewedByUserProfileId,
-      'review_notes': reviewNotes,
-      'requirements': requirements.map((req) => req.toJson()).toList(),
-      'requirements_count': requirementsCount,
-    };
-  }
-}
-
-class ApplicationsResponseModel {
-  final List<ApplicationModel> data;
-  final PaginationMeta meta;
-
-  ApplicationsResponseModel({required this.data, required this.meta});
-
-  factory ApplicationsResponseModel.fromJson(Map<String, dynamic> json) {
-    final dataList = (json['data'] as List<dynamic>)
-        .map((item) => ApplicationModel.fromJson(item as Map<String, dynamic>))
-        .toList();
-
-    return ApplicationsResponseModel(
-      data: dataList,
-      meta: PaginationMeta.fromJson(json['meta'] as Map<String, dynamic>),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'data': data.map((item) => item.toJson()).toList(),
-      'meta': meta.toJson(),
-    };
-  }
-}
+// ─── Programs ────────────────────────────────────────────────────────────────
 
 class ProgramPostingModel {
   final String postingId;
@@ -425,43 +135,44 @@ class ProgramPostingModel {
   final DateTime? requestedAt;
   final BarangayInfo? barangay;
   final ServiceInfo? service;
+  final bool hasRated;
 
-  ProgramPostingModel({
+  const ProgramPostingModel({
     required this.postingId,
     required this.postingTitle,
     required this.overallStatus,
     this.requestedAt,
     this.barangay,
     this.service,
+    this.hasRated = false,
   });
 
-  factory ProgramPostingModel.fromJson(Map<String, dynamic> json) {
-    return ProgramPostingModel(
-      postingId: json['posting_id'].toString(),
-      postingTitle: json['posting_title'] as String,
-      overallStatus: json['overall_status'] as String,
-      requestedAt: json['requested_at'] != null
-          ? DateTime.parse(json['requested_at'] as String)
-          : null,
-      barangay: json['barangay'] != null
-          ? BarangayInfo.fromJson(json['barangay'] as Map<String, dynamic>)
-          : null,
-      service: json['service'] != null
-          ? ServiceInfo.fromJson(json['service'] as Map<String, dynamic>)
-          : null,
-    );
-  }
+  factory ProgramPostingModel.fromJson(Map<String, dynamic> json) =>
+      ProgramPostingModel(
+        postingId: json['posting_id'].toString(),
+        postingTitle: (json['posting_title'] as String?) ?? '',
+        overallStatus: (json['overall_status'] as String?) ?? '',
+        requestedAt: json['requested_at'] != null
+            ? DateTime.tryParse(json['requested_at'] as String)
+            : null,
+        barangay: json['barangay'] != null
+            ? BarangayInfo.fromJson(json['barangay'] as Map<String, dynamic>)
+            : null,
+        service: json['service'] != null
+            ? ServiceInfo.fromJson(json['service'] as Map<String, dynamic>)
+            : null,
+        hasRated: json['has_rated'] as bool? ?? false,
+      );
 
-  Map<String, dynamic> toJson() {
-    return {
-      'posting_id': postingId,
-      'posting_title': postingTitle,
-      'overall_status': overallStatus,
-      'requested_at': requestedAt?.toIso8601String(),
-      'barangay': barangay?.toJson(),
-      'service': service?.toJson(),
-    };
-  }
+  ProgramPostingModel copyWith({bool? hasRated}) => ProgramPostingModel(
+        postingId: postingId,
+        postingTitle: postingTitle,
+        overallStatus: overallStatus,
+        requestedAt: requestedAt,
+        barangay: barangay,
+        service: service,
+        hasRated: hasRated ?? this.hasRated,
+      );
 }
 
 class ProgramTrackingModel {
@@ -471,7 +182,7 @@ class ProgramTrackingModel {
   final DateTime? lastRequestedAt;
   final List<ProgramPostingModel> postings;
 
-  ProgramTrackingModel({
+  const ProgramTrackingModel({
     required this.program,
     required this.totalApplications,
     required this.byStatus,
@@ -479,52 +190,23 @@ class ProgramTrackingModel {
     required this.postings,
   });
 
-  factory ProgramTrackingModel.fromJson(Map<String, dynamic> json) {
-    return ProgramTrackingModel(
-      program: ProgramInfo.fromJson(json['program'] as Map<String, dynamic>),
-      totalApplications: json['total_applications'] as int,
-      byStatus: Map<String, int>.from(json['by_status'] as Map),
-      lastRequestedAt: json['last_requested_at'] != null
-          ? DateTime.parse(json['last_requested_at'] as String)
-          : null,
-      postings: (json['postings'] as List<dynamic>)
-          .map((posting) =>
-              ProgramPostingModel.fromJson(posting as Map<String, dynamic>))
-          .toList(),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'program': program.toJson(),
-      'total_applications': totalApplications,
-      'by_status': byStatus,
-      'last_requested_at': lastRequestedAt?.toIso8601String(),
-      'postings': postings.map((p) => p.toJson()).toList(),
-    };
-  }
+  factory ProgramTrackingModel.fromJson(Map<String, dynamic> json) =>
+      ProgramTrackingModel(
+        program: ProgramInfo.fromJson(json['program'] as Map<String, dynamic>),
+        totalApplications: (json['total_applications'] as num).toInt(),
+        byStatus: (json['by_status'] as Map<String, dynamic>).map(
+          (k, v) => MapEntry(k, (v as num).toInt()),
+        ),
+        lastRequestedAt: json['last_requested_at'] != null
+            ? DateTime.tryParse(json['last_requested_at'] as String)
+            : null,
+        postings: (json['postings'] as List<dynamic>)
+            .map((e) => ProgramPostingModel.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
 }
 
-class ProgramsTrackingResponseModel {
-  final List<ProgramTrackingModel> data;
-
-  ProgramsTrackingResponseModel({required this.data});
-
-  factory ProgramsTrackingResponseModel.fromJson(Map<String, dynamic> json) {
-    final dataList = (json['data'] as List<dynamic>)
-        .map((item) =>
-            ProgramTrackingModel.fromJson(item as Map<String, dynamic>))
-        .toList();
-
-    return ProgramsTrackingResponseModel(data: dataList);
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'data': data.map((item) => item.toJson()).toList(),
-    };
-  }
-}
+// ─── Services ────────────────────────────────────────────────────────────────
 
 class ServicePostingModel {
   final String postingId;
@@ -533,115 +215,85 @@ class ServicePostingModel {
   final DateTime? requestedAt;
   final BarangayInfo? barangay;
   final ProgramInfo? program;
+  final bool hasRated;
 
-  ServicePostingModel({
+  const ServicePostingModel({
     required this.postingId,
     required this.postingTitle,
     required this.overallStatus,
     this.requestedAt,
     this.barangay,
     this.program,
+    this.hasRated = false,
   });
 
-  factory ServicePostingModel.fromJson(Map<String, dynamic> json) {
-    return ServicePostingModel(
-      postingId: json['posting_id'].toString(),
-      postingTitle: json['posting_title'] as String,
-      overallStatus: json['overall_status'] as String,
-      requestedAt: json['requested_at'] != null
-          ? DateTime.parse(json['requested_at'] as String)
-          : null,
-      barangay: json['barangay'] != null
-          ? BarangayInfo.fromJson(json['barangay'] as Map<String, dynamic>)
-          : null,
-      program: json['program'] != null
-          ? ProgramInfo.fromJson(json['program'] as Map<String, dynamic>)
-          : null,
-    );
-  }
+  factory ServicePostingModel.fromJson(Map<String, dynamic> json) =>
+      ServicePostingModel(
+        postingId: json['posting_id'].toString(),
+        postingTitle: (json['posting_title'] as String?) ?? '',
+        overallStatus: (json['overall_status'] as String?) ?? '',
+        requestedAt: json['requested_at'] != null
+            ? DateTime.tryParse(json['requested_at'] as String)
+            : null,
+        barangay: json['barangay'] != null
+            ? BarangayInfo.fromJson(json['barangay'] as Map<String, dynamic>)
+            : null,
+        program: json['program'] != null
+            ? ProgramInfo.fromJson(json['program'] as Map<String, dynamic>)
+            : null,
+        hasRated: json['has_rated'] as bool? ?? false,
+      );
 
-  Map<String, dynamic> toJson() {
-    return {
-      'posting_id': postingId,
-      'posting_title': postingTitle,
-      'overall_status': overallStatus,
-      'requested_at': requestedAt?.toIso8601String(),
-      'barangay': barangay?.toJson(),
-      'program': program?.toJson(),
-    };
-  }
+  ServicePostingModel copyWith({bool? hasRated}) => ServicePostingModel(
+        postingId: postingId,
+        postingTitle: postingTitle,
+        overallStatus: overallStatus,
+        requestedAt: requestedAt,
+        barangay: barangay,
+        program: program,
+        hasRated: hasRated ?? this.hasRated,
+      );
 }
 
 class ServiceTrackingModel {
   final ServiceInfo service;
-  final ProgramInfo program;
+  final ProgramInfo? program;
   final int totalApplications;
   final Map<String, int> byStatus;
   final DateTime? lastRequestedAt;
   final List<ServicePostingModel> postings;
 
-  ServiceTrackingModel({
+  const ServiceTrackingModel({
     required this.service,
-    required this.program,
+    this.program,
     required this.totalApplications,
     required this.byStatus,
     this.lastRequestedAt,
     required this.postings,
   });
 
-  factory ServiceTrackingModel.fromJson(Map<String, dynamic> json) {
-    return ServiceTrackingModel(
-      service: ServiceInfo.fromJson(json['service'] as Map<String, dynamic>),
-      program: ProgramInfo.fromJson(json['program'] as Map<String, dynamic>),
-      totalApplications: json['total_applications'] as int,
-      byStatus: Map<String, int>.from(json['by_status'] as Map),
-      lastRequestedAt: json['last_requested_at'] != null
-          ? DateTime.parse(json['last_requested_at'] as String)
-          : null,
-      postings: (json['postings'] as List<dynamic>)
-          .map((posting) =>
-              ServicePostingModel.fromJson(posting as Map<String, dynamic>))
-          .toList(),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'service': service.toJson(),
-      'program': program.toJson(),
-      'total_applications': totalApplications,
-      'by_status': byStatus,
-      'last_requested_at': lastRequestedAt?.toIso8601String(),
-      'postings': postings.map((p) => p.toJson()).toList(),
-    };
-  }
+  factory ServiceTrackingModel.fromJson(Map<String, dynamic> json) =>
+      ServiceTrackingModel(
+        service:
+            ServiceInfo.fromJson(json['service'] as Map<String, dynamic>),
+        program: json['program'] != null
+            ? ProgramInfo.fromJson(json['program'] as Map<String, dynamic>)
+            : null,
+        totalApplications: (json['total_applications'] as num).toInt(),
+        byStatus: (json['by_status'] as Map<String, dynamic>).map(
+          (k, v) => MapEntry(k, (v as num).toInt()),
+        ),
+        lastRequestedAt: json['last_requested_at'] != null
+            ? DateTime.tryParse(json['last_requested_at'] as String)
+            : null,
+        postings: (json['postings'] as List<dynamic>)
+            .map((e) =>
+                ServicePostingModel.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
 }
 
-class ServicesTrackingResponseModel {
-  final List<ServiceTrackingModel> data;
-  final PaginationMeta meta;
-
-  ServicesTrackingResponseModel({required this.data, required this.meta});
-
-  factory ServicesTrackingResponseModel.fromJson(Map<String, dynamic> json) {
-    final dataList = (json['data'] as List<dynamic>)
-        .map((item) =>
-            ServiceTrackingModel.fromJson(item as Map<String, dynamic>))
-        .toList();
-
-    return ServicesTrackingResponseModel(
-      data: dataList,
-      meta: PaginationMeta.fromJson(json['meta'] as Map<String, dynamic>),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'data': data.map((item) => item.toJson()).toList(),
-      'meta': meta.toJson(),
-    };
-  }
-}
+// ─── Complaints ───────────────────────────────────────────────────────────────
 
 class ComplaintModel {
   final String id;
@@ -653,8 +305,9 @@ class ComplaintModel {
   final DateTime? dateRequested;
   final DateTime? updatedAt;
   final BarangayInfo? barangay;
+  final bool hasRated;
 
-  ComplaintModel({
+  const ComplaintModel({
     required this.id,
     this.code,
     this.type,
@@ -664,64 +317,178 @@ class ComplaintModel {
     this.dateRequested,
     this.updatedAt,
     this.barangay,
+    this.hasRated = false,
   });
 
-  factory ComplaintModel.fromJson(Map<String, dynamic> json) {
-    return ComplaintModel(
-      id: json['id'].toString(),
-      code: json['code'] as String?,
-      type: json['type'] as String?,
-      subject: json['subject'] as String?,
-      status: json['status'] as String?,
-      statusLabel: json['status_label'] as String,
-      dateRequested: json['date_requested'] != null
-          ? DateTime.parse(json['date_requested'] as String)
-          : null,
-      updatedAt: json['updated_at'] != null
-          ? DateTime.parse(json['updated_at'] as String)
-          : null,
-      barangay: json['barangay'] != null
-          ? BarangayInfo.fromJson(json['barangay'] as Map<String, dynamic>)
-          : null,
-    );
+  factory ComplaintModel.fromJson(Map<String, dynamic> json) => ComplaintModel(
+        id: json['id'].toString(),
+        code: json['code'] as String?,
+        type: json['type'] as String?,
+        subject: json['subject'] as String?,
+        status: json['status'] as String?,
+        statusLabel: (json['status_label'] as String?) ?? '',
+        dateRequested: json['date_requested'] != null
+            ? DateTime.tryParse(json['date_requested'] as String)
+            : null,
+        updatedAt: json['updated_at'] != null
+            ? DateTime.tryParse(json['updated_at'] as String)
+            : null,
+        barangay: json['barangay'] != null
+            ? BarangayInfo.fromJson(json['barangay'] as Map<String, dynamic>)
+            : null,
+        hasRated: json['has_rated'] as bool? ?? false,
+      );
+
+  ComplaintModel copyWith({bool? hasRated}) => ComplaintModel(
+        id: id,
+        code: code,
+        type: type,
+        subject: subject,
+        status: status,
+        statusLabel: statusLabel,
+        dateRequested: dateRequested,
+        updatedAt: updatedAt,
+        barangay: barangay,
+        hasRated: hasRated ?? this.hasRated,
+      );
+}
+
+// ─── Badge Requests ───────────────────────────────────────────────────────────
+
+class BadgeRequestModel {
+  final String id;
+  final String? code;
+  final String? type;
+  final String? status;
+  final String statusLabel;
+  final DateTime? dateRequested;
+  final DateTime? reviewedAt;
+  final String? reviewNotes;
+  final DateTime? updatedAt;
+  final bool hasRated;
+
+  const BadgeRequestModel({
+    required this.id,
+    this.code,
+    this.type,
+    this.status,
+    required this.statusLabel,
+    this.dateRequested,
+    this.reviewedAt,
+    this.reviewNotes,
+    this.updatedAt,
+    this.hasRated = false,
+  });
+
+  factory BadgeRequestModel.fromJson(Map<String, dynamic> json) =>
+      BadgeRequestModel(
+        id: json['id'].toString(),
+        code: json['code'] as String?,
+        type: json['type'] as String?,
+        status: json['status'] as String?,
+        statusLabel: (json['status_label'] as String?) ?? '',
+        dateRequested: json['date_requested'] != null
+            ? DateTime.tryParse(json['date_requested'] as String)
+            : null,
+        reviewedAt: json['reviewed_at'] != null
+            ? DateTime.tryParse(json['reviewed_at'] as String)
+            : null,
+        reviewNotes: json['review_notes'] as String?,
+        updatedAt: json['updated_at'] != null
+            ? DateTime.tryParse(json['updated_at'] as String)
+            : null,
+        hasRated: json['has_rated'] as bool? ?? false,
+      );
+
+  BadgeRequestModel copyWith({bool? hasRated}) => BadgeRequestModel(
+        id: id,
+        code: code,
+        type: type,
+        status: status,
+        statusLabel: statusLabel,
+        dateRequested: dateRequested,
+        reviewedAt: reviewedAt,
+        reviewNotes: reviewNotes,
+        updatedAt: updatedAt,
+        hasRated: hasRated ?? this.hasRated,
+      );
+}
+
+// ─── Feedback ─────────────────────────────────────────────────────────────────
+
+class PendingFeedbackEntity {
+  final String? code;
+  final String? title;
+  final String? typeName;
+
+  const PendingFeedbackEntity({this.code, this.title, this.typeName});
+
+  factory PendingFeedbackEntity.fromJson(
+    Map<String, dynamic> json,
+    String feedbackableType,
+  ) {
+    if (feedbackableType == 'case') {
+      return PendingFeedbackEntity(
+        code: json['case_code'] as String?,
+        typeName:
+            (json['case_types'] as Map<String, dynamic>?)?['name'] as String?,
+      );
+    } else if (feedbackableType == 'complaint') {
+      return PendingFeedbackEntity(
+        code: json['complaint_code'] as String?,
+        title: json['subject'] as String?,
+      );
+    } else {
+      final service = json['assistance_services'] as Map<String, dynamic>?;
+      final program =
+          service?['assistance_programs'] as Map<String, dynamic>?;
+      return PendingFeedbackEntity(
+        title: (json['title'] as String?) ?? service?['name'] as String?,
+        typeName: program?['name'] as String?,
+      );
+    }
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'code': code,
-      'type': type,
-      'subject': subject,
-      'status': status,
-      'status_label': statusLabel,
-      'date_requested': dateRequested?.toIso8601String(),
-      'updated_at': updatedAt?.toIso8601String(),
-      'barangay': barangay?.toJson(),
-    };
+  String get displayTitle {
+    if (title != null && title!.isNotEmpty) return title!;
+    if (code != null && code!.isNotEmpty) return code!;
+    if (typeName != null && typeName!.isNotEmpty) return typeName!;
+    return 'Request';
   }
 }
 
-class ComplaintsResponseModel {
-  final List<ComplaintModel> data;
-  final PaginationMeta meta;
+class PendingFeedbackRequest {
+  final String id;
+  final String feedbackableType;
+  final String feedbackableId;
+  final String status;
+  final DateTime expiresAt;
+  final PendingFeedbackEntity? entity;
 
-  ComplaintsResponseModel({required this.data, required this.meta});
+  const PendingFeedbackRequest({
+    required this.id,
+    required this.feedbackableType,
+    required this.feedbackableId,
+    required this.status,
+    required this.expiresAt,
+    this.entity,
+  });
 
-  factory ComplaintsResponseModel.fromJson(Map<String, dynamic> json) {
-    final dataList = (json['data'] as List<dynamic>)
-        .map((item) => ComplaintModel.fromJson(item as Map<String, dynamic>))
-        .toList();
+  factory PendingFeedbackRequest.fromJson(Map<String, dynamic> json) =>
+      PendingFeedbackRequest(
+        id: json['id'].toString(),
+        feedbackableType: json['feedbackable_type'] as String,
+        feedbackableId: json['feedbackable_id'].toString(),
+        status: json['status'] as String,
+        expiresAt: DateTime.parse(json['expires_at'] as String),
+        entity: json['entity'] != null
+            ? PendingFeedbackEntity.fromJson(
+                json['entity'] as Map<String, dynamic>,
+                json['feedbackable_type'] as String,
+              )
+            : null,
+      );
 
-    return ComplaintsResponseModel(
-      data: dataList,
-      meta: PaginationMeta.fromJson(json['meta'] as Map<String, dynamic>),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'data': data.map((item) => item.toJson()).toList(),
-      'meta': meta.toJson(),
-    };
-  }
+  bool get isExpired => expiresAt.isBefore(DateTime.now());
+  int get daysUntilExpiry => expiresAt.difference(DateTime.now()).inDays;
 }
