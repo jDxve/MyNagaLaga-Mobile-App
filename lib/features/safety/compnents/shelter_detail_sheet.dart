@@ -37,10 +37,6 @@ class ShelterDetailsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final parts = shelter.capacity.split('/');
-    final current = parts[0];
-    final total = parts.length > 1 ? parts[1] : '0';
-
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       decoration: BoxDecoration(
@@ -58,9 +54,9 @@ class ShelterDetailsSheet extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildHeader(),
-                  Divider(thickness: 1),
+                  const Divider(thickness: 1),
                   12.gapH,
-                  _buildOccupancySection(current, total),
+                  _buildOccupancySection(),
                   24.gapH,
                   _buildVulnerableGrid(),
                   24.gapH,
@@ -77,11 +73,22 @@ class ShelterDetailsSheet extends StatelessWidget {
     );
   }
 
+  Widget _buildHandle() {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 16.h),
+      width: 45.w,
+      height: 5.h,
+      decoration: BoxDecoration(
+        color: AppColors.grey.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(10.r),
+      ),
+    );
+  }
+
   Widget _buildHeader() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Shelter name + status badge
         Row(
           children: [
             Expanded(
@@ -121,11 +128,8 @@ class ShelterDetailsSheet extends StatelessWidget {
         8.gapH,
         Row(
           children: [
-            Icon(
-              Icons.location_on_outlined,
-              size: D.iconXS,
-              color: AppColors.grey,
-            ),
+            Icon(Icons.location_on_outlined,
+                size: D.iconXS, color: AppColors.grey),
             4.gapW,
             Expanded(
               child: Text(
@@ -188,7 +192,20 @@ class ShelterDetailsSheet extends StatelessWidget {
     }
   }
 
-  Widget _buildOccupancySection(String current, String total) {
+  Widget _buildOccupancySection() {
+    final percentage = shelter.maxCapacity > 0
+        ? (shelter.currentOccupancy / shelter.maxCapacity).clamp(0.0, 1.0)
+        : 0.0;
+
+    Color barColor;
+    if (percentage >= 1.0) {
+      barColor = AppColors.red;
+    } else if (percentage >= 0.75) {
+      barColor = AppColors.orange;
+    } else {
+      barColor = AppColors.primary;
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -205,9 +222,29 @@ class ShelterDetailsSheet extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _buildStat('Current', current),
-            _buildStat('Maximum', total),
+            _buildStat('Current', shelter.currentOccupancy.toString()),
+            Container(width: 1, height: 48.h, color: AppColors.grey.withOpacity(0.2)),
+            _buildStat('Maximum', shelter.maxCapacity.toString()),
           ],
+        ),
+        20.gapH,
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(
+            value: percentage,
+            backgroundColor: AppColors.grey.withOpacity(0.1),
+            valueColor: AlwaysStoppedAnimation<Color>(barColor),
+            minHeight: 8,
+          ),
+        ),
+        6.gapH,
+        Text(
+          '${(percentage * 100).toStringAsFixed(0)}% occupied',
+          style: TextStyle(
+            fontSize: D.textXS,
+            color: AppColors.grey,
+            fontFamily: 'Segoe UI',
+          ),
         ),
       ],
     );
@@ -284,7 +321,7 @@ class ShelterDetailsSheet extends StatelessWidget {
             ),
             _VulnerableTile(
               icon: Icons.pregnant_woman,
-              count: 2,
+              count: 0,
               label: 'Pregnant',
               bgColor: AppColors.lightPink,
               iconColor: AppColors.darkPink,
@@ -312,11 +349,9 @@ class ShelterDetailsSheet extends StatelessWidget {
         Wrap(
           spacing: 10.w,
           runSpacing: 10.h,
-          children: [
-            'Water',
-            'Restroom',
-            'First Aid',
-          ].map((e) => _AmenityChip(label: e)).toList(),
+          children: ['Water', 'Restroom', 'First Aid']
+              .map((e) => _AmenityChip(label: e))
+              .toList(),
         ),
       ],
     );
@@ -328,18 +363,6 @@ class ShelterDetailsSheet extends StatelessWidget {
       isFilled: true,
       icon: Icons.directions,
       onPressed: onDirections,
-    );
-  }
-
-  Widget _buildHandle() {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 16.h),
-      width: 45.w,
-      height: 5.h,
-      decoration: BoxDecoration(
-        color: AppColors.grey.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(10.r),
-      ),
     );
   }
 }

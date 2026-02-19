@@ -15,17 +15,7 @@ class SheltersNotifier extends Notifier<DataState<SheltersResponse>> {
   }
 
   Future<void> fetchAllShelters({bool forceRefresh = false}) async {
-    // Don't reload if we already have data (unless force refresh)
-    if (!forceRefresh) {
-      state.whenOrNull(
-        success: (_) => null, // Already has data, return early
-      );
-      // ignore: unnecessary_type_check
-      if (state is! DataState<SheltersResponse> || 
-          state.toString().contains('success')) {
-        return;
-      }
-    }
+    if (!forceRefresh && state is Success) return;
 
     state = const DataState.loading();
     final repository = ref.read(shelterRepositoryProvider);
@@ -35,6 +25,32 @@ class SheltersNotifier extends Notifier<DataState<SheltersResponse>> {
 
   Future<void> refresh() async {
     await fetchAllShelters(forceRefresh: true);
+  }
+
+  void reset() {
+    state = const DataState.started();
+  }
+}
+
+final assignedCenterNotifierProvider = NotifierProvider<
+    AssignedCenterNotifier, DataState<AssignedCenterData>>(
+  AssignedCenterNotifier.new,
+);
+
+class AssignedCenterNotifier
+    extends Notifier<DataState<AssignedCenterData>> {
+  @override
+  DataState<AssignedCenterData> build() {
+    return const DataState.started();
+  }
+
+  Future<void> fetch({bool forceRefresh = false}) async {
+    if (!forceRefresh && state is Success) return;
+
+    state = const DataState.loading();
+    final repository = ref.read(shelterRepositoryProvider);
+    final result = await repository.getAssignedCenter();
+    state = result;
   }
 
   void reset() {

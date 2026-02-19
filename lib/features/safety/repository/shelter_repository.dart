@@ -3,4 +3,5 @@ import '../models/shelter_data_model.dart';
 
 abstract class ShelterRepository {
   Future<DataState<SheltersResponse>> getAllShelters();
+  Future<DataState<AssignedCenterData>> getAssignedCenter();
 }
