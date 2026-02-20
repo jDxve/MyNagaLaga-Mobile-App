@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../common/resources/dimensions.dart';
 import '../components/case_track_button.dart';
 import '../components/services_header.dart';
@@ -7,18 +8,18 @@ import '../components/services_page/service_request_page.dart';
 import '../components/services_search_section.dart';
 import '../components/featured_program_section.dart';
 import '../components/services_section.dart';
+import '../../home/components/circular_notif.dart';
 import 'track_services_screen.dart';
 
-class ServicesScreen extends StatefulWidget {
+class ServicesScreen extends ConsumerStatefulWidget {
   static const routeName = '/services';
-
   const ServicesScreen({super.key});
 
   @override
-  State<ServicesScreen> createState() => _ServicesScreenState();
+  ConsumerState<ServicesScreen> createState() => _ServicesScreenState();
 }
 
-class _ServicesScreenState extends State<ServicesScreen> {
+class _ServicesScreenState extends ConsumerState<ServicesScreen> {
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -27,10 +28,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
     super.dispose();
   }
 
-  void _handleNotificationTap() {}
-
   void _handleSearchChanged(String value) {
-    // Parent can use value to filter other sections if needed
     setState(() {});
   }
 
@@ -68,7 +66,13 @@ class _ServicesScreenState extends State<ServicesScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     16.gapH,
-                    ServicesHeader(onNotificationTap: _handleNotificationTap),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        ServicesHeader(), // remove onNotificationTap param
+                        const CircularNotifButton(), // ✅
+                      ],
+                    ),
                     20.gapH,
                     ServicesSearchSection(
                       searchController: _searchController,

@@ -8,20 +8,17 @@ import 'router.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Load environment variables
   await dotenv.load(fileName: ".env");
-
-  // Initialize Firebase & FCM
   await FirebaseConfig.initialize();
 
-  // Lock to portrait orientation
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]).then((_) {
+  final container = ProviderContainer();
+  FirebaseConfig.setContainer(container);
+
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((_) {
     runApp(
-      const ProviderScope(
-        child: MyApp(),
+      UncontrolledProviderScope(
+        container: container,
+        child: const MyApp(),
       ),
     );
   });

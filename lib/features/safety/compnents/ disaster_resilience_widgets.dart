@@ -9,11 +9,7 @@ class DrHeader extends StatelessWidget {
   final VoidCallback onNotifTap;
   final int notifCount;
 
-  const DrHeader({
-    super.key,
-    required this.onNotifTap,
-    this.notifCount = 0,
-  });
+  const DrHeader({super.key, required this.onNotifTap, this.notifCount = 0});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +26,7 @@ class DrHeader extends StatelessWidget {
               color: AppColors.black,
             ),
           ),
-          circularNotif(notificationCount: notifCount, onTap: onNotifTap),
+          const CircularNotifButton(),
         ],
       ),
     );
@@ -193,11 +189,23 @@ class AssignedCenterBanner extends StatelessWidget {
     final int max = assigned.maxCapacity;
     final double pct = max > 0 ? (current / max).clamp(0.0, 1.0) : 0.0;
     if (pct >= 1.0) {
-      return (color: const Color(0xFFE53935), label: 'Full', icon: Icons.block_rounded);
+      return (
+        color: const Color(0xFFE53935),
+        label: 'Full',
+        icon: Icons.block_rounded,
+      );
     } else if (pct >= 0.75) {
-      return (color: const Color(0xFFF57C00), label: 'Limited', icon: Icons.warning_amber_rounded);
+      return (
+        color: const Color(0xFFF57C00),
+        label: 'Limited',
+        icon: Icons.warning_amber_rounded,
+      );
     }
-    return (color: AppColors.primary, label: 'Available', icon: Icons.check_circle_rounded);
+    return (
+      color: AppColors.primary,
+      label: 'Available',
+      icon: Icons.check_circle_rounded,
+    );
   }
 
   @override
@@ -223,43 +231,50 @@ class AssignedCenterBanner extends StatelessWidget {
           ),
         ),
         Container(
-      margin: EdgeInsets.fromLTRB(16.w, 0, 16.w, 0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(color: AppColors.primary.withOpacity(0.18), width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withOpacity(0.08),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
+          margin: EdgeInsets.fromLTRB(16.w, 0, 16.w, 0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18.r),
+            border: Border.all(
+              color: AppColors.primary.withOpacity(0.18),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withOpacity(0.08),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _BannerTopSection(
-            assigned: assigned,
-            statusColor: cfg.color,
-            statusLabel: cfg.label,
-            statusIcon: cfg.icon,
-            onGoToCenter: onGoToCenter,
-            distanceInKm: distanceInKm,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _BannerTopSection(
+                assigned: assigned,
+                statusColor: cfg.color,
+                statusLabel: cfg.label,
+                statusIcon: cfg.icon,
+                onGoToCenter: onGoToCenter,
+                distanceInKm: distanceInKm,
+              ),
+              Divider(
+                height: 1,
+                thickness: 1,
+                color: AppColors.grey.withOpacity(0.1),
+              ),
+              _BannerBottomSection(
+                current: current,
+                max: max,
+                pct: pct,
+                statusColor: cfg.color,
+                onChangeTap: () => _showChangeShelterSheet(context),
+              ),
+            ],
           ),
-          Divider(height: 1, thickness: 1, color: AppColors.grey.withOpacity(0.1)),
-          _BannerBottomSection(
-            current: current,
-            max: max,
-            pct: pct,
-            statusColor: cfg.color,
-            onChangeTap: () => _showChangeShelterSheet(context),
-          ),
-        ],
-      ),
-      ),
-    ],
-   );
+        ),
+      ],
+    );
   }
 }
 
@@ -294,7 +309,11 @@ class _BannerTopSection extends StatelessWidget {
               color: AppColors.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(14.r),
             ),
-            child: Icon(Icons.home_work_rounded, color: AppColors.primary, size: 24.w),
+            child: Icon(
+              Icons.home_work_rounded,
+              color: AppColors.primary,
+              size: 24.w,
+            ),
           ),
           14.gapW,
           Expanded(
@@ -304,7 +323,11 @@ class _BannerTopSection extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _StatusPill(color: statusColor, icon: statusIcon, label: statusLabel),
+                    _StatusPill(
+                      color: statusColor,
+                      icon: statusIcon,
+                      label: statusLabel,
+                    ),
                     5.gapH,
                     Text(
                       assigned.centerName,
@@ -322,12 +345,19 @@ class _BannerTopSection extends StatelessWidget {
                 Row(
                   children: [
                     if (assigned.barangayName.isNotEmpty) ...[
-                      Icon(Icons.location_on_outlined, size: 11.w, color: AppColors.grey),
+                      Icon(
+                        Icons.location_on_outlined,
+                        size: 11.w,
+                        color: AppColors.grey,
+                      ),
                       3.gapW,
                       Flexible(
                         child: Text(
                           assigned.barangayName,
-                          style: TextStyle(fontSize: D.textXS, color: AppColors.grey),
+                          style: TextStyle(
+                            fontSize: D.textXS,
+                            color: AppColors.grey,
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -336,7 +366,10 @@ class _BannerTopSection extends StatelessWidget {
                     if (distanceInKm != null) ...[
                       if (assigned.barangayName.isNotEmpty) 8.gapW,
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 2.h),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 7.w,
+                          vertical: 2.h,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.primary.withOpacity(0.08),
                           borderRadius: BorderRadius.circular(20),
@@ -344,7 +377,11 @@ class _BannerTopSection extends StatelessWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.near_me_rounded, size: 10.w, color: AppColors.primary),
+                            Icon(
+                              Icons.near_me_rounded,
+                              size: 10.w,
+                              color: AppColors.primary,
+                            ),
                             3.gapW,
                             Text(
                               DistanceCalculator.formatDistance(distanceInKm!),
@@ -399,7 +436,11 @@ class _BannerBottomSection extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.people_rounded, size: 13.w, color: AppColors.grey),
+                    Icon(
+                      Icons.people_rounded,
+                      size: 13.w,
+                      color: AppColors.grey,
+                    ),
                     5.gapW,
                     Text(
                       'Occupancy',
@@ -411,7 +452,10 @@ class _BannerBottomSection extends StatelessWidget {
                     ),
                     const Spacer(),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 9.w, vertical: 3.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 9.w,
+                        vertical: 3.h,
+                      ),
                       decoration: BoxDecoration(
                         color: statusColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(20),
@@ -445,7 +489,11 @@ class _StatusPill extends StatelessWidget {
   final IconData icon;
   final String label;
 
-  const _StatusPill({required this.color, required this.icon, required this.label});
+  const _StatusPill({
+    required this.color,
+    required this.icon,
+    required this.label,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -462,7 +510,11 @@ class _StatusPill extends StatelessWidget {
           3.gapW,
           Text(
             label,
-            style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, color: color),
+            style: TextStyle(
+              fontSize: 9.5,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
           ),
         ],
       ),
@@ -594,14 +646,23 @@ class _ChangeButtonState extends State<ChangeButton> {
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 13.w, vertical: 8.h),
           decoration: BoxDecoration(
-            color: _pressed ? AppColors.primary.withOpacity(0.06) : Colors.white,
+            color: _pressed
+                ? AppColors.primary.withOpacity(0.06)
+                : Colors.white,
             borderRadius: BorderRadius.circular(10.r),
-            border: Border.all(color: AppColors.primary.withOpacity(0.35), width: 1.5),
+            border: Border.all(
+              color: AppColors.primary.withOpacity(0.35),
+              width: 1.5,
+            ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.swap_horiz_rounded, color: AppColors.primary, size: 15.w),
+              Icon(
+                Icons.swap_horiz_rounded,
+                color: AppColors.primary,
+                size: 15.w,
+              ),
               5.gapW,
               Text(
                 'Change',
@@ -633,17 +694,23 @@ class ChangeShelterSheet extends StatelessWidget {
 
   Color _statusColor(ShelterStatus status) {
     switch (status) {
-      case ShelterStatus.available: return AppColors.primary;
-      case ShelterStatus.limited: return const Color(0xFFF57C00);
-      case ShelterStatus.full: return const Color(0xFFE53935);
+      case ShelterStatus.available:
+        return AppColors.primary;
+      case ShelterStatus.limited:
+        return const Color(0xFFF57C00);
+      case ShelterStatus.full:
+        return const Color(0xFFE53935);
     }
   }
 
   String _statusLabel(ShelterStatus status) {
     switch (status) {
-      case ShelterStatus.available: return 'Available';
-      case ShelterStatus.limited: return 'Limited';
-      case ShelterStatus.full: return 'Full';
+      case ShelterStatus.available:
+        return 'Available';
+      case ShelterStatus.limited:
+        return 'Limited';
+      case ShelterStatus.full:
+        return 'Full';
     }
   }
 
@@ -675,7 +742,11 @@ class ChangeShelterSheet extends StatelessWidget {
                   color: AppColors.primary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(10.r),
                 ),
-                child: Icon(Icons.swap_horiz_rounded, color: AppColors.primary, size: 20.w),
+                child: Icon(
+                  Icons.swap_horiz_rounded,
+                  color: AppColors.primary,
+                  size: 20.w,
+                ),
               ),
               14.gapW,
               Expanded(
@@ -693,7 +764,10 @@ class ChangeShelterSheet extends StatelessWidget {
                     3.gapH,
                     Text(
                       'Tap a center to get directions there',
-                      style: TextStyle(fontSize: D.textXS, color: AppColors.grey),
+                      style: TextStyle(
+                        fontSize: D.textXS,
+                        color: AppColors.grey,
+                      ),
                     ),
                   ],
                 ),
@@ -704,7 +778,9 @@ class ChangeShelterSheet extends StatelessWidget {
           Divider(height: 1, color: AppColors.grey.withOpacity(0.1)),
           12.gapH,
           ConstrainedBox(
-            constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.52),
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.52,
+            ),
             child: ListView.builder(
               shrinkWrap: true,
               itemCount: shelters.length,
@@ -714,7 +790,10 @@ class ChangeShelterSheet extends StatelessWidget {
                 final isFull = shelter.status == ShelterStatus.full;
                 final color = _statusColor(shelter.status);
                 final pct = shelter.maxCapacity > 0
-                    ? (shelter.currentOccupancy / shelter.maxCapacity).clamp(0.0, 1.0)
+                    ? (shelter.currentOccupancy / shelter.maxCapacity).clamp(
+                        0.0,
+                        1.0,
+                      )
                     : 0.0;
 
                 return GestureDetector(
@@ -770,11 +849,19 @@ class _ShelterSheetItem extends StatelessWidget {
         color: isCurrent ? AppColors.primary.withOpacity(0.05) : Colors.white,
         borderRadius: BorderRadius.circular(14.r),
         border: Border.all(
-          color: isCurrent ? AppColors.primary.withOpacity(0.5) : AppColors.grey.withOpacity(0.15),
+          color: isCurrent
+              ? AppColors.primary.withOpacity(0.5)
+              : AppColors.grey.withOpacity(0.15),
           width: isCurrent ? 1.5 : 1,
         ),
         boxShadow: isCurrent
-            ? [BoxShadow(color: AppColors.primary.withOpacity(0.06), blurRadius: 8, offset: const Offset(0, 2))]
+            ? [
+                BoxShadow(
+                  color: AppColors.primary.withOpacity(0.06),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ]
             : [],
       ),
       child: Row(
@@ -800,14 +887,21 @@ class _ShelterSheetItem extends StatelessWidget {
                     if (isCurrent) ...[
                       8.gapW,
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8.w,
+                          vertical: 3.h,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.primary,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
                           'Assigned',
-                          style: TextStyle(fontSize: 9.5, color: Colors.white, fontWeight: FontWeight.w700),
+                          style: TextStyle(
+                            fontSize: 9.5,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ],
@@ -816,12 +910,19 @@ class _ShelterSheetItem extends StatelessWidget {
                 5.gapH,
                 Row(
                   children: [
-                    Icon(Icons.location_on_outlined, size: 11.w, color: AppColors.grey),
+                    Icon(
+                      Icons.location_on_outlined,
+                      size: 11.w,
+                      color: AppColors.grey,
+                    ),
                     3.gapW,
                     Expanded(
                       child: Text(
                         shelter.address,
-                        style: TextStyle(fontSize: D.textXS, color: AppColors.grey),
+                        style: TextStyle(
+                          fontSize: D.textXS,
+                          color: AppColors.grey,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -832,7 +933,10 @@ class _ShelterSheetItem extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 3.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 7.w,
+                        vertical: 3.h,
+                      ),
                       decoration: BoxDecoration(
                         color: color.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(20),
@@ -843,22 +947,39 @@ class _ShelterSheetItem extends StatelessWidget {
                           Container(
                             width: 6.w,
                             height: 6.w,
-                            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                            decoration: BoxDecoration(
+                              color: color,
+                              shape: BoxShape.circle,
+                            ),
                           ),
                           4.gapW,
                           Text(
                             statusLabel,
-                            style: TextStyle(fontSize: D.textXS, color: color, fontWeight: FontWeight.w600),
+                            style: TextStyle(
+                              fontSize: D.textXS,
+                              color: color,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ],
                       ),
                     ),
                     10.gapW,
-                    Expanded(child: OccupancyBar(pct: pct, statusColor: color, height: 5)),
+                    Expanded(
+                      child: OccupancyBar(
+                        pct: pct,
+                        statusColor: color,
+                        height: 5,
+                      ),
+                    ),
                     10.gapW,
                     Text(
                       '${shelter.currentOccupancy}/${shelter.maxCapacity}',
-                      style: TextStyle(fontSize: D.textXS, color: AppColors.grey, fontWeight: FontWeight.w500),
+                      style: TextStyle(
+                        fontSize: D.textXS,
+                        color: AppColors.grey,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ],
                 ),
@@ -870,7 +991,9 @@ class _ShelterSheetItem extends StatelessWidget {
             width: 30.w,
             height: 30.w,
             decoration: BoxDecoration(
-              color: isCurrent ? AppColors.primary : AppColors.grey.withOpacity(0.08),
+              color: isCurrent
+                  ? AppColors.primary
+                  : AppColors.grey.withOpacity(0.08),
               shape: BoxShape.circle,
             ),
             child: Icon(

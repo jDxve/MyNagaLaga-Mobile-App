@@ -27,4 +27,10 @@ abstract class OtpVerificationService {
   Future<HttpResponse<VerifyOtpResponse>> verifyLoginOtp({
     @Body() required OtpVerificationRequest request,
   });
+
+  @POST('/mobile-auth/fcm-token')
+  Future<HttpResponse<void>> updateFcmToken({
+    @Body() required Map<String, dynamic> body,
+    @Header('Authorization') required String authorization,
+  });
 }

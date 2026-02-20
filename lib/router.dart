@@ -5,6 +5,7 @@ import 'package:mynagalaga_mobile_app/features/services/screens/track_services_s
 import 'common/gaurd/auth_gaurd.dart';
 import 'features/account/screens/account_screen.dart';
 import 'features/family/screens/family_ledger_screen.dart';
+import 'features/notification/screen/notification_screen.dart';
 import 'features/safety/screens/disaster_resilience_screen.dart';
 
 import 'features/services/screens/program_screen.dart';
@@ -71,12 +72,14 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(
         builder: (_) => const AuthGuard(child: FamilyLedgerScreen()),
       );
-
+    case NotificationScreen.routeName:
+      return MaterialPageRoute(
+        builder: (_) => const AuthGuard(child: NotificationScreen()),
+      );
     default:
       return MaterialPageRoute(
-        builder: (_) => const Scaffold(
-          body: Center(child: Text('Page not found')),
-        ),
+        builder: (_) =>
+            const Scaffold(body: Center(child: Text('Page not found'))),
       );
   }
 }

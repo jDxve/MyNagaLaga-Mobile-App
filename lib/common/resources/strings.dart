@@ -227,7 +227,7 @@ class AppString {
   static const String termsAndConditions = "Terms and Conditions";
   static const String privacyPolicy = "Privacy Policy";
   static const String logOut = "Log Out";
-  static const String verifyYourBadge = "Verify your badge";
+  static const String verifyYourBadge = "Get your Badge";
 
   static const String childrenYouthWelfare = "Children & Youth Welfare";
   static const String childrenYouthSubTitle =

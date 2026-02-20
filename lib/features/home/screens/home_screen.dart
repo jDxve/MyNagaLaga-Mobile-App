@@ -104,7 +104,7 @@ class _HomeTabState extends ConsumerState<_HomeTab> {
                 children: [
                   Expanded(child: searchInput()),
                   12.gapW,
-                  circularNotif(notificationCount: 0),
+                  const CircularNotifButton(), // ✅ updated
                 ],
               ),
             ),
