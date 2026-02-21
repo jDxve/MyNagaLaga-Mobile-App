@@ -31,9 +31,10 @@ class _PostingApplicationPageState
   final Map<String, File?> _fileUploads = {};
   final Set<String> _selectedOptionalBadgeTypeIds = {};
 
-  // Prefill data waiting to be applied once controllers are ready
   WelfareRequestModel? _pendingPrefill;
+  WelfareRequestModel? _prefillModel;
   bool _prefillApplied = false;
+  Set<String> _autoAttachedRequirementIds = {};
 
   @override
   void initState() {
@@ -50,25 +51,25 @@ class _PostingApplicationPageState
   }
 
   List<String> get _allAttachedBadgeTypeIds => {
-        ...widget.posting.requiredBadges.map((b) => b.id),
-        ..._selectedOptionalBadgeTypeIds,
-      }.toList();
+    ...widget.posting.requiredBadges.map((b) => b.id),
+    ..._selectedOptionalBadgeTypeIds,
+  }.toList();
 
   void _triggerPrefill() {
     if (_allAttachedBadgeTypeIds.isEmpty) return;
     _prefillApplied = false;
     _pendingPrefill = null;
-    ref.read(welfareServiceNotifierProvider.notifier).fetchPrefill(
+    ref
+        .read(welfareServiceNotifierProvider.notifier)
+        .fetchPrefill(
           postingId: widget.posting.id,
           attachedBadgeTypeIds: _allAttachedBadgeTypeIds,
           posting: widget.posting,
         );
   }
 
-  // Called by PostingRequirementGroup when a controller is registered
   void _onControllerCreated(String key, TextEditingController ctrl) {
     ctrl.addListener(() => setState(() {}));
-    // If prefill is waiting, apply it now that this controller exists
     if (_pendingPrefill != null) {
       final val = _buildAutoTexts(_pendingPrefill!)[key];
       if (val != null && ctrl.text.isEmpty) {
@@ -79,6 +80,7 @@ class _PostingApplicationPageState
 
   Map<String, String> _buildAutoTexts(WelfareRequestModel prefill) {
     final autoTexts = <String, String>{};
+
     for (final badge in prefill.prefillBadges) {
       final common = badge.formCommon;
       final extra = badge.formExtraNonNull;
@@ -93,30 +95,55 @@ class _PostingApplicationPageState
       put('contact_number', common['contactNumber']);
       put('sex', common['gender']);
       put('gender', common['gender']);
+      put('type_of_id', common['typeOfId']);
 
       final birthdate = common['birthdate'];
       if (birthdate != null && birthdate.isNotEmpty) {
         final dt = DateTime.tryParse(birthdate);
         if (dt != null) {
-          put('birthdate',
-              '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}');
+          put(
+            'birthdate',
+            '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}',
+          );
           int age = DateTime.now().year - dt.year;
           if (DateTime.now().month < dt.month ||
               (DateTime.now().month == dt.month &&
-                  DateTime.now().day < dt.day)) age--;
+                  DateTime.now().day < dt.day)) {
+            age--;
+          }
           put('age', age.toString());
         }
       }
 
-      extra.forEach((k, v) => put(k, v));
+      extra.forEach((k, v) {
+        put(_camelToSnake(k), v);
+        put(k, v);
+      });
     }
+
     return autoTexts;
+  }
+
+  String _camelToSnake(String key) {
+    return key
+        .replaceAllMapped(
+          RegExp(r'[A-Z]'),
+          (m) => '_${m.group(0)!.toLowerCase()}',
+        )
+        .replaceFirst(RegExp(r'^_'), '');
   }
 
   void _applyPrefill(WelfareRequestModel prefill) {
     if (_prefillApplied) return;
     _prefillApplied = true;
     _pendingPrefill = prefill;
+
+    setState(() {
+      _prefillModel = prefill;
+      _autoAttachedRequirementIds = prefill.autoAttachedRequirements
+          .map((r) => r.requirementId)
+          .toSet();
+    });
 
     if (prefill.prefillBadges.isEmpty) return;
 
@@ -139,18 +166,23 @@ class _PostingApplicationPageState
       } else {
         _selectedOptionalBadgeTypeIds.add(badgeTypeId);
       }
+      _autoAttachedRequirementIds = {};
+      _prefillModel = null;
     });
+
     _prefillApplied = false;
     _pendingPrefill = null;
-    // Clear prefilled text so it gets re-filled from new badge selection
+
     for (final ctrl in _textControllers.values) {
       ctrl.text = '';
     }
+
     WidgetsBinding.instance.addPostFrameCallback((_) => _triggerPrefill());
   }
 
   void _setFile(String key, File file) =>
       setState(() => _fileUploads[key] = file);
+
   void _removeFile(String key) => setState(() => _fileUploads[key] = null);
 
   void _goToReview() {
@@ -158,8 +190,7 @@ class _PostingApplicationPageState
       showErrorModal(
         context: context,
         title: 'Reason Too Short',
-        description:
-            'Please provide a reason with at least 20 characters.',
+        description: 'Please provide a reason with at least 20 characters.',
       );
       return;
     }
@@ -203,21 +234,43 @@ class _PostingApplicationPageState
       success: (_) => false,
     );
 
-    final userBadges = ref.watch(badgesNotifierProvider).when(
+    prefillState.whenOrNull(
+      error: (msg) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && msg != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Could not load badge data: $msg'),
+                backgroundColor: AppColors.red,
+              ),
+            );
+          }
+        });
+      },
+    );
+
+    final userBadges = ref
+        .watch(badgesNotifierProvider)
+        .when(
           started: () => [],
           loading: () => [],
           error: (_) => [],
           success: (data) => data.badges,
         );
 
-    final requiredBadgeIds =
-        widget.posting.requiredBadges.map((b) => b.id).toSet();
+    final requiredBadgeIds = widget.posting.requiredBadges
+        .map((b) => b.id)
+        .toSet();
 
     final optionalBadges = userBadges
-        .where((b) =>
-            b.status.toLowerCase() == 'active' &&
-            !requiredBadgeIds.contains(b.badgeTypeId.toString()))
+        .where(
+          (b) =>
+              b.status.toLowerCase() == 'active' &&
+              !requiredBadgeIds.contains(b.badgeTypeId.toString()),
+        )
         .toList();
+
+
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -232,7 +285,6 @@ class _PostingApplicationPageState
           PostingHeaderCard(posting: widget.posting),
           28.gapH,
 
-          // Required badges
           if (widget.posting.requiredBadges.isNotEmpty) ...[
             PostingSectionHeader(title: 'Your Eligible Badge'),
             8.gapH,
@@ -242,21 +294,22 @@ class _PostingApplicationPageState
                   : 'Your badge data has been used to pre-fill fields below.',
             ),
             16.gapH,
-            ...widget.posting.requiredBadges.map((badge) => Padding(
-                  padding: EdgeInsets.only(bottom: 12.h),
-                  child: _BadgeTile(
-                    name: badge.name,
-                    image: _getBadgeImage(badge.name),
-                    isRequired: true,
-                    isSelected: true,
-                    isLoading: isPrefilling,
-                    onToggle: null,
-                  ),
-                )),
+            ...widget.posting.requiredBadges.map(
+              (badge) => Padding(
+                padding: EdgeInsets.only(bottom: 12.h),
+                child: _BadgeTile(
+                  name: badge.name,
+                  image: _getBadgeImage(badge.name),
+                  isRequired: true,
+                  isSelected: true,
+                  isLoading: isPrefilling,
+                  onToggle: null,
+                ),
+              ),
+            ),
             2.gapH,
           ],
 
-          // Optional badges
           if (optionalBadges.isNotEmpty) ...[
             PostingSectionHeader(title: 'Attach Additional Badges'),
             8.gapH,
@@ -281,7 +334,6 @@ class _PostingApplicationPageState
             24.gapH,
           ],
 
-          // Reason
           PostingSectionHeader(title: 'Reason for Request'),
           8.gapH,
           TextInput(
@@ -296,14 +348,15 @@ class _PostingApplicationPageState
           ),
           24.gapH,
 
-          // Requirements
           if (widget.posting.requirements.isNotEmpty) ...[
             PostingSectionHeader(title: 'Requirements'),
             8.gapH,
             PostingSubtitleText(
               text: isPrefilling
                   ? 'Loading...'
-                  : 'Pre-filled fields came from your badge. You can edit them.',
+                  : _prefillModel != null || _autoAttachedRequirementIds.isNotEmpty
+                  ? 'Fields and files have been auto-filled from your badge.'
+                  : 'Fill in the required fields below.',
             ),
             20.gapH,
             ...widget.posting.requirements.map(
@@ -314,6 +367,7 @@ class _PostingApplicationPageState
                 onPickFile: _setFile,
                 onRemoveFile: _removeFile,
                 onControllerCreated: _onControllerCreated,
+                prefillModel: _prefillModel,
               ),
             ),
           ],
@@ -323,6 +377,7 @@ class _PostingApplicationPageState
     );
   }
 }
+
 class _BadgeTile extends StatelessWidget {
   final String name;
   final String image;
@@ -382,7 +437,9 @@ class _BadgeTile extends StatelessWidget {
                 width: 22.w,
                 height: 22.w,
                 decoration: BoxDecoration(
-                  color: isSelected ? AppColors.primary : Colors.white.withOpacity(.85),
+                  color: isSelected
+                      ? AppColors.primary
+                      : Colors.white.withOpacity(.85),
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: isSelected

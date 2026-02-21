@@ -353,11 +353,7 @@ class PostingReviewFieldRow extends StatelessWidget {
           children: [
             Padding(
               padding: EdgeInsets.only(top: 2.h),
-              child: Icon(
-                icon,
-                size: 15.r,
-                color: iconColor.withOpacity(.8),
-              ),
+              child: Icon(icon, size: 15.r, color: iconColor.withOpacity(.8)),
             ),
             6.gapW,
             Expanded(
@@ -420,11 +416,7 @@ class PostingReviewGroupCard extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Icon(
-                  Icons.folder_outlined,
-                  size: 16.r,
-                  color: AppColors.primary,
-                ),
+                Icon(Icons.folder_outlined, size: 16.r, color: AppColors.primary),
                 8.gapW,
                 Text(
                   category,
@@ -484,10 +476,7 @@ class PostingReviewGroupCard extends StatelessWidget {
                       ),
                       if (!isLastInSection) ...[
                         10.gapH,
-                        Divider(
-                          height: 1,
-                          color: AppColors.grey.withOpacity(.1),
-                        ),
+                        Divider(height: 1, color: AppColors.grey.withOpacity(.1)),
                         10.gapH,
                       ],
                     ],
@@ -521,10 +510,7 @@ class PostingReviewGroupCard extends StatelessWidget {
                       ),
                       if (!isLast) ...[
                         10.gapH,
-                        Divider(
-                          height: 1,
-                          color: AppColors.grey.withOpacity(.1),
-                        ),
+                        Divider(height: 1, color: AppColors.grey.withOpacity(.1)),
                         10.gapH,
                       ],
                     ],
@@ -541,10 +527,7 @@ class PostingReviewGroupCard extends StatelessWidget {
 
 class PostingAutoFilledCategoryCard extends StatefulWidget {
   final WelfareAutoFilledCategory category;
-  const PostingAutoFilledCategoryCard({
-    super.key,
-    required this.category,
-  });
+  const PostingAutoFilledCategoryCard({super.key, required this.category});
 
   @override
   State<PostingAutoFilledCategoryCard> createState() =>
@@ -654,10 +637,7 @@ class _PostingAutoFilledCategoryCardState
             firstChild: const SizedBox.shrink(),
             secondChild: Column(
               children: [
-                Divider(
-                  height: 1,
-                  color: AppColors.primary.withOpacity(.12),
-                ),
+                Divider(height: 1, color: AppColors.primary.withOpacity(.12)),
                 Padding(
                   padding: EdgeInsets.all(14.w),
                   child: Column(
@@ -690,8 +670,7 @@ class _PostingAutoFilledCategoryCardState
                                     'from ${item.badgeTypeName}',
                                     style: TextStyle(
                                       fontSize: D.textXS,
-                                      color:
-                                          AppColors.primary.withOpacity(.6),
+                                      color: AppColors.primary.withOpacity(.6),
                                       fontFamily: 'Segoe UI',
                                     ),
                                   ),
@@ -708,9 +687,8 @@ class _PostingAutoFilledCategoryCardState
                 ),
               ],
             ),
-            crossFadeState: _expanded
-                ? CrossFadeState.showSecond
-                : CrossFadeState.showFirst,
+            crossFadeState:
+                _expanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
             duration: const Duration(milliseconds: 200),
           ),
         ],
@@ -721,10 +699,7 @@ class _PostingAutoFilledCategoryCardState
 
 class PostingAutoAttachedCategoryCard extends StatefulWidget {
   final WelfareAutoAttachedCategory category;
-  const PostingAutoAttachedCategoryCard({
-    super.key,
-    required this.category,
-  });
+  const PostingAutoAttachedCategoryCard({super.key, required this.category});
 
   @override
   State<PostingAutoAttachedCategoryCard> createState() =>
@@ -872,9 +847,8 @@ class _PostingAutoAttachedCategoryCardState
                 ),
               ],
             ),
-            crossFadeState: _expanded
-                ? CrossFadeState.showSecond
-                : CrossFadeState.showFirst,
+            crossFadeState:
+                _expanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
             duration: const Duration(milliseconds: 200),
           ),
         ],
@@ -889,8 +863,9 @@ class PostingRequirementGroup extends StatelessWidget {
   final Map<String, File?> fileUploads;
   final void Function(String key, File file) onPickFile;
   final void Function(String key) onRemoveFile;
-  final void Function(String key, TextEditingController controller)
-      onControllerCreated;
+  final void Function(String key, TextEditingController controller) onControllerCreated;
+  final WelfareRequestModel? prefillModel;
+
   const PostingRequirementGroup({
     super.key,
     required this.group,
@@ -899,6 +874,7 @@ class PostingRequirementGroup extends StatelessWidget {
     required this.onPickFile,
     required this.onRemoveFile,
     required this.onControllerCreated,
+    this.prefillModel,
   });
 
   @override
@@ -925,11 +901,7 @@ class PostingRequirementGroup extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Icon(
-                  Icons.folder_outlined,
-                  size: 16.r,
-                  color: AppColors.primary,
-                ),
+                Icon(Icons.folder_outlined, size: 16.r, color: AppColors.primary),
                 8.gapW,
                 Text(
                   group.category,
@@ -962,26 +934,28 @@ class PostingRequirementGroup extends StatelessWidget {
                 ],
                 ...group.items.asMap().entries.map((entry) {
                   final isLast = entry.key == group.items.length - 1;
+                  final item = entry.value;
                   return Column(
                     children: [
-                      entry.value.type == 'text'
+                      item.type == 'text'
                           ? PostingTextRequirementField(
-                              item: entry.value,
+                              item: item,
                               controllers: textControllers,
                               onControllerCreated: onControllerCreated,
                             )
                           : PostingFileRequirementField(
-                              item: entry.value,
+                              item: item,
                               fileUploads: fileUploads,
                               onPick: onPickFile,
                               onRemove: onRemoveFile,
+                              prefillFile: prefillModel?.findBestPrefillFile(
+                                requirementKey: item.key,
+                                requirementLabel: item.label,
+                              ),
                             ),
                       if (!isLast) ...[
                         12.gapH,
-                        Divider(
-                          height: 1,
-                          color: AppColors.grey.withOpacity(.1),
-                        ),
+                        Divider(height: 1, color: AppColors.grey.withOpacity(.1)),
                         12.gapH,
                       ],
                     ],
@@ -999,8 +973,8 @@ class PostingRequirementGroup extends StatelessWidget {
 class PostingTextRequirementField extends StatefulWidget {
   final WelfareRequirementItem item;
   final Map<String, TextEditingController> controllers;
-  final void Function(String key, TextEditingController controller)
-      onControllerCreated;
+  final void Function(String key, TextEditingController controller) onControllerCreated;
+
   const PostingTextRequirementField({
     super.key,
     required this.item,
@@ -1041,8 +1015,8 @@ class _PostingTextRequirementFieldState
         8.gapH,
         TextInput(
           controller: _controller,
-          hintText:
-              widget.item.notes ?? 'Enter ${widget.item.label.toLowerCase()}',
+          hintText: widget.item.notes ?? 'Enter ${widget.item.label.toLowerCase()}',
+          readOnly: _controller.text.isNotEmpty,
         ),
       ],
     );
@@ -1054,21 +1028,26 @@ class PostingFileRequirementField extends StatelessWidget {
   final Map<String, File?> fileUploads;
   final void Function(String key, File file) onPick;
   final void Function(String key) onRemove;
+  final WelfarePrefillFile? prefillFile;
+
   const PostingFileRequirementField({
     super.key,
     required this.item,
     required this.fileUploads,
     required this.onPick,
     required this.onRemove,
+    this.prefillFile,
   });
 
   @override
   Widget build(BuildContext context) {
-    final file = fileUploads[item.key];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        PostingFieldLabel(label: item.label, required: item.required),
+        PostingFieldLabel(
+          label: item.label,
+          required: item.required,
+        ),
         if (item.notes != null) ...[
           4.gapH,
           Text(
@@ -1081,20 +1060,184 @@ class PostingFileRequirementField extends StatelessWidget {
           ),
         ],
         10.gapH,
-        UploadImage(
-          image: file,
-          subtitle: 'Take a photo or upload a file',
-          height: 160.h,
-          onPickImage: (source) async {
-            final picked = await ImagePicker().pickImage(
-              source: source,
-              imageQuality: 85,
-            );
-            if (picked != null) onPick(item.key, File(picked.path));
-          },
-          onRemove: () => onRemove(item.key),
-        ),
+        if (prefillFile != null) ...[
+          _AutoAttachedFileBanner(prefillFile: prefillFile!),
+        ] else ...[
+          UploadImage(
+            image: fileUploads[item.key],
+            subtitle: 'Take a photo or upload a file',
+            height: 160.h,
+            onPickImage: (source) async {
+              final picked = await ImagePicker().pickImage(
+                source: source,
+                imageQuality: 85,
+              );
+              if (picked != null) onPick(item.key, File(picked.path));
+            },
+            onRemove: () => onRemove(item.key),
+          ),
+        ],
       ],
+    );
+  }
+}
+
+class _AutoAttachedFileBanner extends StatelessWidget {
+  final WelfarePrefillFile prefillFile;
+
+  const _AutoAttachedFileBanner({required this.prefillFile});
+
+  bool get _isImage {
+    final m = prefillFile.mimeType.toLowerCase();
+    return m.contains('jpeg') || m.contains('jpg') || m.contains('png');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.teal.withOpacity(.06),
+        borderRadius: BorderRadius.circular(D.radiusMD),
+        border: Border.all(color: Colors.teal.withOpacity(.25)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (_isImage && prefillFile.url != null) ...[
+            ClipRRect(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(D.radiusMD),
+                topRight: Radius.circular(D.radiusMD),
+              ),
+              child: Image.network(
+                prefillFile.url!,
+                width: double.infinity,
+                height: 160.h,
+                fit: BoxFit.cover,
+                loadingBuilder: (_, child, progress) {
+                  if (progress == null) return child;
+                  return Container(
+                    height: 160.h,
+                    color: Colors.teal.withOpacity(.05),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        value: progress.expectedTotalBytes != null
+                            ? progress.cumulativeBytesLoaded /
+                                progress.expectedTotalBytes!
+                            : null,
+                        color: Colors.teal,
+                        strokeWidth: 2,
+                      ),
+                    ),
+                  );
+                },
+                errorBuilder: (_, __, ___) => Container(
+                  height: 160.h,
+                  color: Colors.teal.withOpacity(.05),
+                  child: Center(
+                    child: Icon(
+                      Icons.broken_image_outlined,
+                      color: Colors.teal.withOpacity(.4),
+                      size: 32.r,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ] else if (_isImage && prefillFile.url == null) ...[
+            Container(
+              height: 160.h,
+              decoration: BoxDecoration(
+                color: Colors.teal.withOpacity(.05),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(D.radiusMD),
+                  topRight: Radius.circular(D.radiusMD),
+                ),
+              ),
+              child: Center(
+                child: Icon(
+                  Icons.image_not_supported_outlined,
+                  color: Colors.teal.withOpacity(.4),
+                  size: 32.r,
+                ),
+              ),
+            ),
+          ],
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+            child: Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(7.w),
+                  decoration: BoxDecoration(
+                    color: Colors.teal.withOpacity(.12),
+                    borderRadius: BorderRadius.circular(D.radiusSM),
+                  ),
+                  child: Icon(
+                    _isImage
+                        ? Icons.image_rounded
+                        : Icons.insert_drive_file_rounded,
+                    size: 18.r,
+                    color: Colors.teal,
+                  ),
+                ),
+                12.gapW,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'File from your badge',
+                        style: TextStyle(
+                          fontSize: D.textXS,
+                          color: Colors.teal,
+                          fontFamily: 'Segoe UI',
+                          fontWeight: D.semiBold,
+                        ),
+                      ),
+                      2.gapH,
+                      Text(
+                        prefillFile.fileName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: D.textXS,
+                          color: AppColors.grey,
+                          fontFamily: 'Segoe UI',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: Colors.teal.withOpacity(.08),
+                    borderRadius: BorderRadius.circular(20.r),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.lock_outline_rounded,
+                          size: 10.r, color: Colors.teal),
+                      3.gapW,
+                      Text(
+                        'Auto-attached',
+                        style: TextStyle(
+                          fontSize: D.textXS,
+                          fontWeight: D.semiBold,
+                          color: Colors.teal,
+                          fontFamily: 'Segoe UI',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

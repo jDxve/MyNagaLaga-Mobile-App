@@ -1,25 +1,60 @@
+class WelfarePrefillFile {
+  final String requirementKey;
+  final String requirementLabel;
+  final String storagePath;
+  final String fileName;
+  final String mimeType;
+  final String? url;
+
+  const WelfarePrefillFile({
+    required this.requirementKey,
+    required this.requirementLabel,
+    required this.storagePath,
+    required this.fileName,
+    required this.mimeType,
+    this.url,
+  });
+
+  factory WelfarePrefillFile.fromMap(Map<String, dynamic> map) {
+    return WelfarePrefillFile(
+      requirementKey: map['requirementKey']?.toString() ?? '',
+      requirementLabel: map['requirementLabel']?.toString() ?? '',
+      storagePath: map['storagePath']?.toString() ?? '',
+      fileName: map['fileName']?.toString() ?? '',
+      mimeType: map['mimeType']?.toString() ?? '',
+      url: map['url']?.toString(),
+    );
+  }
+}
+
 class WelfarePrefillBadge {
   final String badgeTypeId;
   final String badgeTypeName;
   final Map<String, String> formCommon;
   final Map<String, String> formExtraNonNull;
+  final List<WelfarePrefillFile> files;
 
   const WelfarePrefillBadge({
     required this.badgeTypeId,
     required this.badgeTypeName,
     required this.formCommon,
     required this.formExtraNonNull,
+    required this.files,
   });
 
   factory WelfarePrefillBadge.fromMap(Map<String, dynamic> map) {
     final form = map['form'] as Map<String, dynamic>? ?? {};
     final common = form['common'] as Map<String, dynamic>? ?? {};
     final extra = form['extraNonNull'] as Map<String, dynamic>? ?? {};
+    final rawFiles = map['files'] as List<dynamic>? ?? [];
     return WelfarePrefillBadge(
       badgeTypeId: map['badgeTypeId']?.toString() ?? '',
       badgeTypeName: map['badgeTypeName']?.toString() ?? '',
       formCommon: common.map((k, v) => MapEntry(k, v?.toString() ?? '')),
       formExtraNonNull: extra.map((k, v) => MapEntry(k, v?.toString() ?? '')),
+      files: rawFiles
+          .map((f) => WelfarePrefillFile.fromMap(f as Map<String, dynamic>))
+          .toList(),
     );
   }
 }
@@ -53,25 +88,63 @@ class WelfareRequestModel {
       submittedCount: (map['submitted_count'] as num?)?.toInt() ?? 0,
       autoAttachedRequirements:
           (map['auto_attached_requirements'] as List<dynamic>? ?? [])
-              .map((e) => WelfareAutoAttachedRequirement.fromMap(
-                  e as Map<String, dynamic>))
+              .map((e) => WelfareAutoAttachedRequirement.fromMap(e as Map<String, dynamic>))
               .toList(),
       autoAttachedByCategory:
           (map['auto_attached_requirements_by_category'] as List<dynamic>? ?? [])
-              .map((e) => WelfareAutoAttachedCategory.fromMap(
-                  e as Map<String, dynamic>))
+              .map((e) => WelfareAutoAttachedCategory.fromMap(e as Map<String, dynamic>))
               .toList(),
       autoFilledTextByCategory:
-          (map['auto_filled_text_requirements_by_category']
-                      as List<dynamic>? ??
-                  [])
-              .map((e) => WelfareAutoFilledCategory.fromMap(
-                  e as Map<String, dynamic>))
+          (map['auto_filled_text_requirements_by_category'] as List<dynamic>? ?? [])
+              .map((e) => WelfareAutoFilledCategory.fromMap(e as Map<String, dynamic>))
               .toList(),
       prefillBadges: rawBadges
           .map((b) => WelfarePrefillBadge.fromMap(b as Map<String, dynamic>))
           .toList(),
     );
+  }
+
+  WelfarePrefillFile? findBestPrefillFile({
+    required String requirementKey,
+    required String requirementLabel,
+  }) {
+    WelfarePrefillFile? best;
+    double bestScore = 0;
+
+    for (final badge in prefillBadges) {
+      for (final file in badge.files) {
+        if (file.requirementKey.isNotEmpty && file.requirementKey == requirementKey) {
+          return file;
+        }
+
+        final score = _labelSimilarity(
+          file.requirementLabel.toLowerCase(),
+          requirementLabel.toLowerCase(),
+        );
+
+        if (score > bestScore && score >= 0.6) {
+          best = file;
+          bestScore = score;
+        }
+      }
+    }
+
+    return best;
+  }
+
+  double _labelSimilarity(String a, String b) {
+    if (a == b) return 1.0;
+    if (a.contains(b) || b.contains(a)) return 0.8;
+
+    final ta = a.split(RegExp(r'\s+')).where((t) => t.isNotEmpty).toSet();
+    final tb = b.split(RegExp(r'\s+')).where((t) => t.isNotEmpty).toSet();
+
+    if (ta.isEmpty || tb.isEmpty) return 0;
+
+    final inter = ta.intersection(tb).length;
+    final union = ta.union(tb).length;
+
+    return union == 0 ? 0 : inter / union;
   }
 }
 
@@ -108,8 +181,7 @@ class WelfareAutoAttachedCategory {
     return WelfareAutoAttachedCategory(
       category: map['category'] ?? '',
       items: (map['items'] as List<dynamic>? ?? [])
-          .map((e) => WelfareAutoAttachedRequirement.fromMap(
-              e as Map<String, dynamic>))
+          .map((e) => WelfareAutoAttachedRequirement.fromMap(e as Map<String, dynamic>))
           .toList(),
     );
   }
