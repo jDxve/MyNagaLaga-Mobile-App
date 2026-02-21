@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,9 +9,11 @@ import '../resources/assets.dart';
 import '../resources/strings.dart';
 import 'secondary_button.dart';
 
-class UploadImage extends StatelessWidget {
+enum FileOrientation { portrait, landscape, square }
+
+class UploadImage extends StatefulWidget {
   final File? image;
-  final String? title; 
+  final String? title;
   final String subtitle;
   final VoidCallback? onTap;
   final VoidCallback? onRemove;
@@ -18,11 +21,17 @@ class UploadImage extends StatelessWidget {
   final Color iconBackgroundColor;
   final Color iconColor;
   final double? height;
+  final double? width;
+  /// Force a specific orientation layout regardless of image dimensions.
+  /// If null, orientation is auto-detected from the image file.
+  final FileOrientation? orientation;
+  /// Aspect ratio override. If null, defaults to detected/forced orientation.
+  final double? aspectRatio;
 
   const UploadImage({
     super.key,
     this.image,
-    this.title, 
+    this.title,
     this.subtitle = 'Take a photo or upload an image file',
     this.onTap,
     this.onRemove,
@@ -30,7 +39,86 @@ class UploadImage extends StatelessWidget {
     this.iconBackgroundColor = AppColors.lightYellow,
     this.iconColor = AppColors.darkYellow,
     this.height,
+    this.width,
+    this.orientation,
+    this.aspectRatio,
   });
+
+  @override
+  State<UploadImage> createState() => _UploadImageState();
+}
+
+class _UploadImageState extends State<UploadImage> {
+  FileOrientation _detectedOrientation = FileOrientation.landscape;
+  double? _detectedAspectRatio;
+  bool _isResolvingOrientation = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _resolveImageOrientation();
+  }
+
+  @override
+  void didUpdateWidget(UploadImage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.image?.path != widget.image?.path) {
+      _resolveImageOrientation();
+    }
+  }
+
+  Future<void> _resolveImageOrientation() async {
+    if (widget.image == null) return;
+    // If caller forced an orientation, skip detection.
+    if (widget.orientation != null) {
+      setState(() => _detectedOrientation = widget.orientation!);
+      return;
+    }
+
+    setState(() => _isResolvingOrientation = true);
+
+    try {
+      final bytes = await widget.image!.readAsBytes();
+      final codec = await instantiateImageCodec(bytes);
+      final frame = await codec.getNextFrame();
+      final w = frame.image.width.toDouble();
+      final h = frame.image.height.toDouble();
+      frame.image.dispose();
+
+      FileOrientation orientation;
+      if ((w / h - 1.0).abs() < 0.05) {
+        orientation = FileOrientation.square;
+      } else if (w > h) {
+        orientation = FileOrientation.landscape;
+      } else {
+        orientation = FileOrientation.portrait;
+      }
+
+      if (mounted) {
+        setState(() {
+          _detectedOrientation = orientation;
+          _detectedAspectRatio = w / h;
+          _isResolvingOrientation = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _isResolvingOrientation = false);
+    }
+  }
+
+  double get _effectiveAspectRatio {
+    if (widget.aspectRatio != null) return widget.aspectRatio!;
+    if (_detectedAspectRatio != null) return _detectedAspectRatio!;
+    // Fallback defaults per orientation
+    switch (_detectedOrientation) {
+      case FileOrientation.portrait:
+        return 3 / 4; // ID / document
+      case FileOrientation.landscape:
+        return 16 / 9; // wide photo / banner
+      case FileOrientation.square:
+        return 1.0;
+    }
+  }
 
   void _showImageSourceBottomSheet(BuildContext context) {
     showModalBottomSheet(
@@ -80,7 +168,7 @@ class UploadImage extends StatelessWidget {
                 icon: Icons.camera_alt_outlined,
                 onPressed: () {
                   Navigator.pop(context);
-                  onPickImage?.call(ImageSource.camera);
+                  widget.onPickImage?.call(ImageSource.camera);
                 },
               ),
               12.gapH,
@@ -89,7 +177,7 @@ class UploadImage extends StatelessWidget {
                 icon: Icons.file_upload_outlined,
                 onPressed: () {
                   Navigator.pop(context);
-                  onPickImage?.call(ImageSource.gallery);
+                  widget.onPickImage?.call(ImageSource.gallery);
                 },
               ),
             ],
@@ -101,10 +189,14 @@ class UploadImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    final hasImage = widget.image != null;
+    final containerWidth = widget.width ?? double.infinity;
+
+    // Wrap in AspectRatio only when we have an image or an explicit ratio.
+    Widget content = GestureDetector(
       onTap: () {
-        if (image != null) {
-          onTap?.call();
+        if (hasImage) {
+          widget.onTap?.call();
         } else {
           _showImageSourceBottomSheet(context);
         }
@@ -112,15 +204,30 @@ class UploadImage extends StatelessWidget {
       child: CustomPaint(
         painter: DashedRectPainter(color: AppColors.grey.withOpacity(0.3)),
         child: Container(
-          height: height ?? 200.h,
-          width: double.infinity,
+          width: containerWidth,
+          // When no image, use provided height or a sensible default.
+          height: hasImage ? null : (widget.height ?? 200.h),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(D.radiusLG),
           ),
-          child: image != null ? _buildImagePreview() : _buildUploadPlaceholder(),
+          child: _isResolvingOrientation
+              ? const Center(child: CircularProgressIndicator())
+              : hasImage
+                  ? _buildImagePreview()
+                  : _buildUploadPlaceholder(),
         ),
       ),
     );
+
+    // Wrap with AspectRatio to auto-size height when image is present.
+    if (hasImage && !_isResolvingOrientation) {
+      content = AspectRatio(
+        aspectRatio: _effectiveAspectRatio,
+        child: content,
+      );
+    }
+
+    return content;
   }
 
   Widget _buildImagePreview() {
@@ -129,14 +236,17 @@ class UploadImage extends StatelessWidget {
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(D.radiusLG),
-          child: Image.file(image!, fit: BoxFit.cover),
+          child: Image.file(
+            widget.image!,
+            fit: BoxFit.cover,
+          ),
         ),
-        if (onRemove != null)
+        if (widget.onRemove != null)
           Positioned(
             top: 8.h,
             right: 8.w,
             child: GestureDetector(
-              onTap: onRemove,
+              onTap: widget.onRemove,
               child: Container(
                 padding: EdgeInsets.all(6.w),
                 decoration: BoxDecoration(
@@ -158,20 +268,20 @@ class UploadImage extends StatelessWidget {
         Container(
           padding: EdgeInsets.all(12.w),
           decoration: BoxDecoration(
-            color: iconBackgroundColor,
+            color: widget.iconBackgroundColor,
             borderRadius: BorderRadius.circular(12),
           ),
           child: SvgPicture.asset(
             Assets.imageUploadIcon,
             width: 32.w,
             height: 32.w,
-            colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+            colorFilter: ColorFilter.mode(widget.iconColor, BlendMode.srcIn),
           ),
         ),
         12.gapH,
-        if (title != null) ...[ 
+        if (widget.title != null) ...[
           Text(
-            title!,
+            widget.title!,
             style: TextStyle(
               fontSize: D.textBase,
               fontWeight: D.semiBold,
@@ -182,7 +292,7 @@ class UploadImage extends StatelessWidget {
           4.gapH,
         ],
         Text(
-          subtitle,
+          widget.subtitle,
           style: TextStyle(
             fontSize: D.textSM,
             color: AppColors.grey,

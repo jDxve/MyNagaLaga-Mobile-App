@@ -19,6 +19,7 @@ class SettingsTile extends StatelessWidget {
     BuildContext context, {
     required String name,
     required String phoneNumber,
+    VoidCallback? onLogout,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,7 +46,7 @@ class SettingsTile extends StatelessWidget {
           title: AppString.privacyPolicy,
         ),
         32.gapH,
-        _buildLogoutButton(context),
+        _buildLogoutButton(context, onLogout: onLogout),
       ],
     );
   }
@@ -65,11 +66,13 @@ class SettingsTile extends StatelessWidget {
     );
   }
 
-  static Widget _buildLogoutButton(BuildContext context) {
+  static Widget _buildLogoutButton(
+    BuildContext context, {
+    VoidCallback? onLogout,
+  }) {
     return InkWell(
-      onTap: () {
-        // Handle Logout Logic
-      },
+      borderRadius: BorderRadius.circular(D.radiusLG),
+      onTap: onLogout,
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 16.w),
         decoration: BoxDecoration(

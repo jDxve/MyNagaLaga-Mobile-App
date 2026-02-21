@@ -56,6 +56,7 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
   bool get _isCitizen => _selectedBadge?.badgeKey == 'citizen';
   int get _totalSteps => _isCitizen ? 4 : 6;
 
+
   @override
   void initState() {
     super.initState();
@@ -82,39 +83,46 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
   }
 
   void _handleNext() {
+    // Steps >= 2 require valid form before proceeding
     if (_currentStep >= 2 && !_isFormValid) {
       _validationCallback?.call();
       return;
     }
 
-    setState(() {
-      if ((_isCitizen && _currentStep == 3) || (!_isCitizen && _currentStep == 5)) {
-        _submitApplication();
-      } else {
+    final isLastContentStep =
+        (_isCitizen && _currentStep == _totalSteps - 1) ||
+        (!_isCitizen && _currentStep == _totalSteps - 1);
+
+    if (isLastContentStep) {
+      _submitApplication();
+    } else {
+      setState(() {
         _currentStep++;
+        // Reset validity for the next page — except step 1
         _isFormValid = false;
-      }
-    });
+      });
+    }
   }
 
   void _handlePrevious() {
-    setState(() {
-      if (_currentStep > 1) {
+    if (_currentStep > 1) {
+      setState(() {
         _currentStep--;
         _isFormValid = _currentStep == 1 ? (_selectedBadge != null) : false;
-      }
-    });
+      });
+    }
   }
 
-  void _submitApplication() async {
+  Future<void> _submitApplication() async {
     if (_selectedBadge == null || _isSubmitting) return;
 
-    final idTypeError = UIUtils.convertIdTypeToApiFormat(_selectedIdType);
-    if (idTypeError == 'OTHER' && _selectedIdType != 'Other') {
+    // Validate ID type is properly selected
+    final selectedId = _selectedIdType ?? '';
+    if (selectedId.isEmpty) {
       showErrorModal(
         context: context,
-        title: 'ID Type Required',
-        description: 'Please select a valid ID type before submitting.',
+        title: AppString.idTypeNotSelectedTitle,
+        description: AppString.idTypeNotSelectedDescription,
         icon: Icons.badge_outlined,
         iconColor: Colors.orange,
         buttonText: AppString.ok,
@@ -132,12 +140,16 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
       homeAddress: _addressController.text.trim(),
       contactNumber: _phoneController.text.trim(),
       typeOfId: UIUtils.convertIdTypeToApiFormat(_selectedIdType),
-      existingSeniorCitizenId: _existingIdController.text.isEmpty ? null : _existingIdController.text,
-      typeOfDisability: _typeOfDisabilityController.text.isEmpty ? null : _typeOfDisabilityController.text,
+      existingSeniorCitizenId:
+          _existingIdController.text.isEmpty ? null : _existingIdController.text,
+      typeOfDisability:
+          _typeOfDisabilityController.text.isEmpty ? null : _typeOfDisabilityController.text,
       numberOfDependents: int.tryParse(_numberOfDependentsController.text),
-      estimatedMonthlyHouseholdIncome: _monthlyIncomeController.text.isEmpty ? null : _monthlyIncomeController.text,
+      estimatedMonthlyHouseholdIncome:
+          _monthlyIncomeController.text.isEmpty ? null : _monthlyIncomeController.text,
       schoolName: _schoolNameController.text.isEmpty ? null : _schoolNameController.text,
-      educationLevel: _educationLevelController.text.isEmpty ? null : _educationLevelController.text,
+      educationLevel:
+          _educationLevelController.text.isEmpty ? null : _educationLevelController.text,
       yearOrGradeLevel: _yearGradeController.text.isEmpty ? null : _yearGradeController.text,
       schoolIdNumber: _schoolIdController.text.isEmpty ? null : _schoolIdController.text,
       uploadedFiles: _uploadedFiles,
@@ -171,6 +183,28 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
     _schoolIdController.clear();
   }
 
+  Widget _buildDocumentPage() {
+    return DocumentPage(
+      context: context,
+      badgeTypeId: _selectedBadge?.id ?? '',
+      selectedIdType: _selectedIdType,
+      uploadedFiles: _uploadedFiles,
+      onIdTypeChanged: (val) => setState(() => _selectedIdType = val),
+      onFilesChanged: (key, files) => setState(() => _uploadedFiles[key] = files),
+      setIsFormValid: (isValid, showError) {
+        // Use post-frame to avoid setState during build
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            setState(() {
+              _isFormValid = isValid;
+              _validationCallback = showError;
+            });
+          }
+        });
+      },
+    );
+  }
+
   Widget _buildStepContent() {
     switch (_currentStep) {
       case 1:
@@ -185,7 +219,8 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
                 Text(error ?? 'An error occurred'),
                 16.gapH,
                 TextButton(
-                  onPressed: () => ref.read(badgeTypesNotifierProvider.notifier).getBadgeTypes(),
+                  onPressed: () =>
+                      ref.read(badgeTypesNotifierProvider.notifier).getBadgeTypes(),
                   child: const Text('Retry'),
                 ),
               ],
@@ -215,7 +250,8 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
           addressController: _addressController,
           phoneController: _phoneController,
           setIsFormValid: (callback) => setState(() {
-            _isFormValid = UIUtils.validateFullName(_fullNameController.text) == null &&
+            _isFormValid =
+                UIUtils.validateFullName(_fullNameController.text) == null &&
                 _dateOfBirthController.text.isNotEmpty &&
                 UIUtils.validateAddress(_addressController.text) == null &&
                 UIUtils.validatePhoneNumber(_phoneController.text) == null;
@@ -224,28 +260,17 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
         );
 
       case 3:
-        if (_isCitizen) {
-          return DocumentPage(
-            context: context,
-            badgeTypeId: _selectedBadge?.id ?? '',
-            selectedIdType: _selectedIdType,
-            uploadedFiles: _uploadedFiles,
-            onIdTypeChanged: (val) => setState(() => _selectedIdType = val),
-            onFilesChanged: (key, files) => setState(() => _uploadedFiles[key] = files),
-            setIsFormValid: (isValid, showError) => setState(() {
-              _isFormValid = isValid;
-              _validationCallback = showError;
-            }),
-          );
-        }
+        if (_isCitizen) return _buildDocumentPage();
         return EligibilityPage(
           context: context,
           selectedBadge: _selectedBadge?.badgeKey ?? '',
           existingIdController: _existingIdController,
           onDataChanged: (data) {
             _typeOfDisabilityController.text = data['typeOfDisability'] ?? '';
-            _numberOfDependentsController.text = (data['numberOfDependents'] ?? '').toString();
-            _monthlyIncomeController.text = (data['estimatedMonthlyIncome'] ?? '').toString();
+            _numberOfDependentsController.text =
+                (data['numberOfDependents'] ?? '').toString();
+            _monthlyIncomeController.text =
+                (data['estimatedMonthlyIncome'] ?? '').toString();
             _schoolNameController.text = data['schoolName'] ?? '';
             _educationLevelController.text = data['educationLevel'] ?? '';
             _yearGradeController.text = data['yearOrGradeLevel'] ?? '';
@@ -263,21 +288,13 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
             context: context,
             referenceNumber: _generatedReferenceNumber,
             onStartNewApplication: _resetForm,
-            onBackToHome: () => Navigator.of(context).pushNamedAndRemoveUntil(HomeScreen.routeName, (route) => false),
+            onBackToHome: () => Navigator.of(context).pushNamedAndRemoveUntil(
+              HomeScreen.routeName,
+              (route) => false,
+            ),
           );
         }
-        return DocumentPage(
-          context: context,
-          badgeTypeId: _selectedBadge?.id ?? '',
-          selectedIdType: _selectedIdType,
-          uploadedFiles: _uploadedFiles,
-          onIdTypeChanged: (val) => setState(() => _selectedIdType = val),
-          onFilesChanged: (key, files) => setState(() => _uploadedFiles[key] = files),
-          setIsFormValid: (isValid, showError) => setState(() {
-            _isFormValid = isValid;
-            _validationCallback = showError;
-          }),
-        );
+        return _buildDocumentPage();
 
       case 5:
         return ReviewPage(
@@ -287,7 +304,8 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
           gender: _selectedGender,
           address: _addressController.text,
           contactNumber: _phoneController.text,
-          existingId: _existingIdController.text.isNotEmpty ? _existingIdController.text : null,
+          existingId:
+              _existingIdController.text.isNotEmpty ? _existingIdController.text : null,
           selectedIdType: _selectedIdType,
           uploadedFiles: _uploadedFiles,
           isConsentGiven: _isConsentGiven,
@@ -302,7 +320,10 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
           context: context,
           referenceNumber: _generatedReferenceNumber,
           onStartNewApplication: _resetForm,
-          onBackToHome: () => Navigator.of(context).pushNamedAndRemoveUntil(HomeScreen.routeName, (route) => false),
+          onBackToHome: () => Navigator.of(context).pushNamedAndRemoveUntil(
+            HomeScreen.routeName,
+            (route) => false,
+          ),
         );
 
       default:

@@ -69,11 +69,16 @@ class _DocumentPageState extends ConsumerState<DocumentPage> {
     }
   }
 
+  // Called only when the parent wizard explicitly presses Next/Submit.
+  void _onSubmitAttempt() {
+    _showValidationError();
+  }
+
   void _validateForm() {
     final requirementsState = ref.read(badgeRequirementsNotifierProvider)[widget.badgeTypeId];
 
     if (requirementsState is! Success<BadgeRequirementsData>) {
-      widget.setIsFormValid?.call(false, _showValidationError);
+      widget.setIsFormValid?.call(false, _onSubmitAttempt);
       return;
     }
 
@@ -88,7 +93,7 @@ class _DocumentPageState extends ConsumerState<DocumentPage> {
       }
     }
 
-    widget.setIsFormValid?.call(isValid, _showValidationError);
+    widget.setIsFormValid?.call(isValid, _onSubmitAttempt);
   }
 
   void _showValidationError() {
@@ -108,7 +113,7 @@ class _DocumentPageState extends ConsumerState<DocumentPage> {
     if (requirementsState is! Success<BadgeRequirementsData>) return;
 
     final requirements = requirementsState.data.requirements;
-    List<String> missingItems = [];
+    final List<String> missingItems = [];
 
     for (var req in requirements) {
       final files = widget.uploadedFiles[req.key] ?? [];
@@ -170,7 +175,7 @@ class _DocumentPageState extends ConsumerState<DocumentPage> {
         }
       }
     } catch (e) {
-      debugPrint('Error: $e');
+      debugPrint('Error picking image: $e');
     }
   }
 
@@ -227,17 +232,20 @@ class _DocumentPageState extends ConsumerState<DocumentPage> {
                 padding: EdgeInsets.zero,
                 shrinkWrap: true,
                 itemCount: UIUtils.idTypes.length,
-                separatorBuilder: (context, index) => const Divider(height: 1),
+                separatorBuilder: (_, __) => const Divider(height: 1),
                 itemBuilder: (context, index) {
                   return ListTile(
-                    title: Text(UIUtils.idTypes[index], style: const TextStyle(fontFamily: 'Segoe UI')),
+                    title: Text(
+                      UIUtils.idTypes[index],
+                      style: const TextStyle(fontFamily: 'Segoe UI'),
+                    ),
                     onTap: () {
                       setState(() {
                         _idTypeController.text = UIUtils.idTypes[index];
                         _selectedIdType = UIUtils.idTypes[index];
                       });
                       widget.onIdTypeChanged(UIUtils.idTypes[index]);
-                      _toggleDropdown();
+                      _removeOverlay();
                       _validateForm();
                     },
                   );
@@ -268,7 +276,8 @@ class _DocumentPageState extends ConsumerState<DocumentPage> {
                 Text(error ?? 'Failed to load requirements'),
                 16.gapH,
                 TextButton(
-                  onPressed: () => ref.read(badgeRequirementsNotifierProvider.notifier).fetch(widget.badgeTypeId),
+                  onPressed: () =>
+                      ref.read(badgeRequirementsNotifierProvider.notifier).fetch(widget.badgeTypeId),
                   child: const Text('Retry'),
                 ),
               ],
@@ -284,7 +293,14 @@ class _DocumentPageState extends ConsumerState<DocumentPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppString.typeOfId, style: TextStyle(fontSize: D.textBase, fontWeight: D.semiBold, fontFamily: 'Segoe UI')),
+          Text(
+            AppString.typeOfId,
+            style: TextStyle(
+              fontSize: D.textBase,
+              fontWeight: D.semiBold,
+              fontFamily: 'Segoe UI',
+            ),
+          ),
           8.gapH,
           CompositedTransformTarget(
             link: _layerLink,
@@ -294,7 +310,9 @@ class _DocumentPageState extends ConsumerState<DocumentPage> {
                 child: TextInput(
                   controller: _idTypeController,
                   hintText: AppString.selectTypeOfId,
-                  suffixIcon: Icon(_isDropdownOpen ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down),
+                  suffixIcon: Icon(
+                    _isDropdownOpen ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                  ),
                 ),
               ),
             ),
@@ -330,8 +348,8 @@ class _DocumentPageState extends ConsumerState<DocumentPage> {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
               decoration: BoxDecoration(
-                color: requirement.isRequired 
-                    ? AppColors.primary.withOpacity(0.1) 
+                color: requirement.isRequired
+                    ? AppColors.primary.withOpacity(0.1)
                     : AppColors.grey.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(4),
               ),
@@ -380,7 +398,10 @@ class _DocumentPageState extends ConsumerState<DocumentPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppString.tipsForGoodCapture, style: const TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Segoe UI')),
+          Text(
+            AppString.tipsForGoodCapture,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Segoe UI'),
+          ),
           const SizedBox(height: 12),
           _tipRow(AppString.tip1),
           _tipRow(AppString.tip2),
@@ -398,7 +419,16 @@ class _DocumentPageState extends ConsumerState<DocumentPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text('• ', style: TextStyle(color: AppColors.grey)),
-          Expanded(child: Text(text, style: TextStyle(color: AppColors.grey, fontSize: D.textSM, fontFamily: 'Segoe UI'))),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                color: AppColors.grey,
+                fontSize: D.textSM,
+                fontFamily: 'Segoe UI',
+              ),
+            ),
+          ),
         ],
       ),
     );
