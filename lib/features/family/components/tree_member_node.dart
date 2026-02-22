@@ -48,6 +48,7 @@ class _TreeMemberNodeState extends State<TreeMemberNode>
   Color get avatarColor {
     if (widget.isHead) return AppColors.lightBlue;
     if (widget.role == 'Spouse') return AppColors.lightPurple;
+    if (widget.role == 'Parent') return const Color(0xFFDCFCE7);
     if (widget.role == 'Child') return AppColors.lightPink;
     if (widget.role == 'Grandchild') return AppColors.lightYellow;
     if (widget.role == 'Sibling') return AppColors.lightYellow;
@@ -57,6 +58,7 @@ class _TreeMemberNodeState extends State<TreeMemberNode>
   Color get borderColor {
     if (widget.isHead) return AppColors.blue;
     if (widget.role == 'Spouse') return AppColors.purple;
+    if (widget.role == 'Parent') return const Color(0xFF16A34A);
     if (widget.role == 'Child') return AppColors.orange;
     if (widget.role == 'Grandchild') return AppColors.darkYellow;
     if (widget.role == 'Sibling') return AppColors.darkYellow;
@@ -98,8 +100,7 @@ class _TreeMemberNodeState extends State<TreeMemberNode>
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color:
-                                    borderColor.withOpacity(opacity * 0.6),
+                                color: borderColor.withOpacity(opacity * 0.6),
                                 width: 2,
                               ),
                             ),
@@ -142,8 +143,7 @@ class _TreeMemberNodeState extends State<TreeMemberNode>
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.orange,
-                          borderRadius:
-                              BorderRadius.circular(D.radiusSM),
+                          borderRadius: BorderRadius.circular(D.radiusSM),
                           border: Border.all(
                             color: AppColors.white,
                             width: 2,
@@ -175,8 +175,7 @@ class _TreeMemberNodeState extends State<TreeMemberNode>
                     ? FontWeight.w900
                     : FontWeight.w700,
                 fontFamily: 'Segoe UI',
-                color:
-                    isRevoked ? AppColors.grey : AppColors.textlogo,
+                color: isRevoked ? AppColors.grey : AppColors.textlogo,
               ),
             ),
             2.gapH,

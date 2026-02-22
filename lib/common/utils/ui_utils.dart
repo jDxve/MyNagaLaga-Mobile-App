@@ -16,12 +16,16 @@ class ProgramTheme {
 }
 
 class UIUtils {
-  static final TextInputFormatter upperCaseWordsFormatter = _UpperCaseWordsFormatter();
-  static final TextInputFormatter phoneNumberFormatter = _PhoneNumberFormatter();
+  static final TextInputFormatter upperCaseWordsFormatter =
+      _UpperCaseWordsFormatter();
+  static final TextInputFormatter phoneNumberFormatter =
+      _PhoneNumberFormatter();
   static final TextInputFormatter dateTextFormatter = _DateTextFormatter();
 
-  static final TextInputFormatter digitsOnly = FilteringTextInputFormatter.digitsOnly;
-  static TextInputFormatter lengthLimit(int length) => LengthLimitingTextInputFormatter(length);
+  static final TextInputFormatter digitsOnly =
+      FilteringTextInputFormatter.digitsOnly;
+  static TextInputFormatter lengthLimit(int length) =>
+      LengthLimitingTextInputFormatter(length);
 
   static String numberFormat(double amount, {String symbol = '₱'}) {
     final formatter = NumberFormat.currency(
@@ -33,35 +37,45 @@ class UIUtils {
   }
 
   static bool isValidEmail(String email) {
-    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
     return emailRegex.hasMatch(email);
   }
 
   static String? validateEmail(String? value) {
-    if (value == null || value.trim().isEmpty) return 'Email address is required';
-    if (!isValidEmail(value.trim())) return 'Please enter a valid email address';
+    if (value == null || value.trim().isEmpty)
+      return 'Email address is required';
+    if (!isValidEmail(value.trim()))
+      return 'Please enter a valid email address';
     return null;
   }
 
   static String? validateFullName(String? value) {
     if (value == null || value.trim().isEmpty) return 'Full name is required';
-    if (value.trim().length < 2) return 'Full name must be at least 2 characters';
+    if (value.trim().length < 2)
+      return 'Full name must be at least 2 characters';
     final nameRegex = RegExp(r"^[a-zA-Z\s\-'.]+$");
-    if (!nameRegex.hasMatch(value.trim())) return 'Full name can only contain letters, spaces, hyphens, and apostrophes';
+    if (!nameRegex.hasMatch(value.trim()))
+      return 'Full name can only contain letters, spaces, hyphens, and apostrophes';
     return null;
   }
 
   static String? validateAddress(String? value) {
     if (value == null || value.trim().isEmpty) return 'Address is required';
-    if (value.trim().length < 5) return 'Please enter a complete address (minimum 5 characters)';
-    if (value.trim().length > 200) return 'Address is too long (maximum 200 characters)';
+    if (value.trim().length < 5)
+      return 'Please enter a complete address (minimum 5 characters)';
+    if (value.trim().length > 200)
+      return 'Address is too long (maximum 200 characters)';
     return null;
   }
 
   static String? validatePhoneNumber(String? value) {
-    if (value == null || value.trim().isEmpty) return 'Phone number is required';
+    if (value == null || value.trim().isEmpty)
+      return 'Phone number is required';
     final cleaned = value.trim();
-    if (cleaned.length != 10 || !cleaned.startsWith('9')) return 'Enter a valid 10-digit number starting with 9';
+    if (cleaned.length != 10 || !cleaned.startsWith('9'))
+      return 'Enter a valid 10-digit number starting with 9';
     return null;
   }
 
@@ -69,7 +83,8 @@ class UIUtils {
     if (value == null || value.trim().isEmpty) return 'OTP code is required';
     final cleaned = value.trim().replaceAll(RegExp(r'\s'), '');
     if (cleaned.length != 6) return 'OTP must be exactly 6 digits';
-    if (!RegExp(r'^\d{6}$').hasMatch(cleaned)) return 'OTP must contain only numbers';
+    if (!RegExp(r'^\d{6}$').hasMatch(cleaned))
+      return 'OTP must contain only numbers';
     return null;
   }
 
@@ -98,7 +113,7 @@ class UIUtils {
       DateFormat('MM/dd/yyyy').format(date);
 
   static String convertGenderToApiFormat(String? gender) {
-    if (gender == null) return 'Male';
+    if (gender == null || gender.isEmpty) return '';
     final g = gender.toLowerCase();
     return g == 'female' ? 'Female' : 'Male';
   }
@@ -125,17 +140,40 @@ class UIUtils {
   }
 
   static const List<String> idTypes = [
-    "National ID","Driver's License","Passport","Voter's ID","PhilHealth ID",
-    "SSS ID","UMID","Postal ID","E-Card/UMID","Employee ID","PRC ID",
-    "Senior Citizen ID","COMELEC/Voter ID","PhilID/ePhilID","NBI Clearance",
-    "IBP ID","Firearms License","AFPSLAI ID","PVAO ID","AFP Beneficiary ID",
-    "BIR TIN","Pag-IBIG ID","PWD ID","Solo Parent ID","Pantawid 4Ps ID",
-    "Barangay ID","School ID","Other",
+    "Driver's License",
+    'Passport',
+    "Voter's ID",
+    'PhilHealth ID',
+    'SSS ID',
+    'UMID',
+    'E-Card/UMID',
+    'Postal ID',
+    'Employee ID',
+    'PRC ID',
+    'Senior Citizen ID',
+    'COMELEC/Voter ID',
+    'PhilID/ePhilID',
+    'NBI Clearance',
+    'IBP ID',
+    'Firearms License',
+    'AFPSLAI ID',
+    'PVAO ID',
+    'AFP Beneficiary ID',
+    'BIR TIN',
+    'Pag-IBIG ID',
+    'PWD ID',
+    'Solo Parent ID',
+    'Pantawid 4Ps ID',
+    'Barangay ID',
+    'School ID',
+    'Other',
   ];
 
   static String convertIdTypeToApiFormat(String? displayIdType) {
-    if (displayIdType == null || displayIdType.isEmpty) return 'OTHER';
+    if (displayIdType == null || displayIdType.isEmpty) return '';
     final idTypeMap = {
+      'National ID': 'OTHER', // not in enum, fallback
+      'UMID': 'E_CARD_UMID', // UMID = E-Card/UMID
       "Driver's License": 'DRIVERS_LICENSE',
       'Drivers License': 'DRIVERS_LICENSE',
       'E-Card/UMID': 'E_CARD_UMID',
@@ -144,6 +182,7 @@ class UIUtils {
       'Passport': 'PASSPORT',
       'Senior Citizen ID': 'SENIOR_CITIZEN_ID',
       'SSS ID': 'SSS_ID',
+      "Voter's ID": 'COMELEC_VOTER_ID',
       'COMELEC/Voter ID': 'COMELEC_VOTER_ID',
       'PhilID/ePhilID': 'PHILID_EPHILID',
       'NBI Clearance': 'NBI_CLEARANCE',
@@ -235,19 +274,28 @@ class UIUtils {
 
 class _UpperCaseWordsFormatter extends TextInputFormatter {
   @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     if (newValue.text.isEmpty) return newValue;
-    final capitalized = newValue.text.split(' ').map((word) {
-      if (word.isEmpty) return word;
-      return word[0].toUpperCase() + word.substring(1);
-    }).join(' ');
+    final capitalized = newValue.text
+        .split(' ')
+        .map((word) {
+          if (word.isEmpty) return word;
+          return word[0].toUpperCase() + word.substring(1);
+        })
+        .join(' ');
     return newValue.copyWith(text: capitalized, selection: newValue.selection);
   }
 }
 
 class _PhoneNumberFormatter extends TextInputFormatter {
   @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     if (newValue.text.isEmpty) return newValue;
     if (!newValue.text.startsWith('9')) return oldValue;
     return newValue;
@@ -256,15 +304,22 @@ class _PhoneNumberFormatter extends TextInputFormatter {
 
 class _DateTextFormatter extends TextInputFormatter {
   @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-    if (newValue.selection.baseOffset < oldValue.selection.baseOffset) return newValue;
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    if (newValue.selection.baseOffset < oldValue.selection.baseOffset)
+      return newValue;
     final text = newValue.text;
     final buffer = StringBuffer();
     for (int i = 0; i < text.length; i++) {
       if (RegExp(r'[0-9]').hasMatch(text[i])) {
         buffer.write(text[i]);
-        int nonDashLen = buffer.length - (buffer.toString().split('/').length - 1);
-        if ((nonDashLen == 2 || nonDashLen == 4) && i != text.length - 1 && i < 5) {
+        int nonDashLen =
+            buffer.length - (buffer.toString().split('/').length - 1);
+        if ((nonDashLen == 2 || nonDashLen == 4) &&
+            i != text.length - 1 &&
+            i < 5) {
           buffer.write('/');
         }
       }

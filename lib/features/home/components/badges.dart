@@ -35,9 +35,10 @@ class _BadgeDisplayState extends State<BadgeDisplay>
           CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
         );
 
-    _fadeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -89,96 +90,95 @@ class _BadgeDisplayState extends State<BadgeDisplay>
           );
     });
     await _controller.forward();
-    setState(() =>
-        _currentIndex = (_currentIndex - 1 + widget.badges.length) % widget.badges.length);
+    setState(
+      () => _currentIndex =
+          (_currentIndex - 1 + widget.badges.length) % widget.badges.length,
+    );
     _controller.reset();
   }
 
   // ── Empty state ──────────────────────────────────────────────────────────────
-
   Widget _buildEmptyState() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 32.w),
-      child: GestureDetector(
-        onTap: () => Navigator.pushNamed(context, VerifyBadgeScreen.routeName),
-        child: Container(
-          height: 210.h,
-          decoration: BoxDecoration(
-            color: Colors.grey.shade100,
-            borderRadius: BorderRadius.circular(D.radiusXL),
-            border: Border.all(
-              color: Colors.grey.shade300,
-              width: 1.5,
+    return GestureDetector(
+      onTap: () => Navigator.pushNamed(context, VerifyBadgeScreen.routeName),
+      child: Container(
+        width: double.infinity, // full width
+        padding: EdgeInsets.symmetric(vertical: 32.h, horizontal: 24.w),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(D.radiusXL),
+          border: Border.all(color: Colors.grey.shade300, width: 1.5),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Badge icon placeholder
+            Container(
+              width: 64.w,
+              height: 64.w,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.badge_outlined,
+                size: 32.w,
+                color: Colors.grey.shade400,
+              ),
             ),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Badge icon placeholder
-              Container(
-                width: 56.w,
-                height: 56.w,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.badge_outlined,
-                  size: 28.w,
-                  color: Colors.grey.shade400,
-                ),
+            16.gapH,
+            Text(
+              'No Badge Yet',
+              style: TextStyle(
+                fontSize: D.textBase,
+                fontWeight: D.semiBold,
+                color: Colors.grey.shade600,
+                fontFamily: 'Segoe UI',
               ),
-              16.gapH,
-              Text(
-                'No Badge Yet',
-                style: TextStyle(
-                  fontSize: D.textBase,
-                  fontWeight: D.semiBold,
-                  color: Colors.grey.shade600,
-                  fontFamily: 'Segoe UI',
-                ),
+            ),
+            8.gapH,
+            Text(
+              'Tap to apply for your first badge',
+              style: TextStyle(
+                fontSize: D.textSM,
+                color: Colors.grey.shade400,
+                fontFamily: 'Segoe UI',
               ),
-              6.gapH,
-              Text(
-                'Tap to apply for your first badge',
-                style: TextStyle(
-                  fontSize: D.textSM,
-                  color: Colors.grey.shade400,
-                  fontFamily: 'Segoe UI',
-                ),
+            ),
+            24.gapH,
+            // CTA button
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(vertical: 14.h),
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(D.radiusXL),
               ),
-              20.gapH,
-              // CTA chip
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(D.radiusXL),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.add, color: Colors.white, size: 16.w),
-                    6.gapW,
-                    Text(
-                      'Apply for Badge',
-                      style: TextStyle(
-                        fontSize: D.textSM,
-                        fontWeight: D.semiBold,
-                        color: Colors.white,
-                        fontFamily: 'Segoe UI',
-                      ),
+              alignment: Alignment.center,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.add, color: Colors.white, size: 18.w),
+                  8.gapW,
+                  Text(
+                    'Apply for Badge',
+                    style: TextStyle(
+                      fontSize: D.textSM,
+                      fontWeight: D.semiBold,
+                      color: Colors.white,
+                      fontFamily: 'Segoe UI',
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
-
   // ── Badge stack ──────────────────────────────────────────────────────────────
 
   @override
@@ -256,8 +256,9 @@ class _BadgeDisplayState extends State<BadgeDisplay>
 
                 final double topOffset = 15.h * position;
                 final double scale = 1.0 - (0.04 * position);
-                final double opacity =
-                    position > 3 ? 0.0 : (1.0 - (0.25 * position));
+                final double opacity = position > 3
+                    ? 0.0
+                    : (1.0 - (0.25 * position));
 
                 return Positioned(
                   top: topOffset.clamp(0, 60.h),

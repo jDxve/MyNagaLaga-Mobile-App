@@ -16,27 +16,35 @@ class FamilyRegistrySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final parents = members
-        .where((m) =>
-            m.relationshipToHead == 'Head' ||
-            m.relationshipToHead == 'Spouse')
+    final heads = members
+        .where((m) => m.relationshipToHead == 'Head')
         .toList();
 
-    final children = members
+    final parents = members
+        .where((m) => m.relationshipToHead == 'Parent')
+        .toList();
+
+    final spouseSiblings = members
         .where((m) =>
-            m.relationshipToHead == 'Child' ||
+            m.relationshipToHead == 'Spouse' ||
             m.relationshipToHead == 'Sibling')
         .toList();
 
-    final grandchildren =
-        members.where((m) => m.relationshipToHead == 'Grandchild').toList();
+    final children = members
+        .where((m) => m.relationshipToHead == 'Child')
+        .toList();
+
+    final grandchildren = members
+        .where((m) => m.relationshipToHead == 'Grandchild')
+        .toList();
 
     final others = members
         .where((m) =>
             m.relationshipToHead != 'Head' &&
+            m.relationshipToHead != 'Parent' &&
             m.relationshipToHead != 'Spouse' &&
-            m.relationshipToHead != 'Child' &&
             m.relationshipToHead != 'Sibling' &&
+            m.relationshipToHead != 'Child' &&
             m.relationshipToHead != 'Grandchild')
         .toList();
 
@@ -58,7 +66,6 @@ class FamilyRegistrySection extends StatelessWidget {
         children: list.map((member) {
           final isCurrentUser =
               currentUserMemberId != null && member.id == currentUserMemberId;
-
           return TreeMemberNode(
             name: member.fullName,
             role: member.relationshipToHead,
@@ -69,6 +76,15 @@ class FamilyRegistrySection extends StatelessWidget {
         }).toList(),
       );
     }
+
+    final rows = <List<HouseholdMember>>[
+      heads,
+      parents,
+      spouseSiblings,
+      children,
+      grandchildren,
+      others,
+    ].where((r) => r.isNotEmpty).toList();
 
     return Container(
       color: AppColors.white,
@@ -103,16 +119,14 @@ class FamilyRegistrySection extends StatelessWidget {
             ),
           ),
           32.gapH,
-          if (parents.isNotEmpty) memberRow(parents),
-          if (parents.isNotEmpty && children.isNotEmpty) verticalConnector(),
-          if (children.isNotEmpty) memberRow(children),
-          if (children.isNotEmpty && grandchildren.isNotEmpty)
-            verticalConnector(),
-          if (grandchildren.isNotEmpty) memberRow(grandchildren),
-          if (others.isNotEmpty) ...[
-            verticalConnector(),
-            memberRow(others),
-          ],
+          ...rows.asMap().entries.expand((entry) {
+            final index = entry.key;
+            final row = entry.value;
+            return [
+              if (index > 0) verticalConnector(),
+              memberRow(row),
+            ];
+          }),
         ],
       ),
     );

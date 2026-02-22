@@ -1,11 +1,11 @@
-enum BadgeType { 
-  student, 
-  soloParent, 
-  seniorCitizen, 
-  pwd, 
+enum BadgeType {
+  student,
+  soloParent,
+  seniorCitizen,
+  pwd,
   indigent,
   citizen,
-  other 
+  other,
 }
 
 class BadgeModel {
@@ -35,8 +35,10 @@ class BadgeModel {
     final badgeType = json['badgeType'] as Map<String, dynamic>?;
     final expiresAtStr = json['expiresAt'] as String?;
     final approvedAtStr = json['approvedAt'] as String?;
-    
-    final expiresAt = expiresAtStr != null ? DateTime.parse(expiresAtStr) : null;
+
+    final expiresAt = expiresAtStr != null
+        ? DateTime.parse(expiresAtStr)
+        : null;
     final now = DateTime.now();
     final isExpired = expiresAt != null && expiresAt.isBefore(now);
     final daysUntilExpiry = expiresAt != null && !isExpired
@@ -58,16 +60,16 @@ class BadgeModel {
 
   static BadgeType _parseBadgeType(String? name) {
     if (name == null) return BadgeType.other;
-    
     final normalized = name.toLowerCase().replaceAll(' ', '');
-    
     if (normalized.contains('student')) return BadgeType.student;
-    if (normalized.contains('solo') || normalized.contains('parent')) return BadgeType.soloParent;
-    if (normalized.contains('senior') || normalized.contains('citizen')) return BadgeType.seniorCitizen;
-    if (normalized.contains('pwd') || normalized.contains('disability')) return BadgeType.pwd;
-    if (normalized.contains('indigent')) return BadgeType.indigent;
+    if (normalized.contains('solo') || normalized.contains('parent'))
+      return BadgeType.soloParent;
     if (normalized == 'citizen') return BadgeType.citizen;
-    
+    if (normalized.contains('senior') || normalized.contains('citizen'))
+      return BadgeType.seniorCitizen;
+    if (normalized.contains('pwd') || normalized.contains('disability'))
+      return BadgeType.pwd;
+    if (normalized.contains('indigent')) return BadgeType.indigent;
     return BadgeType.other;
   }
 
@@ -95,7 +97,9 @@ class BadgesResponse {
 
   factory BadgesResponse.fromJson(List<dynamic> json) {
     return BadgesResponse(
-      badges: json.map((badge) => BadgeModel.fromJson(badge as Map<String, dynamic>)).toList(),
+      badges: json
+          .map((badge) => BadgeModel.fromJson(badge as Map<String, dynamic>))
+          .toList(),
     );
   }
 

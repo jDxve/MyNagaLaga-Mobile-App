@@ -78,7 +78,7 @@ class NotificationNotifier extends Notifier<List<NotificationModel>> {
   int get unreadCount => state.where((n) => !n.isRead).length;
 }
 
-// Convenience provider for unread count
+
 final unreadNotificationCountProvider = Provider<int>((ref) {
   final notifications = ref.watch(notificationNotifierProvider);
   return notifications.where((n) => !n.isRead).length;

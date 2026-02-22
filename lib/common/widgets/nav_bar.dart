@@ -20,7 +20,7 @@ class BottomNavigation extends StatelessWidget {
     SimpleOption(id: 1, icon: Assets.familyIcon, title: 'Family'),
     SimpleOption(id: 2, icon: Assets.servicesIcon, title: 'Services'),
     SimpleOption(id: 3, icon: Assets.saftyIcon, title: 'Safety'),
-    SimpleOption(id: 4, icon: Assets.acountIcon, title: 'Account'),
+    SimpleOption(id: 4, icon: null, title: 'Account'),
   ];
 
   @override
@@ -36,7 +36,8 @@ class BottomNavigation extends StatelessWidget {
           child: Row(
             children: navItems.map((item) {
               final isSelected = currentIndex == item.id;
-              
+              final color = isSelected ? AppColors.primary : const Color(0xFF637381);
+
               return Expanded(
                 child: GestureDetector(
                   onTap: () => onTap(item.id!),
@@ -45,22 +46,26 @@ class BottomNavigation extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SvgPicture.asset(
-                        item.icon!,
-                        width: 24.w,
-                        height: 24.h,
-                        colorFilter: ColorFilter.mode(
-                          isSelected ? AppColors.primary : const Color(0xFF637381),
-                          BlendMode.srcIn,
+                      if (item.id == 4)
+                        Icon(
+                          Icons.person_rounded,
+                          size: 27.w,
+                          color: color,
+                        )
+                      else
+                        SvgPicture.asset(
+                          item.icon!,
+                          width: 24.w,
+                          height: 24.h,
+                          colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
                         ),
-                      ),
                       4.gapH,
                       Text(
                         item.title!,
                         style: TextStyle(
                           fontSize: 12.f,
                           fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                          color: isSelected ? AppColors.primary : const Color(0xFF637381),
+                          color: color,
                           letterSpacing: 0.2,
                         ),
                       ),

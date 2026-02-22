@@ -40,9 +40,20 @@ class BadgeRequestRepositoryImpl implements BadgeRequestRepository {
     try {
       final authState = _ref.read(authSessionProvider);
       final mobileUserId = authState.userId;
-      
+
       if (mobileUserId == null || mobileUserId.isEmpty) {
         throw Exception('User not authenticated. Please log in again.');
+      }
+
+      // Client-side validation before sending
+      if (gender.isEmpty) {
+        throw Exception('Gender is required.');
+      }
+      if (typeOfId.isEmpty) {
+        throw Exception('ID type is required.');
+      }
+      if (birthdate.isEmpty) {
+        throw Exception('Birthdate is required.');
       }
 
       final formData = FormData();
@@ -67,8 +78,11 @@ class BadgeRequestRepositoryImpl implements BadgeRequestRepository {
       if (numberOfDependents != null) {
         formData.fields.add(MapEntry('numberOfDependents', numberOfDependents.toString()));
       }
-      if (estimatedMonthlyHouseholdIncome != null && estimatedMonthlyHouseholdIncome.isNotEmpty) {
-        formData.fields.add(MapEntry('estimatedMonthlyHouseholdIncome', estimatedMonthlyHouseholdIncome));
+      if (estimatedMonthlyHouseholdIncome != null &&
+          estimatedMonthlyHouseholdIncome.isNotEmpty) {
+        formData.fields.add(
+          MapEntry('estimatedMonthlyHouseholdIncome', estimatedMonthlyHouseholdIncome),
+        );
       }
       if (schoolName != null && schoolName.isNotEmpty) {
         formData.fields.add(MapEntry('schoolName', schoolName));
@@ -107,25 +121,30 @@ class BadgeRequestRepositoryImpl implements BadgeRequestRepository {
       if (response.response.statusCode == 201) {
         final Map<String, dynamic> rawData = response.data;
         final badgeResponse = BadgeRequestResponse.fromJson(rawData);
-        
         return badgeResponse.data;
       } else {
         throw Exception('Server returned status ${response.response.statusCode}');
       }
     } on DioException catch (e) {
-
-      if (e.response?.statusCode == 401) {
+      if (e.response?.statusCode == 400) {
+        final data = e.response?.data;
+        if (data?['details'] != null) {
+          final issues = (data['details'] as List).map((i) {
+            final path = (i['path'] as List?)?.join('.') ?? 'unknown';
+            final message = i['message'] ?? 'Invalid value';
+            return '$path: $message';
+          }).join('\n');
+          throw Exception('Please check your input:\n$issues');
+        }
+        throw Exception(data?['error'] ?? 'Invalid request data');
+      } else if (e.response?.statusCode == 401) {
         throw Exception('Authentication required. Please log in again.');
-      } else if (e.response?.statusCode == 400) {
-        final errorMsg = e.response?.data['error'] ?? 'Invalid request data';
-        throw Exception(errorMsg);
       } else if (e.response?.statusCode == 409) {
         throw Exception('You already have a pending badge request.');
       }
-      
       throw Exception('Network error: ${e.message}');
     } catch (e) {
-      throw Exception('Failed to submit: $e');
+      rethrow;
     }
   }
 
