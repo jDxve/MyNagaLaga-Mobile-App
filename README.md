@@ -23,7 +23,7 @@ This project is a submission to the **1st Naga City Mayoral Hackathon** under th
 - **State Management:** Riverpod
 - **Networking:** Retrofit + Dio
 - **Dependency Injection:** GetIt
-- **Clean Architecture
+-Clean Architecture
 
 ### Project Structure
 
