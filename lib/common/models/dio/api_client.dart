@@ -1,6 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'auth_interceptor.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../../../core/network/auth_interceptor.dart';
+
+// Deprecated: superseded by `dioProvider` in core/network/dio_factory.dart,
+// which shares one Dio/storage instance instead of a fresh one per call
+// site. Kept temporarily so already-migrated and not-yet-migrated call
+// sites both compile; deleted once every call site reads dioProvider.
 
 class ApiClient {
   final String _baseUrl;
@@ -17,7 +23,7 @@ class ApiClient {
 
   Dio create() => Dio(_createBaseOptions())
     ..interceptors.addAll([
-      AuthInterceptor(),
+      AuthInterceptor(const FlutterSecureStorage()),
     ]);
 
   static ApiClient fromEnv() {

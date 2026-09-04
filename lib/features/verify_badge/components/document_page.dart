@@ -10,7 +10,7 @@ import '../../../common/utils/ui_utils.dart';
 import '../../../common/widgets/text_input.dart';
 import '../../../common/widgets/error_modal.dart';
 import '../../../common/widgets/upload_image_card.dart';
-import '../../../common/models/dio/data_state.dart';
+import '../../../core/network/data_state.dart';
 import '../notifier/badge_requirements_notifier.dart';
 import '../models/badge_requirement_model.dart';
 

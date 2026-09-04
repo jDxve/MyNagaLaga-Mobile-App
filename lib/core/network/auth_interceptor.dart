@@ -2,8 +2,17 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class AuthInterceptor extends Interceptor {
-  final FlutterSecureStorage _storage = const FlutterSecureStorage();
+/// Attaches the bearer token to every request and clears the session on a
+/// 401. `QueuedInterceptor` (not `Interceptor`) so concurrent requests that
+/// all 401 at once serialize through this handler instead of each racing to
+/// clear/redirect independently.
+///
+/// Storage is injected (see `dioProvider`) rather than constructed here, so
+/// there is exactly one `FlutterSecureStorage` instance app-wide.
+class AuthInterceptor extends QueuedInterceptor {
+  final FlutterSecureStorage _storage;
+
+  AuthInterceptor(this._storage);
 
   @override
   void onRequest(
@@ -12,7 +21,7 @@ class AuthInterceptor extends Interceptor {
     if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';
     }
-    super.onRequest(options, handler);
+    handler.next(options);
   }
 
   @override
@@ -21,8 +30,7 @@ class AuthInterceptor extends Interceptor {
       await _storage.deleteAll();
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('stay_logged_in');
-      
     }
-    super.onError(err, handler);
+    handler.next(err);
   }
 }

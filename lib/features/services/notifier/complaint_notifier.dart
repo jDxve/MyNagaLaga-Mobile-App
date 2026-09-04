@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../common/models/dio/api_client.dart';
-import '../../../common/models/dio/data_state.dart';
+import '../../../core/network/data_state.dart';
 import '../models/complaint_model.dart';
 import '../repository/complaint_repository_impl.dart';
 import '../services/complaint_service.dart';

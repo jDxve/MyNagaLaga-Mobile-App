@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../common/models/dio/data_state.dart';
+import '../../../core/network/data_state.dart';
 import '../models/auth_models.dart';
 import '../repository/auth_repository_impl.dart';
 

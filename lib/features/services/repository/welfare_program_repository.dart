@@ -1,4 +1,4 @@
-import '../../../common/models/dio/data_state.dart';
+import '../../../core/network/data_state.dart';
 import '../models/welfare_program_model.dart';
 
 abstract class WelfareProgramRepository {

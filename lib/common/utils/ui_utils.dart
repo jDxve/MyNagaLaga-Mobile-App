@@ -1,7 +1,21 @@
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import '../../core/network/app_exception.dart';
 import '../resources/assets.dart';
 import '../resources/colors.dart';
+
+/// The single place an `AppException` (or any caught error) becomes
+/// user-facing copy. Repositories already produce a final message via
+/// `AppException.toMessage()` inside `RepositoryGuard`; this wrapper exists
+/// for UI-layer code that catches an `AppException` directly (e.g. the
+/// `guardThrow` repositories) and needs the same conversion.
+String errorToMessage(
+  Object? error, {
+  String fallback = 'Something went wrong. Please try again.',
+}) {
+  if (error is AppException) return error.toMessage(fallback: fallback);
+  return fallback;
+}
 
 class ProgramTheme {
   final Color accent;

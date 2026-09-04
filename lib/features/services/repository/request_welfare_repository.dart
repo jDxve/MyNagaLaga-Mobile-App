@@ -1,5 +1,5 @@
 import 'dart:io';
-import '../../../common/models/dio/data_state.dart';
+import '../../../core/network/data_state.dart';
 import '../models/welfare_program_model.dart';
 import '../models/welfare_request_model.dart';
 

@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../common/models/dio/data_state.dart';
-import '../../../common/models/responses/error_response.dart';
+import '../../../core/network/data_state.dart';
+import '../../../core/network/models/error_response.dart';
 import '../models/user_badge_model.dart';
 import '../services/user_badge_service.dart';
 import 'user_badge_repository.dart';

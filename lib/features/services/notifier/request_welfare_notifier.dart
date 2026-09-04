@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../common/models/dio/data_state.dart';
+import '../../../core/network/data_state.dart';
 import '../models/welfare_program_model.dart';
 import '../models/welfare_request_model.dart';
 import '../repository/request_welfare_repository_impl.dart';

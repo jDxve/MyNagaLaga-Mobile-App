@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../common/resources/colors.dart';
 import '../../../../common/resources/dimensions.dart';
 import '../../../../common/widgets/custom_app_bar.dart';
-import '../../../common/models/dio/data_state.dart';
+import '../../../core/network/data_state.dart';
 import '../components/programs_page/posting_detailed_page.dart';
 import '../models/welfare_program_model.dart';
 import '../notifier/welfare_program_notifier.dart';

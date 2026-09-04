@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart'; // ADD THIS
-import '../../../common/models/dio/data_state.dart';
+import '../../../core/network/data_state.dart';
 import '../models/tracking_model.dart';
 import '../services/tracking_service.dart';
 import 'tracking_repository.dart';

@@ -1,4 +1,4 @@
-import '../../../common/models/dio/data_state.dart';
+import '../../../core/network/data_state.dart';
 import '../models/user_badge_model.dart';
 
 abstract class BadgeRepository {

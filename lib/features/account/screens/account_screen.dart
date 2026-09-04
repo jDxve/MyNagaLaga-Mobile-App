@@ -4,7 +4,7 @@ import '../../../common/widgets/background_gradient.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/resources/colors.dart';
 import '../components/settings_tile.dart';
-import '../../../common/models/dio/data_state.dart';
+import '../../../core/network/data_state.dart';
 import '../notifier/user_info_notifier.dart';
 import '../../auth/notifier/auth_session_notifier.dart';
 
