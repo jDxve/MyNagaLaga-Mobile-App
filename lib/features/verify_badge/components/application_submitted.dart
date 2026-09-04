@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
 import 'dart:math';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
-import '../../../common/resources/strings.dart';
-import '../../../common/widgets/secondary_button.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/resources/strings.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/secondary_button.dart';
 
 Widget applicationSubmitted({
   required BuildContext context,

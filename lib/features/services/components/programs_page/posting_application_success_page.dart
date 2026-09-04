@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../../common/resources/colors.dart';
-import '../../../../common/resources/dimensions.dart';
-import '../../../../common/widgets/secondary_button.dart';
-import '../../models/welfare_program_model.dart';
-import '../../models/welfare_request_model.dart';
-import '../../../services/screens/services_screen.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/secondary_button.dart';
+import 'package:mynagalaga_mobile_app/features/services/models/welfare_program_model.dart';
+import 'package:mynagalaga_mobile_app/features/services/models/welfare_request_model.dart';
+import 'package:mynagalaga_mobile_app/features/services/screens/services_screen.dart';
 
 class PostingApplicationSuccessPage extends StatefulWidget {
   final WelfarePostingModel posting;

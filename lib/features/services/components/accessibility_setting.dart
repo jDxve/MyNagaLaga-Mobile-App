@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
-import '../../../common/widgets/secondary_button.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/secondary_button.dart';
 
 class AccessibilitySettingsDialog extends StatefulWidget {
   const AccessibilitySettingsDialog({super.key});

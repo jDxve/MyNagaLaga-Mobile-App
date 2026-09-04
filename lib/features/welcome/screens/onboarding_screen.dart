@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../components/onboarding_content.dart';
-import '../components/onboarding_top_bar.dart';
-import '../components/onboarding_bottom.dart';
-import '../../../common/resources/assets.dart';
-import '../../../common/resources/strings.dart';
-import '../../auth/screens/signup_screen.dart';
+import 'package:mynagalaga_mobile_app/features/welcome/components/onboarding_content.dart';
+import 'package:mynagalaga_mobile_app/features/welcome/components/onboarding_top_bar.dart';
+import 'package:mynagalaga_mobile_app/features/welcome/components/onboarding_bottom.dart';
+import 'package:mynagalaga_mobile_app/common/resources/assets.dart';
+import 'package:mynagalaga_mobile_app/common/resources/strings.dart';
+import 'package:mynagalaga_mobile_app/features/auth/screens/signup_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   static const routeName = '/onboarding';

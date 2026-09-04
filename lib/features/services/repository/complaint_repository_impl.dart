@@ -3,12 +3,12 @@ import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import '../../../core/network/app_exception.dart';
-import '../../../core/network/data_state.dart';
-import '../../../core/network/repository_guard.dart';
-import '../models/complaint_model.dart';
-import '../services/complaint_service.dart';
-import 'complaint_repository.dart';
+import 'package:mynagalaga_mobile_app/core/network/app_exception.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/core/network/repository_guard.dart';
+import 'package:mynagalaga_mobile_app/features/services/models/complaint_model.dart';
+import 'package:mynagalaga_mobile_app/features/services/services/complaint_service.dart';
+import 'package:mynagalaga_mobile_app/features/services/repository/complaint_repository.dart';
 
 class ComplaintRepositoryImpl with RepositoryGuard implements ComplaintRepository {
   final ComplaintService _service;

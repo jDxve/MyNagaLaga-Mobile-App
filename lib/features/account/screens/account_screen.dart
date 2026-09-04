@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../common/widgets/background_gradient.dart';
-import '../../../common/resources/dimensions.dart';
-import '../../../common/resources/colors.dart';
-import '../components/settings_tile.dart';
-import '../../../core/network/data_state.dart';
-import '../notifier/user_info_notifier.dart';
-import '../../auth/notifier/auth_session_notifier.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/background_gradient.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/features/account/components/settings_tile.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/features/account/notifier/user_info_notifier.dart';
+import 'package:mynagalaga_mobile_app/features/auth/notifier/auth_session_notifier.dart';
 
 class AccountScreen extends ConsumerStatefulWidget {
   static const routeName = '/account';

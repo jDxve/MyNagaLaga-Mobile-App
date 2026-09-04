@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
 
 class LoadingIndicator extends StatelessWidget {
   final double? size;

@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/network/data_state.dart';
-import '../models/shelter_data_model.dart';
-import '../repository/shelter_repository_impl.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/features/safety/models/shelter_data_model.dart';
+import 'package:mynagalaga_mobile_app/features/safety/repository/shelter_repository_impl.dart';
 
 final sheltersNotifierProvider =
     NotifierProvider<SheltersNotifier, DataState<SheltersResponse>>(

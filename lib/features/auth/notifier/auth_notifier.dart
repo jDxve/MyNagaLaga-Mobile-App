@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/network/data_state.dart';
-import '../models/auth_models.dart';
-import '../repository/auth_repository_impl.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/features/auth/models/auth_models.dart';
+import 'package:mynagalaga_mobile_app/features/auth/repository/auth_repository_impl.dart';
 
 final signupNotifierProvider =
     NotifierProvider.autoDispose<SignupNotifier, DataState<OtpResponse>>(

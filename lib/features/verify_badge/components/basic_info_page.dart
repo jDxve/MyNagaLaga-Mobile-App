@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
-import '../../../common/resources/strings.dart';
-import '../../../common/utils/ui_utils.dart';
-import '../../../common/widgets/error_modal.dart';
-import '../../../common/widgets/text_input.dart';
-import '../../../common/widgets/toggle.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/resources/strings.dart';
+import 'package:mynagalaga_mobile_app/common/utils/ui_utils.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/error_modal.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/text_input.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/toggle.dart';
 
 class BasicInfoPage extends StatefulWidget {
   final BuildContext context;

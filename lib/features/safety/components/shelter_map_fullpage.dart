@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
-import '../models/shelter_data_model.dart';
-import 'shelter_map.dart';
+import 'package:mynagalaga_mobile_app/features/safety/models/shelter_data_model.dart';
+import 'package:mynagalaga_mobile_app/features/safety/components/shelter_map.dart';
 
 class ShelterMapFullPage extends StatelessWidget {
   final List<ShelterData> shelters;

@@ -1,11 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/network/app_exception.dart';
-import '../../../core/network/data_state.dart';
-import '../../../core/network/repository_guard.dart';
-import '../models/auth_models.dart';
-import '../services/auth_service.dart';
-import 'auth_repository.dart';
+import 'package:mynagalaga_mobile_app/core/network/app_exception.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/core/network/repository_guard.dart';
+import 'package:mynagalaga_mobile_app/features/auth/models/auth_models.dart';
+import 'package:mynagalaga_mobile_app/features/auth/services/auth_service.dart';
+import 'package:mynagalaga_mobile_app/features/auth/repository/auth_repository.dart';
 
 final authRepositoryProvider = Provider.autoDispose<AuthRepositoryImpl>((ref) {
   final service = ref.watch(authServiceProvider);

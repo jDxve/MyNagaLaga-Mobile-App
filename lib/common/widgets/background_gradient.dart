@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../resources/colors.dart';
-import '../resources/assets.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/assets.dart';
 
 Widget gradientBackground({required Widget child}) {
   return Container(

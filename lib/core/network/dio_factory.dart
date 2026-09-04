@@ -3,9 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import '../config/app_config.dart';
-import 'auth_interceptor.dart';
-import 'logging_interceptor.dart';
+import 'package:mynagalaga_mobile_app/core/config/app_config.dart';
+import 'package:mynagalaga_mobile_app/core/network/auth_interceptor.dart';
+import 'package:mynagalaga_mobile_app/core/network/logging_interceptor.dart';
 
 /// The single `FlutterSecureStorage` instance for the app. Nothing should
 /// construct `const FlutterSecureStorage()` directly — read this provider

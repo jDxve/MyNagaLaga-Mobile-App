@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'senior_citizen_form.dart';
-import 'pwd_form.dart';
-import 'solo_parent_form.dart';
-import 'indigent_form.dart';
-import 'student_form.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/components/senior_citizen_form.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/components/pwd_form.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/components/solo_parent_form.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/components/indigent_form.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/components/student_form.dart';
 
 class EligibilityPage extends StatelessWidget {
   final BuildContext context;

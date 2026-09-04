@@ -1,13 +1,13 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../../common/resources/colors.dart';
-import '../../../../common/resources/dimensions.dart';
-import '../../../../common/widgets/secondary_button.dart';
-import '../../../../common/widgets/text_input.dart';
-import '../../../../common/widgets/upload_image_card.dart';
-import '../../models/welfare_program_model.dart';
-import '../../models/welfare_request_model.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/secondary_button.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/text_input.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/upload_image_card.dart';
+import 'package:mynagalaga_mobile_app/features/services/models/welfare_program_model.dart';
+import 'package:mynagalaga_mobile_app/features/services/models/welfare_request_model.dart';
 
 class PostingHeaderCard extends StatelessWidget {
   final WelfarePostingModel posting;

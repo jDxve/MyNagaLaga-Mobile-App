@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../../../../core/network/data_state.dart';
-import '../../../../common/resources/colors.dart';
-import '../../../../common/resources/dimensions.dart';
-import '../../../auth/notifier/auth_session_notifier.dart';
-import '../../notifier/tracking_notifier.dart';
-import 'track_case_card.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/features/auth/notifier/auth_session_notifier.dart';
+import 'package:mynagalaga_mobile_app/features/services/notifier/tracking_notifier.dart';
+import 'package:mynagalaga_mobile_app/features/services/components/track_case/track_case_card.dart';
 
 class AllRequestsListWidget extends ConsumerStatefulWidget {
   final bool showHeader;

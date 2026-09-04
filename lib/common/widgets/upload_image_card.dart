@@ -3,11 +3,11 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
-import '../resources/colors.dart';
-import '../resources/dimensions.dart';
-import '../resources/assets.dart';
-import '../resources/strings.dart';
-import 'secondary_button.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/resources/assets.dart';
+import 'package:mynagalaga_mobile_app/common/resources/strings.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/secondary_button.dart';
 
 enum FileOrientation { portrait, landscape, square }
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../common/models/simple_option.dart';
-import '../../../common/resources/dimensions.dart';
-import '../../../common/resources/assets.dart';
-import '../../verify_badge/screens/verify_badge_screen.dart';
+import 'package:mynagalaga_mobile_app/common/models/simple_option.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/resources/assets.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/screens/verify_badge_screen.dart';
 
 Widget quickActions(BuildContext context) {
   final List<SimpleOption> actions = [

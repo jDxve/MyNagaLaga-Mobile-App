@@ -1,4 +1,4 @@
-import '../../account/models/user.dart';
+import 'package:mynagalaga_mobile_app/features/account/models/user.dart';
 
 class OtpVerificationRequest {
   final String email;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../common/resources/dimensions.dart';
-import 'profile_header_content.dart';
-import '../../../common/resources/strings.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/features/account/components/profile_header_content.dart';
+import 'package:mynagalaga_mobile_app/common/resources/strings.dart';
 
 class SettingsTile extends StatelessWidget {
   final IconData icon;

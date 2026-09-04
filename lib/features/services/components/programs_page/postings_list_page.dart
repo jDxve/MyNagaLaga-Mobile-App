@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../../common/resources/colors.dart';
-import '../../../../../common/resources/dimensions.dart';
-import '../../../../core/network/data_state.dart';
-import 'posting_detailed_page.dart';
-import '../../models/welfare_program_model.dart';
-import '../../notifier/welfare_program_notifier.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/features/services/components/programs_page/posting_detailed_page.dart';
+import 'package:mynagalaga_mobile_app/features/services/models/welfare_program_model.dart';
+import 'package:mynagalaga_mobile_app/features/services/notifier/welfare_program_notifier.dart';
 
 class PostingsListPage extends ConsumerStatefulWidget {
   final String serviceId;

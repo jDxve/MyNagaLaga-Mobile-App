@@ -1,8 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import '../../core/network/app_exception.dart';
-import '../resources/assets.dart';
-import '../resources/colors.dart';
+import 'package:mynagalaga_mobile_app/core/network/app_exception.dart';
+import 'package:mynagalaga_mobile_app/common/resources/assets.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
 
 /// The single place an `AppException` (or any caught error) becomes
 /// user-facing copy. Repositories already produce a final message via

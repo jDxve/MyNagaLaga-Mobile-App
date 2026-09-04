@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../common/resources/dimensions.dart';
-import '../components/case_track_button.dart';
-import '../components/services_header.dart';
-import '../components/services_page/complaint_page.dart';
-import '../components/services_page/service_request_page.dart';
-import '../components/services_search_section.dart';
-import '../components/featured_program_section.dart';
-import '../components/services_section.dart';
-import '../../home/components/circular_notif.dart';
-import 'track_services_screen.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/features/services/components/case_track_button.dart';
+import 'package:mynagalaga_mobile_app/features/services/components/services_header.dart';
+import 'package:mynagalaga_mobile_app/features/services/components/services_page/complaint_page.dart';
+import 'package:mynagalaga_mobile_app/features/services/components/services_page/service_request_page.dart';
+import 'package:mynagalaga_mobile_app/features/services/components/services_search_section.dart';
+import 'package:mynagalaga_mobile_app/features/services/components/featured_program_section.dart';
+import 'package:mynagalaga_mobile_app/features/services/components/services_section.dart';
+import 'package:mynagalaga_mobile_app/features/home/components/circular_notif.dart';
+import 'package:mynagalaga_mobile_app/features/services/screens/track_services_screen.dart';
 
 class ServicesScreen extends ConsumerStatefulWidget {
   static const routeName = '/services';

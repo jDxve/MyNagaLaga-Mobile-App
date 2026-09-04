@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
-import '../../../common/resources/strings.dart';
-import '../../../common/utils/ui_utils.dart';
-import 'benefits_card.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/resources/strings.dart';
+import 'package:mynagalaga_mobile_app/common/utils/ui_utils.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/components/benefits_card.dart';
 
 class IndigentForm extends StatefulWidget {
   final TextEditingController existingIdController;

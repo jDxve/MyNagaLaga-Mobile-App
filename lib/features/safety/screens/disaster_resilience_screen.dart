@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/network/data_state.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
-import '../../../common/widgets/search_input.dart';
-import '../components/disaster_resilience_widgets.dart';
-import '../components/shelter_map.dart';
-import '../components/shelter_card.dart';
-import '../components/shelter_detail_sheet.dart';
-import '../components/shelter_map_fullpage.dart';
-import '../notifier/shelter_notifier.dart';
-import '../models/shelter_data_model.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/search_input.dart';
+import 'package:mynagalaga_mobile_app/features/safety/components/disaster_resilience_widgets.dart';
+import 'package:mynagalaga_mobile_app/features/safety/components/shelter_map.dart';
+import 'package:mynagalaga_mobile_app/features/safety/components/shelter_card.dart';
+import 'package:mynagalaga_mobile_app/features/safety/components/shelter_detail_sheet.dart';
+import 'package:mynagalaga_mobile_app/features/safety/components/shelter_map_fullpage.dart';
+import 'package:mynagalaga_mobile_app/features/safety/notifier/shelter_notifier.dart';
+import 'package:mynagalaga_mobile_app/features/safety/models/shelter_data_model.dart';
 
 class DisasterResilienceScreen extends ConsumerStatefulWidget {
   static const String routeName = '/disaster-resilience';

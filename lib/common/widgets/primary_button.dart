@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../resources/colors.dart';
-import '../resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
 
 class PrimaryButton extends StatelessWidget {
   final String text;

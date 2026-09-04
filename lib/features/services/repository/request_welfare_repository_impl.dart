@@ -4,12 +4,12 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http_parser/http_parser.dart';
-import '../../../core/network/data_state.dart';
-import '../../../core/network/repository_guard.dart';
-import '../models/welfare_program_model.dart';
-import '../models/welfare_request_model.dart';
-import '../services/request_welfare_service.dart';
-import 'request_welfare_repository.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/core/network/repository_guard.dart';
+import 'package:mynagalaga_mobile_app/features/services/models/welfare_program_model.dart';
+import 'package:mynagalaga_mobile_app/features/services/models/welfare_request_model.dart';
+import 'package:mynagalaga_mobile_app/features/services/services/request_welfare_service.dart';
+import 'package:mynagalaga_mobile_app/features/services/repository/request_welfare_repository.dart';
 
 final welfareServiceRepositoryProvider =
     Provider<WelfareServiceRepository>((ref) {

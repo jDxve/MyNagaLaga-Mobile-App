@@ -2,12 +2,12 @@ import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart';
-import '../../../core/network/app_exception.dart';
-import '../../../core/network/data_state.dart';
-import '../../../core/network/repository_guard.dart';
-import '../models/otp_model.dart';
-import '../services/otp_verification_service.dart';
-import 'otp_verification_repository.dart';
+import 'package:mynagalaga_mobile_app/core/network/app_exception.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/core/network/repository_guard.dart';
+import 'package:mynagalaga_mobile_app/features/auth/models/otp_model.dart';
+import 'package:mynagalaga_mobile_app/features/auth/services/otp_verification_service.dart';
+import 'package:mynagalaga_mobile_app/features/auth/repository/otp_verification_repository.dart';
 
 final otpVerificationRepositoryProvider =
     Provider.autoDispose<OtpVerificationRepositoryImpl>((ref) {

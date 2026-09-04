@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/network/data_state.dart';
-import '../../../common/widgets/background_gradient.dart';
-import '../../../common/resources/dimensions.dart';
-import '../../../common/widgets/nav_bar.dart';
-import '../../../common/widgets/search_input.dart';
-import '../../account/screens/account_screen.dart';
-import '../../auth/notifier/auth_session_notifier.dart';
-import '../../family/screens/family_ledger_screen.dart';
-import '../../safety/screens/disaster_resilience_screen.dart';
-import '../../services/components/track_case/all_track.dart';
-import '../../services/screens/services_screen.dart';
-import '../components/badges.dart';
-import '../components/circular_notif.dart';
-import '../components/home_greetings.dart';
-import '../components/quik_actions.dart';
-import '../notifier/user_badge_notifier.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/background_gradient.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/nav_bar.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/search_input.dart';
+import 'package:mynagalaga_mobile_app/features/account/screens/account_screen.dart';
+import 'package:mynagalaga_mobile_app/features/auth/notifier/auth_session_notifier.dart';
+import 'package:mynagalaga_mobile_app/features/family/screens/family_ledger_screen.dart';
+import 'package:mynagalaga_mobile_app/features/safety/screens/disaster_resilience_screen.dart';
+import 'package:mynagalaga_mobile_app/features/services/components/track_case/all_track.dart';
+import 'package:mynagalaga_mobile_app/features/services/screens/services_screen.dart';
+import 'package:mynagalaga_mobile_app/features/home/components/badges.dart';
+import 'package:mynagalaga_mobile_app/features/home/components/circular_notif.dart';
+import 'package:mynagalaga_mobile_app/features/home/components/home_greetings.dart';
+import 'package:mynagalaga_mobile_app/features/home/components/quik_actions.dart';
+import 'package:mynagalaga_mobile_app/features/home/notifier/user_badge_notifier.dart';
 
 class HomeScreen extends StatefulWidget {
   static const routeName = '/home';

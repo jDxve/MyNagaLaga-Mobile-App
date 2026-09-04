@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
 
 class BenefitsCard extends StatelessWidget {
   final String title;

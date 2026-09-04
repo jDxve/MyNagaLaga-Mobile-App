@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/network/data_state.dart';
-import '../../../../common/resources/assets.dart';
-import '../../../../common/resources/colors.dart';
-import '../../../../common/resources/dimensions.dart';
-import '../../../../common/widgets/custom_app_bar.dart';
-import '../../../../common/widgets/secondary_button.dart';
-import '../../../auth/notifier/auth_session_notifier.dart';
-import '../../../home/notifier/user_badge_notifier.dart';
-import '../../models/welfare_program_model.dart';
-import '../../notifier/welfare_program_notifier.dart';
-import 'posting_application_page.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/common/resources/assets.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/custom_app_bar.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/secondary_button.dart';
+import 'package:mynagalaga_mobile_app/features/auth/notifier/auth_session_notifier.dart';
+import 'package:mynagalaga_mobile_app/features/home/notifier/user_badge_notifier.dart';
+import 'package:mynagalaga_mobile_app/features/services/models/welfare_program_model.dart';
+import 'package:mynagalaga_mobile_app/features/services/notifier/welfare_program_notifier.dart';
+import 'package:mynagalaga_mobile_app/features/services/components/programs_page/posting_application_page.dart';
 
 class PostingDetailPage extends ConsumerStatefulWidget {
   final WelfarePostingModel posting;

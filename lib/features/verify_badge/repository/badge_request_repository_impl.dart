@@ -2,12 +2,12 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http_parser/http_parser.dart';
-import '../../../core/network/app_exception.dart';
-import '../../../core/network/repository_guard.dart';
-import '../models/badge_request_model.dart';
-import '../services/badge_request_service.dart';
-import 'badge_request_repository.dart';
-import '../../auth/notifier/auth_session_notifier.dart';
+import 'package:mynagalaga_mobile_app/core/network/app_exception.dart';
+import 'package:mynagalaga_mobile_app/core/network/repository_guard.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/models/badge_request_model.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/services/badge_request_service.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/repository/badge_request_repository.dart';
+import 'package:mynagalaga_mobile_app/features/auth/notifier/auth_session_notifier.dart';
 
 final badgeRequestRepositoryProvider = Provider<BadgeRequestRepository>((ref) {
   final service = ref.read(badgeRequestServiceProvider);

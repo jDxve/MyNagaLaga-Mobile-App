@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/network/data_state.dart';
-import '../../../core/network/repository_guard.dart';
-import '../models/welfare_program_model.dart';
-import '../services/welfare_programs_service.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/core/network/repository_guard.dart';
+import 'package:mynagalaga_mobile_app/features/services/models/welfare_program_model.dart';
+import 'package:mynagalaga_mobile_app/features/services/services/welfare_programs_service.dart';
 
 // ─── Abstract ───────────────────────────────────────────────
 

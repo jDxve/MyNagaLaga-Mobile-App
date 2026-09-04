@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
-import '../../../common/resources/strings.dart';
-import '../../../common/widgets/drop_down.dart';
-import '../../../common/widgets/error_modal.dart';
-import 'benefits_card.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/resources/strings.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/drop_down.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/error_modal.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/components/benefits_card.dart';
 
 class PwdForm extends StatefulWidget {
   final TextEditingController existingIdController;

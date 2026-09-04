@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/network/data_state.dart';
-import '../models/user_badge_model.dart';
-import '../repository/user_badge_repository_impl.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/features/home/models/user_badge_model.dart';
+import 'package:mynagalaga_mobile_app/features/home/repository/user_badge_repository_impl.dart';
 
 final badgesNotifierProvider =
     NotifierProvider<BadgesNotifier, DataState<BadgesResponse>>(

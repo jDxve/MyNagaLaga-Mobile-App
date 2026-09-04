@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
 
 class FeaturedProgramCard extends StatelessWidget {
   final String icon;

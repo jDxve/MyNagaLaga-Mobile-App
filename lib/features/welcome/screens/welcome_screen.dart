@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mynagalaga_mobile_app/features/welcome/components/onboarding_button.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/assets.dart';
-import '../../../common/resources/strings.dart';
-import '../../../common/resources/dimensions.dart';
-import 'onboarding_screen.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/assets.dart';
+import 'package:mynagalaga_mobile_app/common/resources/strings.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/features/welcome/screens/onboarding_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   static const routeName = '/welcome';

@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:retrofit/retrofit.dart';
-import '../../../core/network/dio_factory.dart';
+import 'package:mynagalaga_mobile_app/core/network/dio_factory.dart';
 
 part 'tracking_service.g.dart';
 

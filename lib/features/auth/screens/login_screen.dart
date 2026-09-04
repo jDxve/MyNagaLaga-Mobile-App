@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../common/resources/dimensions.dart';
-import '../components/login_form.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/features/auth/components/login_form.dart';
 
 class LogInScreen extends StatelessWidget {
   static const routeName = '/login';

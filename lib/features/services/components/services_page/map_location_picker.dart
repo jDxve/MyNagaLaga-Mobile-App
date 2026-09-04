@@ -2,10 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:geocoding/geocoding.dart' as geo;
-import '../../../../common/resources/colors.dart';
-import '../../../../common/resources/dimensions.dart';
-import '../../../../common/utils/constant.dart';
-import '../../../../common/widgets/primary_button.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/utils/constant.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/primary_button.dart';
 
 
 class MapLocationPicker extends StatefulWidget {

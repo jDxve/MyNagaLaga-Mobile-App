@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/network/data_state.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
-import '../components/household_info_card.dart';
-import '../components/empty_state_widget.dart';
-import '../components/family_registry_section.dart';
-import '../notifier/my_household_notifier.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/features/family/components/household_info_card.dart';
+import 'package:mynagalaga_mobile_app/features/family/components/empty_state_widget.dart';
+import 'package:mynagalaga_mobile_app/features/family/components/family_registry_section.dart';
+import 'package:mynagalaga_mobile_app/features/family/notifier/my_household_notifier.dart';
 
 class FamilyLedgerScreen extends ConsumerStatefulWidget {
   static const String routeName = '/family-ledger';

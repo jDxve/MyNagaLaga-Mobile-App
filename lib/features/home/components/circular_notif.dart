@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../../common/resources/dimensions.dart';
-import '../../../common/resources/assets.dart';
-import '../../../features/notification/notifier/notification_notifier.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/resources/assets.dart';
+import 'package:mynagalaga_mobile_app/features/notification/notifier/notification_notifier.dart';
 
 class CircularNotifButton extends ConsumerWidget {
   final double? size;

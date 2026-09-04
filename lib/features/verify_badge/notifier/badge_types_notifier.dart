@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/network/data_state.dart';
-import '../models/badge_type_model.dart';
-import '../repository/badge_type_repository_impl.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/models/badge_type_model.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/repository/badge_type_repository_impl.dart';
 
 final badgeTypesNotifierProvider =
     NotifierProvider<BadgeTypesNotifier, DataState<List<BadgeType>>>(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'onboarding_button.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/features/welcome/components/onboarding_button.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
 
 Widget buildOnboardingBottomSection({
   required int currentPage,

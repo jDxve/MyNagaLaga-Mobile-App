@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
-import '../../../common/widgets/search_input.dart';
-import 'posting_list.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/search_input.dart';
+import 'package:mynagalaga_mobile_app/features/services/components/posting_list.dart';
 
 class ServicesSearchSection extends StatefulWidget {
   final TextEditingController? searchController;

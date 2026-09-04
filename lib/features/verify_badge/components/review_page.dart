@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
-import '../../../common/resources/strings.dart';
-import '../../../common/widgets/error_modal.dart';
-import '../../../common/widgets/info_card.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/resources/strings.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/error_modal.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/info_card.dart';
 
 class ReviewPage extends StatefulWidget {
   final String? selectedBadge;

@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'common/firebase/firebase_config.dart';
-import 'core/config/app_config.dart';
-import 'core/observability/error_reporter.dart';
-import 'features/welcome/screens/splash_screen.dart';
-import 'router.dart';
+import 'package:mynagalaga_mobile_app/common/firebase/firebase_config.dart';
+import 'package:mynagalaga_mobile_app/core/config/app_config.dart';
+import 'package:mynagalaga_mobile_app/core/observability/error_reporter.dart';
+import 'package:mynagalaga_mobile_app/features/welcome/screens/splash_screen.dart';
+import 'package:mynagalaga_mobile_app/router.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -3,12 +3,12 @@ import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import '../../../core/network/app_exception.dart';
-import '../../../core/network/data_state.dart';
-import '../../../core/network/repository_guard.dart';
-import '../models/service_request_model.dart';
-import '../services/service_request_service.dart';
-import 'service_request_repository.dart';
+import 'package:mynagalaga_mobile_app/core/network/app_exception.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/core/network/repository_guard.dart';
+import 'package:mynagalaga_mobile_app/features/services/models/service_request_model.dart';
+import 'package:mynagalaga_mobile_app/features/services/services/service_request_service.dart';
+import 'package:mynagalaga_mobile_app/features/services/repository/service_request_repository.dart';
 
 class ServiceRequestRepositoryImpl
     with RepositoryGuard

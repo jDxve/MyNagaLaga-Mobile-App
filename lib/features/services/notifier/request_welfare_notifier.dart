@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/network/data_state.dart';
-import '../models/welfare_program_model.dart';
-import '../models/welfare_request_model.dart';
-import '../repository/request_welfare_repository_impl.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/features/services/models/welfare_program_model.dart';
+import 'package:mynagalaga_mobile_app/features/services/models/welfare_request_model.dart';
+import 'package:mynagalaga_mobile_app/features/services/repository/request_welfare_repository_impl.dart';
 
 final welfareServiceNotifierProvider =
     NotifierProvider<WelfareServiceNotifier, DataState<WelfareRequestModel>>(

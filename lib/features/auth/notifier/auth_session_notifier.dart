@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../core/network/dio_factory.dart';
-import '../models/auth_models.dart';
+import 'package:mynagalaga_mobile_app/core/network/dio_factory.dart';
+import 'package:mynagalaga_mobile_app/features/auth/models/auth_models.dart';
 
 class AuthSessionNotifier extends Notifier<AuthSessionState> {
   // Reads the same shared instance dioProvider's AuthInterceptor uses, so a

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
-import '../../../common/widgets/custom_app_bar.dart';
-import '../models/notification_model.dart';
-import '../notifier/notification_notifier.dart';
-import '../components/notification_tile.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/custom_app_bar.dart';
+import 'package:mynagalaga_mobile_app/features/notification/models/notification_model.dart';
+import 'package:mynagalaga_mobile_app/features/notification/notifier/notification_notifier.dart';
+import 'package:mynagalaga_mobile_app/features/notification/components/notification_tile.dart';
 
 class NotificationScreen extends ConsumerWidget {
   static const routeName = '/notifications';

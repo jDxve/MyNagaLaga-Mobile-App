@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/network/app_exception.dart';
-import '../../../core/network/data_state.dart';
-import '../../../core/network/repository_guard.dart';
-import '../models/user_badge_model.dart';
-import '../services/user_badge_service.dart';
-import 'user_badge_repository.dart';
+import 'package:mynagalaga_mobile_app/core/network/app_exception.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/core/network/repository_guard.dart';
+import 'package:mynagalaga_mobile_app/features/home/models/user_badge_model.dart';
+import 'package:mynagalaga_mobile_app/features/home/services/user_badge_service.dart';
+import 'package:mynagalaga_mobile_app/features/home/repository/user_badge_repository.dart';
 
 final badgeRepositoryProvider = Provider<BadgeRepositoryImpl>((ref) {
   final service = ref.read(badgeServiceProvider);

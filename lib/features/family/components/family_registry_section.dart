@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
-import '../models/household_model.dart';
-import 'tree_member_node.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/features/family/models/household_model.dart';
+import 'package:mynagalaga_mobile_app/features/family/components/tree_member_node.dart';
 
 class FamilyRegistrySection extends StatelessWidget {
   final List<HouseholdMember> members;

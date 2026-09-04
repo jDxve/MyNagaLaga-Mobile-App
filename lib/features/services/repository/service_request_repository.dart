@@ -1,5 +1,5 @@
-import '../../../core/network/data_state.dart';
-import '../models/service_request_model.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/features/services/models/service_request_model.dart';
 
 abstract class ServiceRequestRepository {
   Future<DataState<List<CaseTypeModel>>> getCaseTypes();

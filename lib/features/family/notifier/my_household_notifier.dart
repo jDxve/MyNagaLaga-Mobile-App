@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/network/data_state.dart';
-import '../models/household_model.dart';
-import '../repository/family_ledger_repository_impl.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/features/family/models/household_model.dart';
+import 'package:mynagalaga_mobile_app/features/family/repository/family_ledger_repository_impl.dart';
 
 final myHouseholdNotifierProvider =
     NotifierProvider<MyHouseholdNotifier, DataState<Household?>>(

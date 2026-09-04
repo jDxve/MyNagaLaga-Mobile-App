@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../common/resources/assets.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
-import '../models/user_badge_model.dart';
-import '../../verify_badge/screens/verify_badge_screen.dart';
+import 'package:mynagalaga_mobile_app/common/resources/assets.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/features/home/models/user_badge_model.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/screens/verify_badge_screen.dart';
 
 class BadgeDisplay extends StatefulWidget {
   final List<BadgeModel> badges;

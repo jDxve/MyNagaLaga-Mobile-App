@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/network/dio_factory.dart';
-import '../../../core/network/data_state.dart';
-import '../models/complaint_model.dart';
-import '../repository/complaint_repository_impl.dart';
-import '../services/complaint_service.dart';
+import 'package:mynagalaga_mobile_app/core/network/dio_factory.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/features/services/models/complaint_model.dart';
+import 'package:mynagalaga_mobile_app/features/services/repository/complaint_repository_impl.dart';
+import 'package:mynagalaga_mobile_app/features/services/services/complaint_service.dart';
 
 final complaintTypesNotifierProvider =
     NotifierProvider<

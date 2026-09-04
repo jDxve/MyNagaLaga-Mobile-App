@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
-import '../../../common/resources/strings.dart';
-import '../../../common/utils/ui_utils.dart';
-import '../../../common/widgets/text_input.dart';
-import '../../../common/widgets/error_modal.dart';
-import '../../../common/widgets/upload_image_card.dart';
-import '../../../core/network/data_state.dart';
-import '../notifier/badge_requirements_notifier.dart';
-import '../models/badge_requirement_model.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/resources/strings.dart';
+import 'package:mynagalaga_mobile_app/common/utils/ui_utils.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/text_input.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/error_modal.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/upload_image_card.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/notifier/badge_requirements_notifier.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/models/badge_requirement_model.dart';
 
 class DocumentPage extends ConsumerStatefulWidget {
   final BuildContext context;

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../common/resources/colors.dart';
-import '../../../../common/resources/dimensions.dart';
-import '../../../../common/widgets/primary_button.dart';
-import '../../notifier/tracking_notifier.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/primary_button.dart';
+import 'package:mynagalaga_mobile_app/features/services/notifier/tracking_notifier.dart';
 
 class TrackCaseCard extends ConsumerWidget {
   final String? caseId;

@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/badge_type_model.dart';
-import '../services/badge_type_service.dart';
-import 'badge_type_repository.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/models/badge_type_model.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/services/badge_type_service.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/repository/badge_type_repository.dart';
 
 final badgeTypeRepositoryProvider = Provider<BadgeTypeRepository>((ref) {
   final service = ref.read(badgeTypeServiceProvider);

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'dart:async';
-import '../../../common/resources/assets.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
-import '../../../common/utils/constant.dart';
-import '../models/shelter_data_model.dart';
-import '../../../common/utils/distant_caculator.dart';
-import 'shelter_map_fullpage.dart';
+import 'package:mynagalaga_mobile_app/common/resources/assets.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/utils/constant.dart';
+import 'package:mynagalaga_mobile_app/features/safety/models/shelter_data_model.dart';
+import 'package:mynagalaga_mobile_app/common/utils/distant_caculator.dart';
+import 'package:mynagalaga_mobile_app/features/safety/components/shelter_map_fullpage.dart';
 
 class ShelterMap extends StatefulWidget {
   final List<ShelterData> shelters;

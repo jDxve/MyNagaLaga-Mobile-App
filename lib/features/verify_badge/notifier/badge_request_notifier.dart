@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/network/data_state.dart';
-import '../models/badge_request_model.dart';
-import '../repository/badge_request_repository_impl.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/models/badge_request_model.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/repository/badge_request_repository_impl.dart';
 
 final badgeRequestNotifierProvider =
     NotifierProvider.autoDispose<BadgeRequestNotifier, DataState<BadgeRequestData>>(

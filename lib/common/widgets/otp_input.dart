@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../resources/colors.dart';
-import '../resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
 
 class OtpInput extends StatefulWidget {
   final Function(String) onCompleted;

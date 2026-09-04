@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/network/dio_factory.dart';
-import '../../../core/network/data_state.dart';
-import '../models/service_request_model.dart';
-import '../repository/service_request_repository.dart';
-import '../repository/service_request_repository_impl.dart';
-import '../services/service_request_service.dart';
+import 'package:mynagalaga_mobile_app/core/network/dio_factory.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/features/services/models/service_request_model.dart';
+import 'package:mynagalaga_mobile_app/features/services/repository/service_request_repository.dart';
+import 'package:mynagalaga_mobile_app/features/services/repository/service_request_repository_impl.dart';
+import 'package:mynagalaga_mobile_app/features/services/services/service_request_service.dart';
 
 final caseTypesNotifierProvider =
     NotifierProvider<CaseTypesNotifier, DataState<List<CaseTypeModel>>>(

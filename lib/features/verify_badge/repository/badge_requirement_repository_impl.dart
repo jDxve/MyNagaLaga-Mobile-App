@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/badge_requirement_model.dart';
-import '../services/badge_requirement_service.dart';
-import 'badge_requirement_repository.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/models/badge_requirement_model.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/services/badge_requirement_service.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/repository/badge_requirement_repository.dart';
 
 final badgeRequirementRepositoryProvider =
     Provider<BadgeRequirementRepository>((ref) {

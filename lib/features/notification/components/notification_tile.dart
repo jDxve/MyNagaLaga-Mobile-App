@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
-import '../models/notification_model.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/features/notification/models/notification_model.dart';
 
 class NotificationTile extends StatelessWidget {
   final NotificationModel notification;

@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/network/app_exception.dart';
-import '../../../core/network/data_state.dart';
-import '../../../core/network/repository_guard.dart';
-import '../models/shelter_data_model.dart';
-import '../services/shelter_service.dart';
-import 'shelter_repository.dart';
+import 'package:mynagalaga_mobile_app/core/network/app_exception.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/core/network/repository_guard.dart';
+import 'package:mynagalaga_mobile_app/features/safety/models/shelter_data_model.dart';
+import 'package:mynagalaga_mobile_app/features/safety/services/shelter_service.dart';
+import 'package:mynagalaga_mobile_app/features/safety/repository/shelter_repository.dart';
 
 final shelterRepositoryProvider =
     Provider.autoDispose<ShelterRepositoryImpl>((ref) {

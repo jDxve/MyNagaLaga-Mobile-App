@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
-import '../../../common/utils/distant_caculator.dart';
-import '../../home/components/circular_notif.dart';
-import '../models/shelter_data_model.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/utils/distant_caculator.dart';
+import 'package:mynagalaga_mobile_app/features/home/components/circular_notif.dart';
+import 'package:mynagalaga_mobile_app/features/safety/models/shelter_data_model.dart';
 
 class DrHeader extends StatelessWidget {
   final VoidCallback onNotifTap;

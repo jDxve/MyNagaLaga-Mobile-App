@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:mynagalaga_mobile_app/features/auth/screens/login_screen.dart';
 import 'package:mynagalaga_mobile_app/features/auth/screens/signup_screen.dart';
 import 'package:mynagalaga_mobile_app/features/services/screens/track_services_screen.dart';
-import 'common/navigation/auth_guard.dart';
-import 'features/account/screens/account_screen.dart';
-import 'features/family/screens/family_ledger_screen.dart';
-import 'features/notification/screens/notification_screen.dart';
-import 'features/safety/screens/disaster_resilience_screen.dart';
+import 'package:mynagalaga_mobile_app/common/navigation/auth_guard.dart';
+import 'package:mynagalaga_mobile_app/features/account/screens/account_screen.dart';
+import 'package:mynagalaga_mobile_app/features/family/screens/family_ledger_screen.dart';
+import 'package:mynagalaga_mobile_app/features/notification/screens/notification_screen.dart';
+import 'package:mynagalaga_mobile_app/features/safety/screens/disaster_resilience_screen.dart';
 
-import 'features/services/screens/program_screen.dart';
-import 'features/services/screens/services_screen.dart';
-import 'features/welcome/screens/onboarding_screen.dart';
-import 'features/welcome/screens/splash_screen.dart';
-import 'features/welcome/screens/welcome_screen.dart';
-import 'features/home/screens/home_screen.dart';
-import 'features/verify_badge/screens/verify_badge_screen.dart';
+import 'package:mynagalaga_mobile_app/features/services/screens/program_screen.dart';
+import 'package:mynagalaga_mobile_app/features/services/screens/services_screen.dart';
+import 'package:mynagalaga_mobile_app/features/welcome/screens/onboarding_screen.dart';
+import 'package:mynagalaga_mobile_app/features/welcome/screens/splash_screen.dart';
+import 'package:mynagalaga_mobile_app/features/welcome/screens/welcome_screen.dart';
+import 'package:mynagalaga_mobile_app/features/home/screens/home_screen.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/screens/verify_badge_screen.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {

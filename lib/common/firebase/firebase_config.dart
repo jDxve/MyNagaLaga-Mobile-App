@@ -5,8 +5,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../firebase_options.dart';
-import '../../features/notification/notifier/notification_notifier.dart';
+import 'package:mynagalaga_mobile_app/firebase_options.dart';
+import 'package:mynagalaga_mobile_app/features/notification/notifier/notification_notifier.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {

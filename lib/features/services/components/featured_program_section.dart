@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../common/resources/assets.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
-import '../../../common/resources/strings.dart';
-import '../screens/program_screen.dart';
-import 'featured_program_card.dart';
+import 'package:mynagalaga_mobile_app/common/resources/assets.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/resources/strings.dart';
+import 'package:mynagalaga_mobile_app/features/services/screens/program_screen.dart';
+import 'package:mynagalaga_mobile_app/features/services/components/featured_program_card.dart';
 
 class FeaturedProgramSection extends StatelessWidget {
   final List<FeaturedProgramData>? programs;

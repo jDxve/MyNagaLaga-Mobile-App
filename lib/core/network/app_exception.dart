@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 
-import 'models/error_response.dart';
+import 'package:mynagalaga_mobile_app/core/network/models/error_response.dart';
 
 enum AppErrorType {
   timeout,

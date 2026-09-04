@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../common/resources/dimensions.dart';
-import '../../../common/resources/strings.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/resources/strings.dart';
 
 Widget greetingText({String userName = ''}) {
   final hour = DateTime.now().hour;

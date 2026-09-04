@@ -1,11 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/network/dio_factory.dart';
-import '../../../core/network/data_state.dart';
-import '../../../common/models/dio/polling_service.dart';
-import '../models/tracking_model.dart';
-import '../repository/tracking_repository.dart';
-import '../repository/tracking_repository_impl.dart';
-import '../services/tracking_service.dart';
+import 'package:mynagalaga_mobile_app/core/network/dio_factory.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/common/models/dio/polling_service.dart';
+import 'package:mynagalaga_mobile_app/features/services/models/tracking_model.dart';
+import 'package:mynagalaga_mobile_app/features/services/repository/tracking_repository.dart';
+import 'package:mynagalaga_mobile_app/features/services/repository/tracking_repository_impl.dart';
+import 'package:mynagalaga_mobile_app/features/services/services/tracking_service.dart';
 
 TrackingRepository _buildRepository(Ref ref) {
   final service = TrackingService(ref.watch(dioProvider));

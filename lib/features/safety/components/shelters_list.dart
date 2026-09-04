@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/dimensions.dart';
-import '../models/shelter_data_model.dart';
-import 'shelter_card.dart';
-import 'shelter_detail_sheet.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/features/safety/models/shelter_data_model.dart';
+import 'package:mynagalaga_mobile_app/features/safety/components/shelter_card.dart';
+import 'package:mynagalaga_mobile_app/features/safety/components/shelter_detail_sheet.dart';
 
-import 'shelter_map.dart';
-import 'shelter_map_fullpage.dart';
+import 'package:mynagalaga_mobile_app/features/safety/components/shelter_map.dart';
+import 'package:mynagalaga_mobile_app/features/safety/components/shelter_map_fullpage.dart';
 
 class SheltersList extends StatelessWidget {
   final List<ShelterData> shelters;

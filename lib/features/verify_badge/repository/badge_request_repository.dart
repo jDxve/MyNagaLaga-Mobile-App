@@ -1,5 +1,5 @@
 import 'dart:io';
-import '../models/badge_request_model.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/models/badge_request_model.dart';
 
 abstract class BadgeRequestRepository {
   Future<BadgeRequestData?> submitBadgeRequest({

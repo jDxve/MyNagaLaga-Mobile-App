@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../home/screens/home_screen.dart';
-import '../../auth/screens/login_screen.dart';
-import '../../auth/notifier/auth_session_notifier.dart';
-import '../../../common/resources/colors.dart';
-import '../../../common/resources/strings.dart';
-import '../../../common/resources/dimensions.dart';
-import '../../../common/resources/assets.dart';
-import 'onboarding_screen.dart';
+import 'package:mynagalaga_mobile_app/features/home/screens/home_screen.dart';
+import 'package:mynagalaga_mobile_app/features/auth/screens/login_screen.dart';
+import 'package:mynagalaga_mobile_app/features/auth/notifier/auth_session_notifier.dart';
+import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
+import 'package:mynagalaga_mobile_app/common/resources/strings.dart';
+import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/resources/assets.dart';
+import 'package:mynagalaga_mobile_app/features/welcome/screens/onboarding_screen.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   static const routeName = '/splash';

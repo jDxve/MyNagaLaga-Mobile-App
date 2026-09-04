@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/network/app_exception.dart';
-import '../../../core/network/repository_guard.dart';
-import '../models/user.dart';
-import '../services/user_info_service.dart';
-import 'user_info_repository.dart';
+import 'package:mynagalaga_mobile_app/core/network/app_exception.dart';
+import 'package:mynagalaga_mobile_app/core/network/repository_guard.dart';
+import 'package:mynagalaga_mobile_app/features/account/models/user.dart';
+import 'package:mynagalaga_mobile_app/features/account/services/user_info_service.dart';
+import 'package:mynagalaga_mobile_app/features/account/repository/user_info_repository.dart';
 
 final userInfoRepositoryProvider = Provider<UserInfoRepository>((ref) {
   final service = ref.read(userInfoProvider);

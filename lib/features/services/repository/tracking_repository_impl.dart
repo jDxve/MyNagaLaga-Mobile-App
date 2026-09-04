@@ -1,10 +1,10 @@
 import 'package:retrofit/retrofit.dart'; // ADD THIS
-import '../../../core/network/app_exception.dart';
-import '../../../core/network/data_state.dart';
-import '../../../core/network/repository_guard.dart';
-import '../models/tracking_model.dart';
-import '../services/tracking_service.dart';
-import 'tracking_repository.dart';
+import 'package:mynagalaga_mobile_app/core/network/app_exception.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/core/network/repository_guard.dart';
+import 'package:mynagalaga_mobile_app/features/services/models/tracking_model.dart';
+import 'package:mynagalaga_mobile_app/features/services/services/tracking_service.dart';
+import 'package:mynagalaga_mobile_app/features/services/repository/tracking_repository.dart';
 
 class TrackingRepositoryImpl with RepositoryGuard implements TrackingRepository {
   static const int _pageSize = 50;

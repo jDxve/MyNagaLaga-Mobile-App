@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 
-import 'app_exception.dart';
-import 'data_state.dart';
+import 'package:mynagalaga_mobile_app/core/network/app_exception.dart';
+import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
 
 const _kDefaultErrorMessage = 'Something went wrong. Please try again.';
 
