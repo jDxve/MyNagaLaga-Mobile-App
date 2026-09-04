@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../common/models/dio/api_client.dart';
+import '../../../core/network/dio_factory.dart';
 import '../../../core/network/data_state.dart';
 import '../../../common/models/dio/polling_service.dart';
 import '../models/tracking_model.dart';
@@ -7,8 +7,8 @@ import '../repository/tracking_repository.dart';
 import '../repository/tracking_repository_impl.dart';
 import '../services/tracking_service.dart';
 
-TrackingRepository _buildRepository() {
-  final service = TrackingService(ApiClient.fromEnv().create());
+TrackingRepository _buildRepository(Ref ref) {
+  final service = TrackingService(ref.watch(dioProvider));
   return TrackingRepositoryImpl(service: service);
 }
 
@@ -31,7 +31,7 @@ class AllTrackingNotifier extends Notifier<DataState<List<TrackingItemModel>>> {
 
   @override
   DataState<List<TrackingItemModel>> build() {
-    _repo = _buildRepository();
+    _repo = _buildRepository(ref);
     ref.onDispose(_polling.dispose);
     return const DataState.started();
   }
@@ -128,7 +128,7 @@ class ProgramsTrackingNotifier
 
   @override
   DataState<List<ProgramTrackingModel>> build() {
-    _repo = _buildRepository();
+    _repo = _buildRepository(ref);
     ref.onDispose(_polling.dispose);
     return const DataState.started();
   }
@@ -227,7 +227,7 @@ class ServicesTrackingNotifier
 
   @override
   DataState<List<ServiceTrackingModel>> build() {
-    _repo = _buildRepository();
+    _repo = _buildRepository(ref);
     ref.onDispose(_polling.dispose);
     return const DataState.started();
   }
@@ -327,7 +327,7 @@ class ComplaintsTrackingNotifier
 
   @override
   DataState<List<ComplaintModel>> build() {
-    _repo = _buildRepository();
+    _repo = _buildRepository(ref);
     ref.onDispose(_polling.dispose);
     return const DataState.started();
   }
@@ -416,7 +416,7 @@ class BadgeTrackingNotifier
 
   @override
   DataState<List<BadgeRequestModel>> build() {
-    _repo = _buildRepository();
+    _repo = _buildRepository(ref);
     ref.onDispose(_polling.dispose);
     return const DataState.started();
   }
@@ -499,7 +499,7 @@ class PendingFeedbackNotifier
 
   @override
   DataState<List<PendingFeedbackRequest>> build() {
-    _repo = _buildRepository();
+    _repo = _buildRepository(ref);
     return const DataState.started();
   }
 
@@ -540,7 +540,7 @@ class FeedbackSubmitNotifier extends Notifier<FeedbackSubmitState> {
 
   @override
   FeedbackSubmitState build() {
-    _repo = _buildRepository();
+    _repo = _buildRepository(ref);
     return const FeedbackSubmitState();
   }
 

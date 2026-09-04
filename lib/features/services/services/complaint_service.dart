@@ -1,12 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:retrofit/retrofit.dart';
-import '../../../common/models/dio/api_client.dart';
+import '../../../core/network/dio_factory.dart';
 
 part 'complaint_service.g.dart';
 
 final complaintServiceProvider = Provider.autoDispose<ComplaintService>((ref) {
-  return ComplaintService(ApiClient.fromEnv().create());
+  return ComplaintService(ref.watch(dioProvider));
 });
 
 @RestApi()

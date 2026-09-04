@@ -1,12 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:retrofit/retrofit.dart';
-import '../../../common/models/dio/api_client.dart';
+import '../../../core/network/dio_factory.dart';
 
 part 'tracking_service.g.dart';
 
 final trackingServiceProvider = Provider.autoDispose<TrackingService>((ref) {
-  return TrackingService(ApiClient.fromEnv().create());
+  return TrackingService(ref.watch(dioProvider));
 });
 
 @RestApi()

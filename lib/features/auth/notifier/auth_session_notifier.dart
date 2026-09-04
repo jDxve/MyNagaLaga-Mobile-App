@@ -1,10 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/network/dio_factory.dart';
 import '../models/auth_models.dart';
 
 class AuthSessionNotifier extends Notifier<AuthSessionState> {
-  final _storage = const FlutterSecureStorage();
+  // Reads the same shared instance dioProvider's AuthInterceptor uses, so a
+  // deleteAll() from a 401 and a read/write here always hit the same store.
+  FlutterSecureStorage get _storage => ref.watch(secureStorageProvider);
 
   static const _tokenKey = 'access_token';
   static const _emailKey = 'user_email';

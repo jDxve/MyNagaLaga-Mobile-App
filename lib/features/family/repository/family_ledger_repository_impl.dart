@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/network/app_exception.dart';
 import '../../auth/notifier/auth_session_notifier.dart';
 import '../models/household_model.dart';
 import '../services/family_ledger_service.dart';
@@ -17,6 +18,11 @@ class FamilyLedgerRepositoryImpl implements FamilyLedgerRepository {
 
   FamilyLedgerRepositoryImpl(this._service, this._ref);
 
+  // Not using RepositoryGuard here: a 404 means "no household yet" and must
+  // return null rather than throw, which doesn't fit guard/guardThrow's
+  // generic try/catch shape. AppException is still used directly so the
+  // thrown errors display the same clean copy (via AppException.toString())
+  // as every other repository.
   @override
   Future<Household?> fetchMyHousehold() async {
     if (_cachedHousehold != null) {
@@ -28,7 +34,7 @@ class FamilyLedgerRepositoryImpl implements FamilyLedgerRepository {
       final userId = authState.userId;
 
       if (userId == null || userId.isEmpty) {
-        throw Exception('User not authenticated. Please log in again.');
+        throw const AppException(message: 'User not authenticated. Please log in again.');
       }
 
       final response = await _service.getMyHousehold(userId);
@@ -44,13 +50,17 @@ class FamilyLedgerRepositoryImpl implements FamilyLedgerRepository {
       return null;
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        throw Exception('Authentication required. Please log in again.');
+        throw const AppException(
+          statusCode: 401,
+          message: 'Authentication required. Please log in again.',
+        );
       } else if (e.response?.statusCode == 404) {
         return null;
       }
-      throw Exception('Network error: ${e.message}');
+      throw AppException.fromDioException(e, fallbackMessage: 'Network error');
     } catch (e) {
-      throw Exception('Failed to fetch household: $e');
+      if (e is AppException) rethrow;
+      throw AppException(message: 'Failed to fetch household: $e');
     }
   }
 

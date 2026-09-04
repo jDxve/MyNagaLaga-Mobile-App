@@ -1,13 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:retrofit/retrofit.dart';
-import '../../../common/models/dio/api_client.dart';
+import '../../../core/network/dio_factory.dart';
 
 part 'user_info_service.g.dart';
 
 final userInfoProvider = Provider.autoDispose<UserInfoService>((ref) {
-  final apiClient = ApiClient.fromEnv();
-  final dio = apiClient.create();
+  final dio = ref.watch(dioProvider);
   return UserInfoService(dio);
 });
 

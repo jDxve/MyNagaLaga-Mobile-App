@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../common/models/dio/api_client.dart';
+import '../../../core/network/dio_factory.dart';
 import '../../../core/network/data_state.dart';
 import '../models/service_request_model.dart';
 import '../repository/service_request_repository.dart';
@@ -17,7 +17,7 @@ class CaseTypesNotifier extends Notifier<DataState<List<CaseTypeModel>>> {
   @override
   DataState<List<CaseTypeModel>> build() {
     _repository = ServiceRequestRepositoryImpl(
-      service: ServiceRequestService(ApiClient.fromEnv().create()),
+      service: ServiceRequestService(ref.watch(dioProvider)),
     );
     Future.microtask(() => fetchCaseTypes());
     return const DataState.loading();
@@ -52,7 +52,7 @@ class SubmitServiceRequestNotifier
   @override
   DataState<ServiceRequestResponseModel> build() {
     _repository = ServiceRequestRepositoryImpl(
-      service: ServiceRequestService(ApiClient.fromEnv().create()),
+      service: ServiceRequestService(ref.watch(dioProvider)),
     );
     return const DataState.started();
   }
@@ -83,7 +83,7 @@ class MyServiceRequestsNotifier
   @override
   DataState<List<ServiceRequestResponseModel>> build() {
     _repository = ServiceRequestRepositoryImpl(
-      service: ServiceRequestService(ApiClient.fromEnv().create()),
+      service: ServiceRequestService(ref.watch(dioProvider)),
     );
     return const DataState.started();
   }

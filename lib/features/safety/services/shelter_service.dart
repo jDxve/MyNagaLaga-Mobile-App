@@ -1,11 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:retrofit/retrofit.dart';
-import '../../../common/models/dio/api_client.dart';
+import '../../../core/network/dio_factory.dart';
 part 'shelter_service.g.dart';
 
 final shelterServiceProvider = Provider.autoDispose<ShelterService>((ref) {
-  final dio = ApiClient.fromEnv().create();
+  final dio = ref.watch(dioProvider);
   return ShelterService(dio);
 });
 

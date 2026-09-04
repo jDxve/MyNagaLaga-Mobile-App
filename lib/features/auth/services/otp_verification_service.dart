@@ -1,15 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:retrofit/retrofit.dart';
-import '../../../common/models/dio/api_client.dart';
+import '../../../core/network/dio_factory.dart';
 import '../models/otp_model.dart';
 
 part 'otp_verification_service.g.dart';
 
 final otpVerificationServiceProvider =
     Provider.autoDispose<OtpVerificationService>((ref) {
-  final apiClient = ApiClient.fromEnv();
-  final dio = apiClient.create();
+  final dio = ref.watch(dioProvider);
   return OtpVerificationService(dio);
 });
 

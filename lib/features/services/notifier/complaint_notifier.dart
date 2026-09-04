@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../common/models/dio/api_client.dart';
+import '../../../core/network/dio_factory.dart';
 import '../../../core/network/data_state.dart';
 import '../models/complaint_model.dart';
 import '../repository/complaint_repository_impl.dart';
@@ -14,7 +14,7 @@ final complaintTypesNotifierProvider =
 class ComplaintTypesNotifier
     extends Notifier<DataState<List<ComplaintTypeModel>>> {
   late final _repository = ComplaintRepositoryImpl(
-    service: ComplaintService(ApiClient.fromEnv().create()),
+    service: ComplaintService(ref.watch(dioProvider)),
   );
 
   @override
@@ -43,7 +43,7 @@ final submitComplaintNotifierProvider =
 class SubmitComplaintNotifier
     extends Notifier<DataState<ComplaintResponseModel>> {
   late final _repository = ComplaintRepositoryImpl(
-    service: ComplaintService(ApiClient.fromEnv().create()),
+    service: ComplaintService(ref.watch(dioProvider)),
   );
 
   @override

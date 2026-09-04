@@ -2,12 +2,12 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:retrofit/retrofit.dart';
-import '../../../common/models/dio/api_client.dart';
+import '../../../core/network/dio_factory.dart';
 
 part 'posting_service.g.dart';
 
 final postingServiceProvider = Provider.autoDispose<PostingService>((ref) {
-  final dio = ApiClient.fromEnv().create();
+  final dio = ref.watch(dioProvider);
   return PostingService(dio);
 });
 

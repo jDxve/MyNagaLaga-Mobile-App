@@ -1,14 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:retrofit/retrofit.dart';
-import '../../../common/models/dio/api_client.dart';
+import '../../../core/network/dio_factory.dart';
 import '../models/auth_models.dart';
 
 part 'auth_service.g.dart';
 
 final authServiceProvider = Provider.autoDispose<AuthService>((ref) {
-  final apiClient = ApiClient.fromEnv();
-  final dio = apiClient.create();
+  final dio = ref.watch(dioProvider);
   return AuthService(dio);
 });
 

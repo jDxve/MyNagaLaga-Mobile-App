@@ -53,18 +53,6 @@ class AppException implements Exception {
       );
     }
 
-    if (statusCode == 400 && data is Map<String, dynamic> && data['details'] is List) {
-      final issues = (data['details'] as List)
-          .map((issue) => issue.toString())
-          .toList(growable: false);
-      return AppException(
-        statusCode: statusCode,
-        type: AppErrorType.validation,
-        validationIssues: issues,
-        message: _extractServerMessage(data),
-      );
-    }
-
     if (statusCode != null && statusCode >= 500) {
       return AppException(
         statusCode: statusCode,
@@ -85,7 +73,12 @@ class AppException implements Exception {
   }
 
   static String? _extractServerMessage(dynamic data) {
+    if (data is String && data.isNotEmpty) return data;
     if (data is! Map<String, dynamic>) return null;
+    // Server error bodies in this API use either `message` or `error` as
+    // the human-readable field, inconsistently across endpoints.
+    final direct = data['error'] ?? data['message'];
+    if (direct is String && direct.isNotEmpty) return direct;
     try {
       return ErrorResponse.fromMap(data).message;
     } catch (_) {
@@ -108,4 +101,11 @@ class AppException implements Exception {
       AppErrorType.unknown => fallback,
     };
   }
+
+  // Repositories that throw (via `RepositoryGuard.guardThrow`) are consumed
+  // by notifiers written as `catch (e) { state = DataState.error(error:
+  // e.toString()) }`. Overriding toString() to the same copy as toMessage()
+  // means those call sites keep working unchanged.
+  @override
+  String toString() => toMessage();
 }

@@ -3,44 +3,39 @@ import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import '../../../core/network/app_exception.dart';
 import '../../../core/network/data_state.dart';
+import '../../../core/network/repository_guard.dart';
 import '../models/service_request_model.dart';
 import '../services/service_request_service.dart';
 import 'service_request_repository.dart';
 
-class ServiceRequestRepositoryImpl implements ServiceRequestRepository {
+class ServiceRequestRepositoryImpl
+    with RepositoryGuard
+    implements ServiceRequestRepository {
   final ServiceRequestService _service;
 
   ServiceRequestRepositoryImpl({required ServiceRequestService service})
       : _service = service;
 
   @override
-  Future<DataState<List<CaseTypeModel>>> getCaseTypes() async {
-    try {
-      final response = await _service.getCaseTypes();
-      final raw = response.data;
+  Future<DataState<List<CaseTypeModel>>> getCaseTypes() => guard(() async {
+        final response = await _service.getCaseTypes();
+        final raw = response.data;
 
-      List<dynamic> typesJson;
+        List<dynamic> typesJson;
+        if (raw is List) {
+          typesJson = raw;
+        } else if (raw is Map<String, dynamic> && raw.containsKey('data')) {
+          typesJson = raw['data'] as List<dynamic>;
+        } else {
+          throw const AppException(message: 'Invalid response format');
+        }
 
-      if (raw is List) {
-        typesJson = raw;
-      } else if (raw is Map<String, dynamic> && raw.containsKey('data')) {
-        typesJson = raw['data'] as List<dynamic>;
-      } else {
-        return const DataState.error(error: 'Invalid response format');
-      }
-
-      final types = typesJson
-          .map((json) => CaseTypeModel.fromJson(json as Map<String, dynamic>))
-          .toList();
-
-      return DataState.success(data: types);
-    } on DioException catch (e) {
-      return DataState.error(error: _parseDioError(e) ?? 'Network error occurred');
-    } catch (e) {
-      return DataState.error(error: 'Unexpected error: $e');
-    }
-  }
+        return typesJson
+            .map((json) => CaseTypeModel.fromJson(json as Map<String, dynamic>))
+            .toList();
+      });
 
   Future<File?> _compressImage(String filePath) async {
     try {
@@ -68,60 +63,51 @@ class ServiceRequestRepositoryImpl implements ServiceRequestRepository {
   @override
   Future<DataState<ServiceRequestResponseModel>> submitServiceRequest(
     ServiceRequestModel request,
-  ) async {
-    try {
-      final formData = FormData();
+  ) =>
+      guard(() async {
+        final formData = FormData();
 
-      formData.fields.add(MapEntry('case_type_id', request.caseTypeId.toString()));
-      formData.fields.add(MapEntry('description', request.description));
-      formData.fields.add(MapEntry('is_anonymous', request.isAnonymous.toString()));
-      formData.fields.add(MapEntry('is_sensitive', request.isSensitive.toString()));
+        formData.fields.add(MapEntry('case_type_id', request.caseTypeId.toString()));
+        formData.fields.add(MapEntry('description', request.description));
+        formData.fields.add(MapEntry('is_anonymous', request.isAnonymous.toString()));
+        formData.fields.add(MapEntry('is_sensitive', request.isSensitive.toString()));
 
-      if (request.barangayId != null) {
-        formData.fields.add(MapEntry('barangay_id', request.barangayId.toString()));
-      }
-
-      if (request.badgeIds != null && request.badgeIds!.isNotEmpty) {
-        formData.fields.add(MapEntry('badge_ids', request.badgeIds.toString()));
-      }
-
-      if (request.filePaths != null && request.filePaths!.isNotEmpty) {
-        for (final filePath in request.filePaths!) {
-          final fileToUpload = await _compressImage(filePath);
-          if (fileToUpload == null || !await fileToUpload.exists()) continue;
-
-          final mimeType = lookupMimeType(fileToUpload.path) ?? 'image/jpeg';
-          final mimeTypeParts = mimeType.split('/');
-
-          formData.files.add(MapEntry(
-            'documents',
-            await MultipartFile.fromFile(
-              fileToUpload.path,
-              filename: fileToUpload.path.split('/').last,
-              contentType: MediaType(mimeTypeParts[0], mimeTypeParts[1]),
-            ),
-          ));
+        if (request.barangayId != null) {
+          formData.fields.add(MapEntry('barangay_id', request.barangayId.toString()));
         }
-      }
 
-      final response = await _service.submitServiceRequest(formData);
-      final raw = response.data;
+        if (request.badgeIds != null && request.badgeIds!.isNotEmpty) {
+          formData.fields.add(MapEntry('badge_ids', request.badgeIds.toString()));
+        }
 
-      if (raw['success'] != true) {
-        return DataState.error(
-          error: raw['error'] ?? raw['message'] ?? 'Failed to submit service request',
-        );
-      }
+        if (request.filePaths != null && request.filePaths!.isNotEmpty) {
+          for (final filePath in request.filePaths!) {
+            final fileToUpload = await _compressImage(filePath);
+            if (fileToUpload == null || !await fileToUpload.exists()) continue;
 
-      return DataState.success(
-        data: ServiceRequestResponseModel.fromJson(raw['data'] as Map<String, dynamic>),
-      );
-    } on DioException catch (e) {
-      return DataState.error(error: _parseDioError(e) ?? 'Network error occurred');
-    } catch (e) {
-      return DataState.error(error: 'Unexpected error: $e');
-    }
-  }
+            final mimeType = lookupMimeType(fileToUpload.path) ?? 'image/jpeg';
+            final mimeTypeParts = mimeType.split('/');
+
+            formData.files.add(MapEntry(
+              'documents',
+              await MultipartFile.fromFile(
+                fileToUpload.path,
+                filename: fileToUpload.path.split('/').last,
+                contentType: MediaType(mimeTypeParts[0], mimeTypeParts[1]),
+              ),
+            ));
+          }
+        }
+
+        final response = await _service.submitServiceRequest(formData);
+        final raw = response.data;
+
+        if (raw['success'] != true) {
+          throw AppException(message: raw['error'] ?? raw['message'] ?? 'Failed to submit service request');
+        }
+
+        return ServiceRequestResponseModel.fromJson(raw['data'] as Map<String, dynamic>);
+      });
 
   @override
   Future<DataState<List<ServiceRequestResponseModel>>> getMyServiceRequests({
@@ -129,53 +115,29 @@ class ServiceRequestRepositoryImpl implements ServiceRequestRepository {
     String? search,
     int page = 1,
     int limit = 20,
-  }) async {
-    try {
-      final response = await _service.getMyServiceRequests(status, search, page, limit);
-      final raw = response.data;
+  }) =>
+      guard(() async {
+        final response = await _service.getMyServiceRequests(status, search, page, limit);
+        final raw = response.data;
 
-      if (raw['success'] != true) {
-        return DataState.error(error: raw['error'] ?? 'Failed to fetch service requests');
-      }
+        if (raw['success'] != true) {
+          throw AppException(message: raw['error'] ?? 'Failed to fetch service requests');
+        }
 
-      final requests = (raw['data'] as List<dynamic>)
-          .map((json) => ServiceRequestResponseModel.fromJson(json as Map<String, dynamic>))
-          .toList();
-
-      return DataState.success(data: requests);
-    } on DioException catch (e) {
-      return DataState.error(error: _parseDioError(e) ?? 'Network error occurred');
-    } catch (e) {
-      return DataState.error(error: 'Unexpected error: $e');
-    }
-  }
+        return (raw['data'] as List<dynamic>)
+            .map((json) => ServiceRequestResponseModel.fromJson(json as Map<String, dynamic>))
+            .toList();
+      });
 
   @override
-  Future<DataState<ServiceRequestResponseModel>> getServiceRequestById(String id) async {
-    try {
-      final response = await _service.getServiceRequestById(id);
-      final raw = response.data;
+  Future<DataState<ServiceRequestResponseModel>> getServiceRequestById(String id) => guard(() async {
+        final response = await _service.getServiceRequestById(id);
+        final raw = response.data;
 
-      if (raw['success'] != true) {
-        return DataState.error(error: raw['error'] ?? 'Failed to fetch service request');
-      }
+        if (raw['success'] != true) {
+          throw AppException(message: raw['error'] ?? 'Failed to fetch service request');
+        }
 
-      return DataState.success(
-        data: ServiceRequestResponseModel.fromJson(raw['data'] as Map<String, dynamic>),
-      );
-    } on DioException catch (e) {
-      return DataState.error(error: _parseDioError(e) ?? 'Network error occurred');
-    } catch (e) {
-      return DataState.error(error: 'Unexpected error: $e');
-    }
-  }
-
-  String? _parseDioError(DioException e) {
-    final data = e.response?.data;
-    if (data is Map<String, dynamic>) {
-      return data['error'] as String? ?? data['message'] as String?;
-    }
-    if (data is String) return data;
-    return e.message;
-  }
+        return ServiceRequestResponseModel.fromJson(raw['data'] as Map<String, dynamic>);
+      });
 }
