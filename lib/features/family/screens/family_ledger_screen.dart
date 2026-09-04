@@ -6,7 +6,7 @@ import '../../../common/resources/dimensions.dart';
 import '../components/household_info_card.dart';
 import '../components/empty_state_widget.dart';
 import '../components/family_registry_section.dart';
-import '../notitier/my_household_notifier.dart';
+import '../notifier/my_household_notifier.dart';
 
 class FamilyLedgerScreen extends ConsumerStatefulWidget {
   static const String routeName = '/family-ledger';

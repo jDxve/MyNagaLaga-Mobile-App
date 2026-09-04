@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../common/models/dio/data_state.dart';
 import '../models/shelter_data_model.dart';
-import '../repository/shelter_repository._impl.dart';
+import '../repository/shelter_repository_impl.dart';
 
 final sheltersNotifierProvider =
     NotifierProvider<SheltersNotifier, DataState<SheltersResponse>>(

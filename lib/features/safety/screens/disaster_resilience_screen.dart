@@ -4,11 +4,11 @@ import '../../../common/models/dio/data_state.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/widgets/search_input.dart';
-import '../compnents/ disaster_resilience_widgets.dart';
-import '../compnents/shelter_map.dart';
-import '../compnents/shelter_card.dart';
-import '../compnents/shelter_detail_sheet.dart';
-import '../compnents/shelter_map_fullpage.dart';
+import '../components/disaster_resilience_widgets.dart';
+import '../components/shelter_map.dart';
+import '../components/shelter_card.dart';
+import '../components/shelter_detail_sheet.dart';
+import '../components/shelter_map_fullpage.dart';
 import '../notifier/shelter_notifier.dart';
 import '../models/shelter_data_model.dart';
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
-import '../model/notification_model.dart';
+import '../models/notification_model.dart';
 
 class NotificationTile extends StatelessWidget {
   final NotificationModel notification;

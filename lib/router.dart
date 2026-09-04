@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:mynagalaga_mobile_app/features/auth/screens/login_screen.dart';
 import 'package:mynagalaga_mobile_app/features/auth/screens/signup_screen.dart';
 import 'package:mynagalaga_mobile_app/features/services/screens/track_services_screen.dart';
-import 'common/gaurd/auth_gaurd.dart';
+import 'common/navigation/auth_guard.dart';
 import 'features/account/screens/account_screen.dart';
 import 'features/family/screens/family_ledger_screen.dart';
-import 'features/notification/screen/notification_screen.dart';
+import 'features/notification/screens/notification_screen.dart';
 import 'features/safety/screens/disaster_resilience_screen.dart';
 
 import 'features/services/screens/program_screen.dart';

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../common/resources/colors.dart';
 import '../../../common/resources/dimensions.dart';
 import '../../../common/widgets/custom_app_bar.dart';
-import '../model/notification_model.dart';
+import '../models/notification_model.dart';
 import '../notifier/notification_notifier.dart';
 import '../components/notification_tile.dart';
 
