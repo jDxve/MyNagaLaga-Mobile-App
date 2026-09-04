@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mynagalaga_mobile_app/core/utils/launch_utils.dart';
 import 'package:mynagalaga_mobile_app/features/home/screens/home_screen.dart';
 import 'package:mynagalaga_mobile_app/features/auth/screens/login_screen.dart';
 import 'package:mynagalaga_mobile_app/features/auth/notifier/auth_session_notifier.dart';
@@ -42,8 +42,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       return;
     }
 
-    final prefs = await SharedPreferences.getInstance();
-    final isFirstInstall = prefs.getBool('isFirstInstall') ?? true;
+    final firstInstall = await isFirstInstall();
 
     if (!mounted || _hasNavigated) return;
 
@@ -60,8 +59,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
           transitionDuration: const Duration(milliseconds: 300),
         ),
       );
-    } else if (isFirstInstall) {
-      await prefs.setBool('isFirstInstall', false);
+    } else if (firstInstall) {
+      await markInstalled();
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
