@@ -5,6 +5,7 @@ import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
 import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
 import 'package:mynagalaga_mobile_app/features/family/components/household_info_card.dart';
 import 'package:mynagalaga_mobile_app/features/family/components/empty_state_widget.dart';
+import 'package:mynagalaga_mobile_app/features/family/components/family_ledger_header.dart';
 import 'package:mynagalaga_mobile_app/features/family/components/family_registry_section.dart';
 import 'package:mynagalaga_mobile_app/features/family/notifier/my_household_notifier.dart';
 
@@ -60,31 +61,7 @@ class _FamilyLedgerScreenState extends ConsumerState<FamilyLedgerScreen> {
                 children: [
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20.w),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        16.gapH,
-                        Text(
-                          'Family Ledger',
-                          style: TextStyle(
-                            fontSize: 24.f,
-                            fontWeight: FontWeight.w700,
-                            fontFamily: 'Segoe UI',
-                            color: AppColors.textlogo,
-                          ),
-                        ),
-                        4.gapH,
-                        Text(
-                          'View and manage your household members',
-                          style: TextStyle(
-                            fontSize: 14.f,
-                            fontWeight: FontWeight.w400,
-                            fontFamily: 'Segoe UI',
-                            color: AppColors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
+                    child: const FamilyLedgerHeader(),
                   ),
                   const Expanded(
                     child: EmptyStateWidget(
@@ -109,26 +86,7 @@ class _FamilyLedgerScreenState extends ConsumerState<FamilyLedgerScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      16.gapH,
-                      Text(
-                        'Family Ledger',
-                        style: TextStyle(
-                          fontSize: 24.f,
-                          fontWeight: FontWeight.w700,
-                          fontFamily: 'Segoe UI',
-                          color: AppColors.textlogo,
-                        ),
-                      ),
-                      4.gapH,
-                      Text(
-                        'View and manage your household members',
-                        style: TextStyle(
-                          fontSize: 14.f,
-                          fontWeight: FontWeight.w400,
-                          fontFamily: 'Segoe UI',
-                          color: AppColors.grey,
-                        ),
-                      ),
+                      const FamilyLedgerHeader(),
                       20.gapH,
                       HouseholdInfoCard(
                         householdCode: household.householdCode,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
 import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/confirm_dialog.dart';
 import 'package:mynagalaga_mobile_app/common/widgets/custom_app_bar.dart';
 import 'package:mynagalaga_mobile_app/features/notification/models/notification_model.dart';
 import 'package:mynagalaga_mobile_app/features/notification/notifier/notification_notifier.dart';
@@ -115,27 +116,14 @@ class NotificationScreen extends ConsumerWidget {
     }
   }
 
-  void _showClearDialog(BuildContext context, NotificationNotifier notifier) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Clear all notifications?'),
-        content: const Text('This will remove all notifications permanently.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              notifier.clearAll();
-              Navigator.pop(context);
-            },
-            child: Text('Clear', style: TextStyle(color: Colors.red[400])),
-          ),
-        ],
-      ),
+  Future<void> _showClearDialog(BuildContext context, NotificationNotifier notifier) async {
+    final confirmed = await showConfirmDialog(
+      context,
+      title: 'Clear all notifications?',
+      message: 'This will remove all notifications permanently.',
+      confirmText: 'Clear',
+      confirmColor: Colors.red[400],
     );
+    if (confirmed) notifier.clearAll();
   }
 }

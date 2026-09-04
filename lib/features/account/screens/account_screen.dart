@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mynagalaga_mobile_app/common/widgets/background_gradient.dart';
+import 'package:mynagalaga_mobile_app/common/widgets/confirm_dialog.dart';
 import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
-import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
 import 'package:mynagalaga_mobile_app/features/account/components/settings_tile.dart';
 import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
 import 'package:mynagalaga_mobile_app/features/account/notifier/user_info_notifier.dart';
@@ -26,47 +26,14 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
   }
 
   Future<void> _handleLogout() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(D.radiusLG),
-        ),
-        title: const Text(
-          'Log Out',
-          style: TextStyle(fontFamily: 'Segoe UI', fontWeight: FontWeight.bold),
-        ),
-        content: const Text(
-          'Are you sure you want to log out?',
-          style: TextStyle(fontFamily: 'Segoe UI'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(
-                fontFamily: 'Segoe UI',
-                color: AppColors.grey,
-              ),
-            ),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text(
-              'Log Out',
-              style: TextStyle(
-                fontFamily: 'Segoe UI',
-                color: AppColors.primary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
-      ),
+    final confirmed = await showConfirmDialog(
+      context,
+      title: 'Log Out',
+      message: 'Are you sure you want to log out?',
+      confirmText: 'Log Out',
     );
 
-    if (confirmed != true) return;
+    if (!confirmed) return;
 
     await ref.read(authSessionProvider.notifier).logout();
 
