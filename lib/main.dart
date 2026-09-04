@@ -1,17 +1,36 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'common/firebase/firebase_config.dart';
+import 'core/config/app_config.dart';
+import 'core/observability/error_reporter.dart';
 import 'features/welcome/screens/splash_screen.dart';
 import 'router.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-  await FirebaseConfig.initialize();
+  AppConfig.assertSecureBaseUrl();
 
   final container = ProviderContainer();
+  final reporter = container.read(errorReporterProvider);
+
+  // Two OS-level catch-alls installed before runApp so no uncaught error is
+  // invisible in production - neither substitutes the user-facing toast/
+  // ErrorView shown at the DataState edge, they exist so *we* see the
+  // failures too, not just the ones a repository routed through DataState.
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details); // keep the red screen in debug
+    reporter.reportFlutterError(details);
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    reporter.reportError(error, stack, context: 'PlatformDispatcher');
+    return true; // handled - don't let it crash silently
+  };
+
+  await FirebaseConfig.initialize();
   FirebaseConfig.setContainer(container);
 
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((_) {
