@@ -14,10 +14,10 @@ class TrackCasesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: AppColors.white,
-      appBar: const CustomAppBar(title: "Track Requests"),
-      body: const TrackingWidget(),
+      appBar: CustomAppBar(title: "Track Requests"),
+      body: TrackingWidget(),
     );
   }
 }

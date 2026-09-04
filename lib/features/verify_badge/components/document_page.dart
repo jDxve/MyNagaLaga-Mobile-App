@@ -398,9 +398,9 @@ class _DocumentPageState extends ConsumerState<DocumentPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             AppString.tipsForGoodCapture,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Segoe UI'),
+            style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Segoe UI'),
           ),
           const SizedBox(height: 12),
           _tipRow(AppString.tip1),

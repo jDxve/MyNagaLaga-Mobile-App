@@ -156,12 +156,12 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
     return Container(
       width: double.infinity,
       height: MediaQuery.of(context).size.height,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [AppColors.primary, Colors.white],
-          stops: const [0.0, 0.45],
+          stops: [0.0, 0.45],
         ),
       ),
       child: SafeArea(
@@ -212,7 +212,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                             child: TextInput(
                               controller: emailController,
                               hintText: 'Enter your email address',
-                              prefixIcon: Icon(
+                              prefixIcon: const Icon(
                                 Icons.email_outlined,
                                 color: AppColors.grey,
                               ),
@@ -234,7 +234,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                             child: TextInput(
                               controller: fullNameController,
                               hintText: 'Enter your full name',
-                              prefixIcon: Icon(
+                              prefixIcon: const Icon(
                                 Icons.person_outline,
                                 color: AppColors.grey,
                               ),
@@ -255,7 +255,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                             child: TextInput(
                               controller: addressController,
                               hintText: 'Enter complete address',
-                              prefixIcon: Icon(
+                              prefixIcon: const Icon(
                                 Icons.location_on_outlined,
                                 color: AppColors.grey,
                               ),
@@ -276,7 +276,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                             child: TextInput(
                               controller: phoneController,
                               hintText: 'Enter phone number',
-                              prefixIcon: Icon(
+                              prefixIcon: const Icon(
                                 Icons.phone_outlined,
                                 color: AppColors.grey,
                               ),

@@ -250,7 +250,7 @@ class ShelterMapState extends State<ShelterMap> with OSMMixinObserver {
         _userLocation!,
         markerIcon: MarkerIcon(
           assetMarker: AssetMarker(
-            image: AssetImage(Assets.currentLoc),
+            image: const AssetImage(Assets.currentLoc),
             scaleAssetImage: 1.5,
           ),
         ),

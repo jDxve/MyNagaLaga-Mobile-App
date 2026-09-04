@@ -319,7 +319,7 @@ class ShelterDetailsSheet extends StatelessWidget {
               bgColor: AppColors.lightPurple,
               iconColor: AppColors.darkPurple,
             ),
-            _VulnerableTile(
+            const _VulnerableTile(
               icon: Icons.pregnant_woman,
               count: 0,
               label: 'Pregnant',

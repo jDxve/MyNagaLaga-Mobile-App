@@ -66,11 +66,11 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     16.gapH,
-                    Row(
+                    const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         ServicesHeader(), // remove onNotificationTap param
-                        const CircularNotifButton(), // ✅
+                        CircularNotifButton(), // ✅
                       ],
                     ),
                     20.gapH,
@@ -80,7 +80,7 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
                       onFilterTap: _handleFilterTap,
                     ),
                     24.gapH,
-                    FeaturedProgramSection(),
+                    const FeaturedProgramSection(),
                     24.gapH,
                     ServicesSection(
                       onRequestServicesTap: _handleRequestServicesTap,

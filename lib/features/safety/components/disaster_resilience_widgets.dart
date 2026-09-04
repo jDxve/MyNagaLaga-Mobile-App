@@ -42,7 +42,7 @@ class DrEmptyState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.home_work_outlined, size: 64, color: AppColors.grey),
+          const Icon(Icons.home_work_outlined, size: 64, color: AppColors.grey),
           16.gapH,
           Text(
             'No evacuation centers available',
@@ -68,7 +68,7 @@ class DrErrorState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: Colors.red),
+            const Icon(Icons.error_outline, size: 64, color: Colors.red),
             16.gapH,
             Text(
               'Failed to load evacuation centers',
@@ -895,7 +895,7 @@ class _ShelterSheetItem extends StatelessWidget {
                           color: AppColors.primary,
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: Text(
+                        child: const Text(
                           'Assigned',
                           style: TextStyle(
                             fontSize: 9.5,

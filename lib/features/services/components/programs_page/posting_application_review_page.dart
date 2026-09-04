@@ -114,7 +114,7 @@ class _PostingApplicationReviewPageState
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: CustomAppBar(title: 'Review Application'),
+      appBar: const CustomAppBar(title: 'Review Application'),
       bottomNavigationBar: PostingBottomBar(
         label: 'Submit Application',
         isLoading: isSubmitting,
@@ -128,9 +128,9 @@ class _PostingApplicationReviewPageState
 
           // Auto-filled summary (shown after submit returns, before navigation)
           if (hasPreFilledText) ...[
-            PostingSectionHeader(title: 'Auto-filled from Your Badges'),
+            const PostingSectionHeader(title: 'Auto-filled from Your Badges'),
             8.gapH,
-            PostingSubtitleText(
+            const PostingSubtitleText(
               text:
                   'The following information was pre-filled from your verified badges.',
             ),
@@ -144,9 +144,9 @@ class _PostingApplicationReviewPageState
             24.gapH,
           ],
           if (hasAutoAttached) ...[
-            PostingSectionHeader(title: 'Auto-attached Documents'),
+            const PostingSectionHeader(title: 'Auto-attached Documents'),
             8.gapH,
-            PostingSubtitleText(
+            const PostingSubtitleText(
               text:
                   'The following documents were automatically attached from your badge records.',
             ),

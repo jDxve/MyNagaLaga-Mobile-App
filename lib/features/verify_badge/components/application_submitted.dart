@@ -75,7 +75,7 @@ class _ApplicationSubmittedWidgetState
                 Container(
                   width: 80.w,
                   height: 80.w,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: AppColors.primary,
                     shape: BoxShape.circle,
                   ),
@@ -180,7 +180,7 @@ class _ApplicationSubmittedWidgetState
             maxBlastForce: 20,
             minBlastForce: 5,
             gravity: 0.3,
-            colors: [
+            colors: const [
               AppColors.primary,
               AppColors.secondary,
               Colors.green,

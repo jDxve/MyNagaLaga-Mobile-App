@@ -273,7 +273,7 @@ class _ConsentCheckbox extends StatelessWidget {
                       child: Container(
                         height: 8.h,
                         width: 8.w,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           shape: BoxShape.circle,
                           color: AppColors.primary,
                         ),
@@ -291,7 +291,7 @@ class _ConsentCheckbox extends StatelessWidget {
                     height: 1.5,
                     fontFamily: 'Segoe UI',
                   ),
-                  children: [
+                  children: const [
                     TextSpan(text: AppString.consentText1),
                     TextSpan(
                       text: AppString.consentText2,

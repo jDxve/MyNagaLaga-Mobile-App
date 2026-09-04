@@ -398,7 +398,7 @@ class _ComplaintPageState extends ConsumerState<ComplaintPage> {
       ),
       child: Row(
         children: [
-          Icon(Icons.info_outline, size: 18, color: AppColors.primary),
+          const Icon(Icons.info_outline, size: 18, color: AppColors.primary),
           8.gapW,
           Expanded(
             child: Text(

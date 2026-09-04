@@ -40,7 +40,7 @@ Widget searchInput({
       border: baseBorder,
       enabledBorder: baseBorder,
       focusedBorder: baseBorder.copyWith(
-        borderSide: BorderSide(color: AppColors.primary, width: 1.5),
+        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
       ),
     ),
   );

@@ -126,12 +126,12 @@ class _LoginFormState extends ConsumerState<LogInForm> {
     return Container(
       width: double.infinity,
       height: MediaQuery.of(context).size.height,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [AppColors.primary, Colors.white],
-          stops: const [0.0, 0.45],
+          stops: [0.0, 0.45],
         ),
       ),
       child: SafeArea(
@@ -177,7 +177,7 @@ class _LoginFormState extends ConsumerState<LogInForm> {
                   child: TextInput(
                     controller: emailController,
                     hintText: 'Enter your email address',
-                    prefixIcon: Icon(Icons.email_outlined, color: AppColors.grey),
+                    prefixIcon: const Icon(Icons.email_outlined, color: AppColors.grey),
                     keyboardType: TextInputType.emailAddress,
                   ),
                 ),

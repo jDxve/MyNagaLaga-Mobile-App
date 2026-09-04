@@ -169,7 +169,7 @@ class _StudentFormState extends State<StudentForm> {
           hintText: 'Enter your school ID number',
         ),
         24.gapH,
-        BenefitsCard(
+        const BenefitsCard(
           title: AppString.studentBenefitsTitle,
           benefits: [
             AppString.studentBenefit1,

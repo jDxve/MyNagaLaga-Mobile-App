@@ -98,7 +98,7 @@ class _PwdFormState extends State<PwdForm> {
           items: disabilityTypes, // Display with spaces
         ),
         24.gapH,
-        BenefitsCard(
+        const BenefitsCard(
           title: AppString.pwdBenefitsTitle,
           benefits: [
             AppString.pwdBenefit1,

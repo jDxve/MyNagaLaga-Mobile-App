@@ -101,7 +101,7 @@ class _PostingApplicationSuccessPageState
                     Container(
                       width: 56.w,
                       height: 56.w,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: AppColors.primary,
                         shape: BoxShape.circle,
                       ),

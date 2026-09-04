@@ -275,7 +275,7 @@ class _PostingItem extends StatelessWidget {
                           width: 3,
                           height: 3,
                           margin: EdgeInsets.symmetric(horizontal: 6.w),
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: AppColors.grey,
                             shape: BoxShape.circle,
                           ),

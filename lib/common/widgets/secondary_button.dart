@@ -51,7 +51,7 @@ class SecondaryButton extends StatelessWidget {
                   ? SizedBox(
                       height: 20.h,
                       width: 20.w,
-                      child: CircularProgressIndicator(
+                      child: const CircularProgressIndicator(
                         strokeWidth: 2,
                         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
@@ -111,7 +111,7 @@ class SecondaryButton extends StatelessWidget {
                   ? SizedBox(
                       height: 20.h,
                       width: 20.w,
-                      child: CircularProgressIndicator(
+                      child: const CircularProgressIndicator(
                         strokeWidth: 2,
                         valueColor: AlwaysStoppedAnimation<Color>(AppColors.grey),
                       ),

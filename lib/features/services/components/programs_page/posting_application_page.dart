@@ -274,7 +274,7 @@ class _PostingApplicationPageState
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: CustomAppBar(title: 'Apply for Assistance'),
+      appBar: const CustomAppBar(title: 'Apply for Assistance'),
       bottomNavigationBar: PostingBottomBar(
         label: 'Review Application',
         onSubmit: _goToReview,
@@ -286,7 +286,7 @@ class _PostingApplicationPageState
           28.gapH,
 
           if (widget.posting.requiredBadges.isNotEmpty) ...[
-            PostingSectionHeader(title: 'Your Eligible Badge'),
+            const PostingSectionHeader(title: 'Your Eligible Badge'),
             8.gapH,
             PostingSubtitleText(
               text: isPrefilling
@@ -311,9 +311,9 @@ class _PostingApplicationPageState
           ],
 
           if (optionalBadges.isNotEmpty) ...[
-            PostingSectionHeader(title: 'Attach Additional Badges'),
+            const PostingSectionHeader(title: 'Attach Additional Badges'),
             8.gapH,
-            PostingSubtitleText(
+            const PostingSubtitleText(
               text: 'Select more badges to auto-fill additional fields.',
             ),
             16.gapH,
@@ -334,7 +334,7 @@ class _PostingApplicationPageState
             24.gapH,
           ],
 
-          PostingSectionHeader(title: 'Reason for Request'),
+          const PostingSectionHeader(title: 'Reason for Request'),
           8.gapH,
           TextInput(
             controller: _reasonController,
@@ -349,7 +349,7 @@ class _PostingApplicationPageState
           24.gapH,
 
           if (widget.posting.requirements.isNotEmpty) ...[
-            PostingSectionHeader(title: 'Requirements'),
+            const PostingSectionHeader(title: 'Requirements'),
             8.gapH,
             PostingSubtitleText(
               text: isPrefilling
@@ -421,7 +421,7 @@ class _BadgeTile extends StatelessWidget {
                 child: SizedBox(
                   width: 14.w,
                   height: 14.w,
-                  child: CircularProgressIndicator(
+                  child: const CircularProgressIndicator(
                     strokeWidth: 2,
                     color: AppColors.primary,
                   ),

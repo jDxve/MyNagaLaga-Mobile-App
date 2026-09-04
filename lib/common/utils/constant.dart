@@ -32,7 +32,7 @@ class Constant {
     longitude: 123.1948,
   );
   
-  static final nagaBoundingBox = BoundingBox(
+  static final nagaBoundingBox = const BoundingBox(
     north: 14.5,
     south: 12.0,
     east: 124.5,

@@ -51,7 +51,7 @@ class ShelterCard extends StatelessWidget {
         Expanded(
           child: Text(
             shelter.name,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: AppColors.black,
@@ -86,12 +86,12 @@ class ShelterCard extends StatelessWidget {
   Widget _buildInfoRow() {
     return Row(
       children: [
-        Icon(Icons.location_on_outlined, size: 16, color: AppColors.grey),
+        const Icon(Icons.location_on_outlined, size: 16, color: AppColors.grey),
         4.gapW,
         Expanded(
           child: Text(
             shelter.address,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 13,
               color: AppColors.grey,
             ),
@@ -101,11 +101,11 @@ class ShelterCard extends StatelessWidget {
         ),
         if (distanceInKm != null) ...[
           12.gapW,
-          Icon(Icons.navigation, size: 16, color: AppColors.primary),
+          const Icon(Icons.navigation, size: 16, color: AppColors.primary),
           4.gapW,
           Text(
             DistanceCalculator.formatDistance(distanceInKm!),
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
               color: AppColors.primary,
@@ -125,7 +125,7 @@ class ShelterCard extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
+            const Text(
               'Capacity',
               style: TextStyle(
                 fontSize: 12,
@@ -134,7 +134,7 @@ class ShelterCard extends StatelessWidget {
             ),
             Text(
               shelter.capacity,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: AppColors.black,

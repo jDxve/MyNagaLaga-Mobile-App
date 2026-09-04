@@ -224,7 +224,7 @@ class _ServiceRequestPageState extends ConsumerState<ServiceRequestPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.login, size: 80, color: AppColors.grey),
+            const Icon(Icons.login, size: 80, color: AppColors.grey),
             20.gapH,
             Text(
               'Login Required',

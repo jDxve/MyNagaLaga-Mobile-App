@@ -107,7 +107,7 @@ class _IndigentFormState extends State<IndigentForm> {
           ],
         ),
         24.gapH,
-        BenefitsCard(
+        const BenefitsCard(
           title: AppString.indigentBenefitsTitle,
           benefits: [
             AppString.indigentBenefit1,

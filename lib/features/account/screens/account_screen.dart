@@ -43,7 +43,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(
+            child: const Text(
               'Cancel',
               style: TextStyle(
                 fontFamily: 'Segoe UI',
@@ -53,7 +53,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text(
+            child: const Text(
               'Log Out',
               style: TextStyle(
                 fontFamily: 'Segoe UI',

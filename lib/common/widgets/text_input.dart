@@ -95,7 +95,7 @@ class TextInput extends StatelessWidget {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(D.radiusLG),
-            borderSide: BorderSide(
+            borderSide: const BorderSide(
               color: AppColors.primary,
               width: 1,
             ),

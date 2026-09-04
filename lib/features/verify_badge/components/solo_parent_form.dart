@@ -99,7 +99,7 @@ class _SoloParentFormState extends State<SoloParentForm> {
           ],
         ),
         24.gapH,
-        BenefitsCard(
+        const BenefitsCard(
           title: AppString.soloParentBenefitsTitle,
           benefits: [
             AppString.soloParentBenefit1,

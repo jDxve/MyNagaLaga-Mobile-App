@@ -57,7 +57,7 @@ class _SeniorCitizenFormState extends State<SeniorCitizenForm> {
           ),
         ),
         24.gapH,
-        BenefitsCard(
+        const BenefitsCard(
           title: AppString.seniorCitizenBenefitsTitle,
           benefits: [
             AppString.seniorBenefit1,

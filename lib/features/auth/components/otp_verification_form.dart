@@ -241,12 +241,12 @@ class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
       body: Container(
         width: double.infinity,
         height: MediaQuery.of(context).size.height,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [AppColors.primary, Colors.white],
-            stops: const [0.0, 0.45],
+            stops: [0.0, 0.45],
           ),
         ),
         child: SafeArea(
