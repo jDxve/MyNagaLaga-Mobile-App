@@ -4,8 +4,8 @@ import 'package:mynagalaga_mobile_app/common/resources/colors.dart';
 import 'package:mynagalaga_mobile_app/common/resources/dimensions.dart';
 import 'package:mynagalaga_mobile_app/common/widgets/custom_app_bar.dart';
 import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
+import 'package:mynagalaga_mobile_app/features/services/components/posting_list_item.dart';
 import 'package:mynagalaga_mobile_app/features/services/components/programs_page/posting_detailed_page.dart';
-import 'package:mynagalaga_mobile_app/features/services/models/welfare_program_model.dart';
 import 'package:mynagalaga_mobile_app/features/services/notifier/welfare_program_notifier.dart';
 
 class ProgramScreenArgs {
@@ -43,16 +43,6 @@ class _ProgramScreenState extends ConsumerState<ProgramScreen> {
           .read(welfarePostingsNotifierProvider.notifier)
           .fetchPostingsByProgramName(widget.args.programName);
     });
-  }
-
-  Map<String, List<WelfarePostingModel>> _groupByService(
-      List<WelfarePostingModel> postings) {
-    final map = <String, List<WelfarePostingModel>>{};
-    for (final p in postings) {
-      final key = p.serviceName ?? 'Other';
-      map.putIfAbsent(key, () => []).add(p);
-    }
-    return map;
   }
 
   @override
@@ -110,7 +100,7 @@ class _ProgramScreenState extends ConsumerState<ProgramScreen> {
                   );
                 }
 
-                final grouped = _groupByService(postings);
+                final grouped = groupPostingsByService(postings);
                 final serviceNames = grouped.keys.toList();
 
                 return ListView.builder(
@@ -157,7 +147,7 @@ class _ProgramScreenState extends ConsumerState<ProgramScreen> {
                             padding: EdgeInsets.only(
                                 bottom:
                                     i < sectionPostings.length - 1 ? 10.h : 0),
-                            child: _PostingItem(
+                            child: PostingListItem(
                               posting: posting,
                               onTap: () => Navigator.push(
                                 context,
@@ -177,152 +167,6 @@ class _ProgramScreenState extends ConsumerState<ProgramScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _PostingItem extends StatelessWidget {
-  final WelfarePostingModel posting;
-  final VoidCallback? onTap;
-
-  const _PostingItem({required this.posting, this.onTap});
-
-  bool get _isUrgent {
-    if (posting.endAt == null) return false;
-    return posting.endAt!.difference(DateTime.now()).inDays <= 7;
-  }
-
-  String get _daysLeft {
-    if (posting.endAt == null) return '';
-    final diff = posting.endAt!.difference(DateTime.now()).inDays;
-    if (diff <= 0) return 'Ends today';
-    if (diff == 1) return '1 day left';
-    return '$diff days left';
-  }
-
-  String get _slotsText {
-    if (posting.slotsRemaining == null) return '';
-    if (posting.slotsRemaining! <= 0) return 'Full';
-    return '${posting.slotsRemaining} slots left';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(D.radiusLG),
-      child: Container(
-        padding: EdgeInsets.all(14.w),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(D.radiusLG),
-          border: Border.all(
-            color: _isUrgent
-                ? AppColors.red.withOpacity(0.25)
-                : AppColors.grey.withOpacity(0.2),
-            width: 1,
-          ),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    posting.title,
-                    style: TextStyle(
-                      fontSize: D.textBase,
-                      fontWeight: D.semiBold,
-                      color: AppColors.black,
-                    ),
-                  ),
-                  if (posting.description != null) ...[
-                    4.gapH,
-                    Text(
-                      posting.description!,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: D.textSM,
-                        color: AppColors.grey,
-                      ),
-                    ),
-                  ],
-                  8.gapH,
-                  Row(
-                    children: [
-                      if (_daysLeft.isNotEmpty) ...[
-                        Icon(
-                          Icons.access_time_rounded,
-                          size: 12.w,
-                          color: _isUrgent ? AppColors.red : AppColors.grey,
-                        ),
-                        4.gapW,
-                        Text(
-                          _daysLeft,
-                          style: TextStyle(
-                            fontSize: D.textXS,
-                            color: _isUrgent ? AppColors.red : AppColors.grey,
-                            fontWeight: _isUrgent ? D.semiBold : D.regular,
-                          ),
-                        ),
-                      ],
-                      if (_slotsText.isNotEmpty && _daysLeft.isNotEmpty)
-                        Container(
-                          width: 3,
-                          height: 3,
-                          margin: EdgeInsets.symmetric(horizontal: 6.w),
-                          decoration: const BoxDecoration(
-                            color: AppColors.grey,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                      if (_slotsText.isNotEmpty) ...[
-                        Icon(
-                          Icons.people_outline_rounded,
-                          size: 12.w,
-                          color: AppColors.grey,
-                        ),
-                        4.gapW,
-                        Text(
-                          _slotsText,
-                          style: TextStyle(
-                            fontSize: D.textXS,
-                            color: AppColors.grey,
-                          ),
-                        ),
-                      ],
-                      if (_isUrgent) ...[
-                        const Spacer(),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 8.w, vertical: 2.h),
-                          decoration: BoxDecoration(
-                            color: AppColors.lightPink,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            'Urgent',
-                            style: TextStyle(
-                              fontSize: D.textXS,
-                              fontWeight: D.semiBold,
-                              color: AppColors.red,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            12.gapW,
-            Icon(Icons.chevron_right, color: AppColors.grey, size: 22.w),
-          ],
-        ),
       ),
     );
   }

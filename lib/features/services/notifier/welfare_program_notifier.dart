@@ -3,6 +3,20 @@ import 'package:mynagalaga_mobile_app/core/network/data_state.dart';
 import 'package:mynagalaga_mobile_app/features/services/models/welfare_program_model.dart';
 import 'package:mynagalaga_mobile_app/features/services/repository/welfare_program_repository_impl.dart';
 
+/// Groups postings by service name for display, preserving each service's
+/// first-seen order. Pure data transformation, kept next to the model it
+/// operates on rather than inline in a screen's build().
+Map<String, List<WelfarePostingModel>> groupPostingsByService(
+  List<WelfarePostingModel> postings,
+) {
+  final map = <String, List<WelfarePostingModel>>{};
+  for (final posting in postings) {
+    final key = posting.serviceName ?? 'Other';
+    map.putIfAbsent(key, () => []).add(posting);
+  }
+  return map;
+}
+
 final welfareProgramsNotifierProvider = NotifierProvider<
     WelfareProgramsNotifier, DataState<List<WelfareProgramModel>>>(
   WelfareProgramsNotifier.new,
