@@ -17,6 +17,7 @@ import 'package:mynagalaga_mobile_app/features/verify_badge/components/previous_
 import 'package:mynagalaga_mobile_app/features/verify_badge/components/review_page.dart';
 import 'package:mynagalaga_mobile_app/features/verify_badge/components/select_badges.dart';
 import 'package:mynagalaga_mobile_app/features/verify_badge/components/top_verify.dart';
+import 'package:mynagalaga_mobile_app/features/verify_badge/models/badge_request_model.dart';
 import 'package:mynagalaga_mobile_app/features/verify_badge/models/badge_type_model.dart';
 
 class VerifyBadgeScreen extends ConsumerStatefulWidget {
@@ -33,7 +34,6 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
   bool _isFormValid = false;
   bool _isConsentGiven = false;
   VoidCallback? _validationCallback;
-  String? _generatedReferenceNumber;
   bool _isSubmitting = false;
 
   final _fullNameController = TextEditingController();
@@ -55,6 +55,13 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
 
   bool get _isCitizen => _selectedBadge?.badgeKey == 'citizen';
   int get _totalSteps => _isCitizen ? 4 : 6;
+
+  /// Read directly from the notifier's success state rather than copying it
+  /// out into a local field via a ref.listen side effect.
+  String? get _referenceNumber {
+    final state = ref.watch(badgeRequestNotifierProvider);
+    return state is Success<BadgeRequestData> ? state.data.badgeRequestCode : null;
+  }
 
   @override
   void initState() {
@@ -113,93 +120,33 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
   }
 
   Future<void> _submitApplication() async {
-  if (_selectedBadge == null || _isSubmitting) return;
+    if (_selectedBadge == null || _isSubmitting) return;
 
-  // Validate gender
-  if (_selectedGender == null || _selectedGender!.isEmpty) {
-    showErrorModal(
-      context: context,
-      title: 'Gender Required',
-      description: 'Please select your gender before submitting.',
-      icon: Icons.person_outline,
-      iconColor: Colors.orange,
-      buttonText: AppString.ok,
+    setState(() => _isSubmitting = true);
+
+    // Raw values only — format conversion, income sanitization, and
+    // required-field validation are the notifier's job (see
+    // BadgeRequestNotifier.submit), not the screen's.
+    await ref.read(badgeRequestNotifierProvider.notifier).submit(
+      badgeTypeId: _selectedBadge!.id,
+      fullName: _fullNameController.text,
+      birthdate: _dateOfBirthController.text,
+      gender: _selectedGender ?? '',
+      homeAddress: _addressController.text,
+      contactNumber: _phoneController.text,
+      typeOfId: _selectedIdType ?? '',
+      existingSeniorCitizenId: _existingIdController.text,
+      typeOfDisability: _typeOfDisabilityController.text,
+      numberOfDependents: _numberOfDependentsController.text,
+      estimatedMonthlyHouseholdIncome: _monthlyIncomeController.text,
+      schoolName: _schoolNameController.text,
+      educationLevel: _educationLevelController.text,
+      yearOrGradeLevel: _yearGradeController.text,
+      schoolIdNumber: _schoolIdController.text,
+      uploadedFiles: _uploadedFiles,
     );
-    return;
   }
 
-  // Validate ID type
-  final selectedId = _selectedIdType ?? '';
-  if (selectedId.isEmpty) {
-    showErrorModal(
-      context: context,
-      title: AppString.idTypeNotSelectedTitle,
-      description: AppString.idTypeNotSelectedDescription,
-      icon: Icons.badge_outlined,
-      iconColor: Colors.orange,
-      buttonText: AppString.ok,
-    );
-    return;
-  }
-
-  // Validate birthdate
-  if (_dateOfBirthController.text.isEmpty) {
-    showErrorModal(
-      context: context,
-      title: 'Birthdate Required',
-      description: 'Please enter your date of birth.',
-      icon: Icons.calendar_today_outlined,
-      iconColor: Colors.orange,
-      buttonText: AppString.ok,
-    );
-    return;
-  }
-
-  setState(() => _isSubmitting = true);
-
-  // Sanitize income — strip everything except digits
-  final cleanIncome = _monthlyIncomeController.text
-      .replaceAll(RegExp(r'[^\d]'), '');
-
-  await ref.read(badgeRequestNotifierProvider.notifier).submit(
-    badgeTypeId: _selectedBadge!.id,
-    fullName: _fullNameController.text.trim(),
-    birthdate: UIUtils.convertDateToApiFormat(_dateOfBirthController.text),
-    gender: UIUtils.convertGenderToApiFormat(_selectedGender),
-    homeAddress: _addressController.text.trim(),
-    contactNumber: _phoneController.text.trim(),
-    typeOfId: UIUtils.convertIdTypeToApiFormat(_selectedIdType),
-    existingSeniorCitizenId:
-        _existingIdController.text.trim().isEmpty
-            ? null
-            : _existingIdController.text.trim(),
-    typeOfDisability:
-        _typeOfDisabilityController.text.trim().isEmpty
-            ? null
-            : _typeOfDisabilityController.text.trim(),
-    numberOfDependents:
-        int.tryParse(_numberOfDependentsController.text.trim()),
-    estimatedMonthlyHouseholdIncome:
-        cleanIncome.isEmpty ? null : cleanIncome,
-    schoolName:
-        _schoolNameController.text.trim().isEmpty
-            ? null
-            : _schoolNameController.text.trim(),
-    educationLevel:
-        _educationLevelController.text.trim().isEmpty
-            ? null
-            : _educationLevelController.text.trim(),
-    yearOrGradeLevel:
-        _yearGradeController.text.trim().isEmpty
-            ? null
-            : _yearGradeController.text.trim(),
-    schoolIdNumber:
-        _schoolIdController.text.trim().isEmpty
-            ? null
-            : _schoolIdController.text.trim(),
-    uploadedFiles: _uploadedFiles,
-  );
-}
   void _resetForm() {
     ref.read(badgeRequestNotifierProvider.notifier).reset();
     setState(() {
@@ -211,7 +158,6 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
       _selectedGender = null;
       _selectedIdType = null;
       _uploadedFiles = {};
-      _generatedReferenceNumber = null;
     });
     _fullNameController.clear();
     _dateOfBirthController.clear();
@@ -338,7 +284,7 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
         if (_isCitizen) {
           return applicationSubmitted(
             context: context,
-            referenceNumber: _generatedReferenceNumber,
+            referenceNumber: _referenceNumber,
             onStartNewApplication: _resetForm,
             onBackToHome: () => Navigator.of(
               context,
@@ -370,7 +316,7 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
       case 6:
         return applicationSubmitted(
           context: context,
-          referenceNumber: _generatedReferenceNumber,
+          referenceNumber: _referenceNumber,
           onStartNewApplication: _resetForm,
           onBackToHome: () => Navigator.of(
             context,
@@ -392,7 +338,6 @@ class _VerifyScreenBadgeState extends ConsumerState<VerifyBadgeScreen> {
           started: () {},
           loading: () {},
           success: (data) => setState(() {
-            _generatedReferenceNumber = data.badgeRequestCode;
             _currentStep = _totalSteps;
             _isSubmitting = false;
           }),
