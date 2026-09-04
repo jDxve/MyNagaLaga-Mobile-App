@@ -46,22 +46,6 @@ class _DisasterResilienceScreenState
     if (mounted) setState(() => _distances = distances);
   }
 
-  ShelterData _fallbackShelter(AssignedCenterData assigned) => ShelterData(
-        id: assigned.centerId,
-        name: assigned.centerName,
-        address: assigned.address,
-        capacity: '${assigned.currentOccupancy}/${assigned.maxCapacity}',
-        currentOccupancy: assigned.currentOccupancy,
-        maxCapacity: assigned.maxCapacity,
-        status: ShelterStatus.available,
-        latitude: assigned.latitude,
-        longitude: assigned.longitude,
-        seniors: 0,
-        infants: 0,
-        pwd: 0,
-        barangayName: assigned.barangayName,
-      );
-
   void _goToShelterMap(BuildContext context, List<ShelterData> shelters, ShelterData target) {
     Navigator.push(
       context,
@@ -83,7 +67,7 @@ class _DisasterResilienceScreenState
   ) {
     final match = shelters.firstWhere(
       (s) => s.id == assigned.centerId,
-      orElse: () => _fallbackShelter(assigned),
+      orElse: () => fallbackShelterFromAssignedCenter(assigned),
     );
     return AssignedCenterBanner(
       assigned: assigned,
@@ -98,7 +82,7 @@ class _DisasterResilienceScreenState
     if (shelterData.shelters.isEmpty) return const DrEmptyState();
 
     final assignedState = ref.watch(assignedCenterNotifierProvider);
-    final sortedShelters = _getSortedShelters(shelterData.shelters);
+    final sortedShelters = sortSheltersByDistance(shelterData.shelters, _distances);
 
     return CustomScrollView(
       slivers: [
@@ -184,17 +168,6 @@ class _DisasterResilienceScreenState
         ),
       ],
     );
-  }
-
-  List<ShelterData> _getSortedShelters(List<ShelterData> shelters) {
-    if (_distances.isEmpty) return shelters;
-    final list = List<ShelterData>.from(shelters);
-    list.sort((a, b) {
-      final distA = _distances[a.id] ?? double.infinity;
-      final distB = _distances[b.id] ?? double.infinity;
-      return distA.compareTo(distB);
-    });
-    return list;
   }
 
   @override
